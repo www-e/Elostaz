@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أ/ أشرف حسن - مدرس رياضيات للمرحلة الثانوية</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Loader -->
+<div class="loader-wrapper">
+    <div class="loader">
+        <div class="loader-content">
+            <i class="fas fa-square-root-alt"></i>
+        </div>
+    </div>
+</div>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light floating-nav">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">أ/ أشرف حسن</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">الرئيسية</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">نبذة عني</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#courses">الصفوف الدراسية</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">تواصل معي</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="schedule.html">المواعيد</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" aria-label="Toggle Theme">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="hero-background">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+        <div class="container position-relative">
+            <div class="row min-vh-100 align-items-center">
+                <div class="col-lg-6 text-center text-lg-end order-2 order-lg-1">
+                    <div class="hero-content">
+                        <h1 class="hero-title mb-4">
+                            <span class="highlight">أ/ أشرف حسن</span>
+                            <span class="d-block hero-subtitle mt-3">مدرس رياضيات للمرحلة الثانوية</span>
+                        </h1>
+                        <p class="hero-description mb-4" dir="rtl">نحو تعليم رياضيات مبسط وفعال لطلاب المرحلة الثانوية</p>                        <div class="hero-features mb-5">
+                            <span class="feature-badge"><i class="fas fa-graduation-cap"></i> خبرة في التدريس</span>
+                            <span class="feature-badge"><i class="fas fa-book"></i> مناهج حديثة</span>
+                            <span class="feature-badge"><i class="fas fa-chart-line"></i> نتائج متميزة</span>
+                        </div>
+                        <div class="hero-cta">
+                            <a href="#contact" class="btn btn-primary btn-lg me-3">تواصل معي</a>
+                            <a href="#courses" class="btn btn-outline-secondary btn-lg">استكشف الصفوف</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center mb-5 mb-lg-0 order-1 order-lg-2">
+                    <div class="hero-image-wrapper">
+                        <div class="hero-image-container">
+                            <div class="hero-image-shape">
+                                <div class="hero-image-clip">
+                                    <img src="assets/images/profile-placeholder.jpg" alt="أ/ أشرف حسن" class="hero-image">
+                                </div>
+                                <div class="hero-image-border"></div>
+                            </div>
+                            <div class="hero-image-decoration">
+                                <div class="decoration-item item-1">
+                                    <i class="fas fa-square-root-alt"></i>
+                                </div>
+                                <div class="decoration-item item-2">
+                                    <i class="fas fa-infinity"></i>
+                                </div>
+                                <div class="decoration-item item-3">
+                                    <i class="fas fa-function"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="section-header text-center mb-5">
+                <h2 class="section-title">المركز التعليمي</h2>
+                <div class="section-line"></div>
+                <p class="section-subtitle">نظام تعليمي متكامل للمرحلة الثانوية</p>
+            </div>
+
+            <!-- Student ID Card Section -->
+            <div class="row mb-5">
+                <div class="col-lg-6">
+                    <div class="content-block" data-aos="fade-right">
+                        <h3 class="feature-title">بطاقة الطالب الذكية</h3>
+                        <p class="feature-description">نظام متكامل لمتابعة حضور وأداء الطلاب</p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-id-card"></i> بطاقة تعريف شخصية لكل طالب</li>
+                            <li><i class="fas fa-qrcode"></i> نظام باركود للحضور اليومي</li>
+                            <li><i class="fas fa-clock"></i> تسجيل وقت الحضور والانصراف</li>
+                            <li><i class="fas fa-chart-line"></i> متابعة مستوى التقدم</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="smart-card-container" data-aos="fade-left">
+                        <div class="smart-card">
+                            <div class="smart-card-inner">
+                                <div class="smart-card-front">
+                                    <img src="assets/images/card-front.jpg" alt="بطاقة الطالب الأمامية" class="card-image">
+                                </div>
+                                <div class="smart-card-back">
+                                    <img src="assets/images/card-back.jpg" alt="بطاقة الطالب الخلفية" class="card-image">
+                                </div>
+                            </div>
+                        </div>
+                        <button class="flip-button d-md-none"> ضهر الكارت </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance System -->
+            <div class="row mb-5">
+                <div class="col-lg-6 order-lg-2">
+                    <div class="content-block" data-aos="fade-left">
+                        <h3 class="feature-title">نظام الحضور والمتابعة</h3>
+                        <div class="attendance-stats">
+                            <div class="stat-card">
+                                <i class="fas fa-user-check"></i>
+                                <h4>الحضور</h4>
+                                <p>متابعة يومية</p>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-book-reader"></i>
+                                <h4>الاشتراك</h4>
+                                <p>متابعة شهرية</p>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-tasks"></i>
+                                <h4>الواجبات</h4>
+                                <p>متابعة أسبوعية</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 order-lg-1">
+                    <div class="notification-preview" data-aos="fade-right">
+                        <div class="whatsapp-message">
+                            <div class="message-header">
+                                <i class="fab fa-whatsapp"></i>
+                                <span>تنبيه حضور و غياب الطالب</span>
+                            </div>
+                            <div class="message-content">
+                                <p>السلام عليكم , بنبلغ حضراتكم ان الطالب قد تغيب اليوم عن الحصة في المعاد 4:30   كود الطالب std-1339</p>
+                                <p>حصة الرياضيات - الصف الثاني الثانوي</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Books Section -->
+            <div class="books-section">
+                <h3 class="text-center mb-4">الكتب والمذكرات</h3>
+                <div class="row g-4">
+                    <!-- First Grade Book -->
+                    <div class="col-lg-4">
+                        <div class="book-container" data-aos="flip-left">
+                            <img src="assets/images/front1.jpg" alt="كتاب الصف الأول الثانوي" class="book-image">
+                            <div class="book-overlay">
+                                <h4>الصف الأول الثانوي</h4>
+                                <p> الرياضيات عام</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Second Grade Books -->
+                    <div class="col-lg-4">
+                        <div class="book-container" data-aos="flip-left" data-aos-delay="100">
+                            <img src="assets/images/front2.jpg" alt="كتاب الرياضيات البحتة" class="book-image">
+                            <div class="book-overlay">
+                                <h4>الصف الثاني الثانوي</h4>
+                                <p>الرياضيات التطبيقية</p>
+                            </div>
+                        </div>
+                        <div class="book-container mt-4" data-aos="flip-left" data-aos-delay="200">
+                            <img src="assets/images/front3.jpg" alt="كتاب الرياضيات التطبيقية" class="book-image">
+                            <div class="book-overlay">
+                                <h4>الصف الثاني الثانوي</h4>
+                                <p>الرياضيات البحتة</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Third Grade Book -->
+                    <div class="col-lg-4">
+                        <div class="book-container" data-aos="flip-left" data-aos-delay="300">
+                            <img src="assets/images/front4.jpg" alt="كتاب الصف الثالث الثانوي" class="book-image">
+                            <div class="book-overlay">
+                                <h4>الصف الثالث الثانوي</h4>
+                                <p>الرياضيات للثانوية</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Courses Section -->
+    <section id="courses" class="courses-section">
+        <div class="container">
+            <div class="section-header text-center mb-5">
+                <h2 class="section-title">الصفوف الدراسية</h2>
+                <div class="section-line"></div>
+                <p class="section-subtitle">جميع صفوف الرياضيات للثانوية العامة</p>
+            </div>
+
+            <div class="row g-4">
+                <!-- الصف الأول الثانوي -->
+                <div class="col-lg-4">
+                    <div class="course-card">
+                        <div class="card-badge">
+                            <i class="fas fa-star-of-life me-1"></i>
+                            الصف الأول الثانوي
+                        </div>
+                        <div class="course-content">
+                            <div class="course-stats">
+                                <div class="stat-item">
+                                    <i class="fas fa-book"></i>
+                                    <span>12 درس</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>36 ساعة</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-tasks"></i>
+                                    <span>24 اختبار</span>
+                                </div>
+                            </div>
+                            <div class="course-topics">
+                                <h4 class="topics-title">المواضيع الرئيسية</h4>
+                                <ul class="topics-list">
+                                    <li>
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>الجبر والمعادلات</span>
+                                    </li>
+                                    <li>
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>الهندسة التحليلية</span>
+                                    </li>
+                                    <li>
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>حساب المثلثات</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="course-features">
+                                <div class="feature-item">
+                                    <i class="fas fa-video"></i>
+                                    <span>فيديوهات شرح تفاعلية</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <span>ملخصات وملفات PDF</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                    <span>دروس خصوصية مباشرة</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-brain"></i>
+                                    <span>تدريبات وحل مسائل</span>
+                                </div>
+                            </div>
+                            <div class="course-progress">
+                                <div class="progress-label">
+                                    <span>اكتمال المنهج</span>
+                                    <span class="progress-value">75%</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            <div class="course-action">
+                                <a href="grade1.html" class="btn-course">
+                                    <span>ابدأ التعلم الآن</span>
+                                    <i class="fas fa-arrow-left"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- الصف الثاني الثانوي -->
+                <div class="col-lg-4">
+                    <div class="course-card">
+                        <div class="card-badge">
+                            <i class="fas fa-star-of-life me-1"></i>
+                            الصف الثاني الثانوي
+                        </div>
+                        <div class="course-content">
+                            <div class="course-stats">
+                                <div class="stat-item">
+                                    <i class="fas fa-book"></i>
+                                    <span>14 درس</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>42 ساعة</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-tasks"></i>
+                                    <span>28 اختبار</span>
+                                </div>
+                            </div>
+                            <div class="course-topics">
+                                <h4 class="topics-title">المواضيع الرئيسية</h4>
+                                <ul class="topics-list">
+                                    <li>
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>التفاضل والتكامل</span>
+                                    </li>
+                                    <li>
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>الاحتمالات والإحصاء</span>
+                                    </li>
+                                    <li>
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>الهندسة الفراغية</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="course-features">
+                                <div class="feature-item">
+                                    <i class="fas fa-video"></i>
+                                    <span>شرح مفصل للمفاهيم المتقدمة</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <span>مذكرات وتمارين شاملة</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                    <span>حصص تقوية أسبوعية</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-brain"></i>
+                                    <span>اختبارات دورية للتقييم</span>
+                                </div>
+                            </div>
+                            <div class="course-progress">
+                                <div class="progress-label">
+                                    <span>اكتمال المنهج</span>
+                                    <span class="progress-value">85%</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div class="course-action">
+                                <a href="grade2.html" class="btn-course">
+                                    <span>ابدأ التعلم الآن</span>
+                                    <i class="fas fa-arrow-left"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- الصف الثالث الثانوي -->
+                <div class="col-lg-4">
+                    <div class="course-card">
+                        <div class="card-badge">
+                            <i class="fas fa-star-of-life me-1"></i>
+                            الصف الثالث الثانوي
+                        </div>
+                        <div class="course-content">
+                            <div class="course-stats">
+                                <div class="stat-item">
+                                    <i class="fas fa-book"></i>
+                                    <span>16 درس</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>48 ساعة</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-tasks"></i>
+                                    <span>32 اختبار</span>
+                                </div>
+                            </div>
+                            <div class="course-topics">
+                                <h4 class="topics-title">المواضيع الرئيسية</h4>
+                                <ul class="topics-list">
+                                    <li>
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>التفاضل والتكامل المتقدم</span>
+                                    </li>
+                                    <li>
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>المصفوفات والمحددات</span>
+                                    </li>
+                                    <li>
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>التحليل الرياضي</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="course-features">
+                                <div class="feature-item">
+                                    <i class="fas fa-video"></i>
+                                    <span>مراجعات مكثفة للثانوية</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-file-pdf"></i>
+                                    <span>نماذج امتحانات سابقة</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                    <span>تدريب على نظام البابل شيت</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-brain"></i>
+                                    <span>حل مسائل متنوعة</span>
+                                </div>
+                            </div>
+                            <div class="course-progress">
+                                <div class="progress-label">
+                                    <span>اكتمال المنهج</span>
+                                    <span class="progress-value">90%</span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: 90%"></div>
+                                </div>
+                            </div>
+                            <div class="course-action">
+                                <a href="grade3.html" class="btn-course">
+                                    <span>ابدأ التعلم الآن</span>
+                                    <i class="fas fa-arrow-left"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <div class="section-header text-center mb-5">
+                <h2 class="section-title">تواصل معي</h2>
+                <div class="section-line"></div>
+                <p class="section-subtitle">يمكنك التواصل معي عبر وسائل التواصل الاجتماعي أو واتساب</p>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="contact-card">
+                        <div class="contact-grid">
+                            <!-- WhatsApp -->
+                            <a href="https://wa.me/+201227278084?text=السلام%20عليكم%20,%20ازيك%20يا%20مستر%20؟%20ايه%20الأخبار%20؟" class="contact-item whatsapp" target="_blank">
+                                <div class="item-icon">
+                                    <i class="fab fa-whatsapp"></i>
+                                </div>
+                                <h3 class="item-title">واتساب</h3>
+                                <p class="item-text">تواصل معي مباشرة على واتساب</p>
+                                <div class="item-arrow">
+                                    <i class="fas fa-arrow-left"></i>
+                                </div>
+                            </a>
+
+                            <!-- Facebook -->
+                            <a href="https://www.facebook.com/@ashraf.hassan.5099940" class="contact-item facebook" target="_blank">
+                                <div class="item-icon">
+                                    <i class="fab fa-facebook-f"></i>
+                                </div>
+                                <h3 class="item-title">فيسبوك</h3>
+                                <p class="item-text">تابعني على صفحة الفيسبوك</p>
+                                <div class="item-arrow">
+                                    <i class="fas fa-arrow-left"></i>
+                                </div>
+                            </a>
+
+                            <!-- YouTube -->
+                            <a href="https://www.youtube.com/@mr.ashrafhassan-2365" class="contact-item youtube" target="_blank">
+                                <div class="item-icon">
+                                    <i class="fab fa-youtube"></i>
+                                </div>
+                                <h3 class="item-title">يوتيوب</h3>
+                                <p class="item-text">شاهد دروسي على اليوتيوب</p>
+                                <div class="item-arrow">
+                                    <i class="fas fa-arrow-left"></i>
+                                </div>
+                            </a>
+
+                            <!-- Telegram -->
+                            <a href="#" class="contact-item telegram" target="_blank">
+                                <div class="item-icon">
+                                    <i class="fab fa-telegram-plane"></i>
+                                </div>
+                                <h3 class="item-title">تليجرام</h3>
+                                <p class="item-text">انضم إلى قناتي على تليجرام</p>
+                                <p class="item-text">قريبا.....</p>
+                                <div class="item-arrow">
+                                    <i class="fas fa-arrow-left"></i>
+                                </div>
+                            </a>
+                        </div>
+
+                        <div class="contact-info">
+                            <div class="info-item">
+                                <i class="fas fa-phone-alt"></i>
+                                <span class="info-text">+20 1227278084</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-phone-alt"></i>
+                                <span class="info-text">+20 1062739292</span>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-envelope"></i>
+                                <span class="info-text">ah8370521@gmail.com</span>
+                            </div>
+                        </div>
+
+                        <div class="contact-decoration">
+                            <div class="decoration-shape shape-1"></div>
+                            <div class="decoration-shape shape-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content text-center">
+                <p class="mb-2">
+                    تم التطوير والتصميم بواسطة 
+                    <a href="whatsapp://send?phone=+201154688628" class="developer-link" target="_blank">
+                        <span>Omar Ashraf</span>
+                        <i class="fas fa-code ms-1"></i>
+                    </a>
+                </p>
+                <p class="copyright mb-0">
+                   
+                    جميع الحقوق محفوظة 2024 أ/ أشرف حسن
+                    <i class="far fa-copyright ms-1"></i>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
