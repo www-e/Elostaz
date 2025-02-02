@@ -3,6 +3,7 @@
   "short_name": "أ/ أشرف حسن",
   "description": "مركز تعليمي متخصص في تدريس الرياضيات للمرحلة الثانوية",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#5E35B1",

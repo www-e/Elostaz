@@ -1,4 +1,7 @@
 const CACHE_NAME = 'alostaz-cache-v1';
+// Detect if we're on GitHub Pages
+const isGitHubPages = location.hostname === 'www-e.github.io';
+const BASE_PATH = isGitHubPages ? '/Elostaz/' : './';
 
 // Install event
 self.addEventListener('install', event => {
@@ -10,19 +13,23 @@ self.addEventListener('install', event => {
         
         // First, cache the HTML files
         const htmlFiles = [
-          'index.html',
-          'about.html',
-          'grade1.html',
-          'grade2.html',
-          'grade3.html',
-          'schedule.html'
+          `${BASE_PATH}index.html`,
+          `${BASE_PATH}about.html`,
+          `${BASE_PATH}grade1.html`,
+          `${BASE_PATH}grade2.html`,
+          `${BASE_PATH}grade3.html`,
+          `${BASE_PATH}schedule.html`
         ];
         
         await Promise.all(
           htmlFiles.map(async (url) => {
             try {
-              await cache.add(url);
-              console.log(`Cached: ${url}`);
+              const request = new Request(url);
+              const response = await fetch(request);
+              if (response.ok) {
+                await cache.put(request, response);
+                console.log(`Cached: ${url}`);
+              }
             } catch (err) {
               console.warn(`Failed to cache: ${url}`, err);
             }
@@ -31,17 +38,21 @@ self.addEventListener('install', event => {
 
         // Then cache the CSS files
         const cssFiles = [
-          'css/styles.css',
-          'css/mobile.css',
-          'css/grade-styles.css',
-          'css/about-styles.css'
+          `${BASE_PATH}css/styles.css`,
+          `${BASE_PATH}css/mobile.css`,
+          `${BASE_PATH}css/grade-styles.css`,
+          `${BASE_PATH}css/about-styles.css`
         ];
 
         await Promise.all(
           cssFiles.map(async (url) => {
             try {
-              await cache.add(url);
-              console.log(`Cached: ${url}`);
+              const request = new Request(url);
+              const response = await fetch(request);
+              if (response.ok) {
+                await cache.put(request, response);
+                console.log(`Cached: ${url}`);
+              }
             } catch (err) {
               console.warn(`Failed to cache: ${url}`, err);
             }
@@ -73,6 +84,11 @@ self.addEventListener('activate', event => {
 
 // Fetch event
 self.addEventListener('fetch', event => {
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
