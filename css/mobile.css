@@ -1,0 +1,70 @@
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+    /* Hide bottom navigation */
+    .bottom-nav {
+        display: none !important;
+    }
+
+    /* Custom drawer icon */
+    .navbar-toggler {
+        border: none;
+        padding: 0;
+    }
+    
+    .navbar-toggler .fas.fa-bars {
+        font-size: 1.5rem;
+        color: var(--primary);
+    }
+
+    /* General */
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    /* Navigation */
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+
+    /* Hero Section */
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+    .hero-content p {
+        font-size: 1rem;
+    }
+    .hero-image-container {
+        margin-top: 2rem;
+    }
+
+    /* Books Section */
+    .book-container {
+        margin-bottom: 2rem;
+    }
+
+    /* Course Cards */
+    .course-card {
+        margin-bottom: 2rem;
+    }
+
+    /* Contact Section */
+    .contact-form {
+        padding: 1.5rem;
+    }
+
+    /* Footer */
+    .footer-content {
+        padding: 2rem 0;
+    }
+}
+
+/* Small devices (phones) */
+@media (max-width: 576px) {
+    .section-title {
+        font-size: 1.75rem;
+    }
+    .section-subtitle {
+        font-size: 0.9rem;
+    }
+}
