@@ -626,9 +626,27 @@
                         scope: '/Elostaz/'
                     });
                     console.log('ServiceWorker registration successful with scope:', registration.scope);
+                    
+                    // Check for updates
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // New content is available, show refresh prompt
+                                if (confirm('تم تحديث المحتوى. هل تريد تحديث الصفحة؟')) {
+                                    window.location.reload();
+                                }
+                            }
+                        });
+                    });
                 } catch (err) {
                     console.error('ServiceWorker registration failed:', err);
                 }
+            });
+
+            // Check for updates when page loads
+            navigator.serviceWorker.ready.then(registration => {
+                registration.update();
             });
         }
     </script>
