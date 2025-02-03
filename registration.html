@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الطلاب - مركز أ/ أشرف حسن للرياضيات</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="registration.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light floating-nav">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">أ/ أشرف حسن</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">الرئيسية</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" aria-label="Toggle Theme">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <div class="registration-container">
+        <h1>فورم حجز الترم الثاني</h1>
+        <form id="registrationForm" class="registration-form">
+            <div class="form-group">
+                <label for="studentName">اسم الطالب</label>
+                <input type="text" id="studentName" name="entry.704942904" required>
+                <div class="validation-message">يرجى إدخال اسم الطالب</div>
+            </div>
+
+            <div class="form-group">
+                <label for="studentPhone">رقم الطالب</label>
+                <input type="tel" id="studentPhone" name="entry.1530055795" required>
+                <div class="validation-message">يرجى إدخال رقم الطالب</div>
+            </div>
+
+            <div class="form-group">
+                <label for="parentPhone">رقم ولي الأمر</label>
+                <input type="tel" id="parentPhone" name="entry.14816919" required>
+                <div class="validation-message">يرجى إدخال رقم ولي الأمر</div>
+            </div>
+
+            <div class="form-group">
+                <label for="grade">الصف الدراسي</label>
+                <select id="grade" name="entry.1185658655" required>
+                    <option value="">اختر الصف</option>
+                    <option value="first">الصف الأول الثانوي</option>
+                    <option value="second">الصف الثاني الثانوي</option>
+                    <option value="third">الصف الثالث الثانوي</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="sectionGroup" style="display: none;">
+                <label for="section">الشعبة</label>
+                <select id="section" name="entry.1819611279">
+                    <option value="">اختر الشعبة</option>
+                    <option value="scientific">علمي</option>
+                    <option value="literary">أدبي</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="groupSelect">
+                <label for="group">المجموعة</label>
+                <select id="group" name="entry.1957842203" required>
+                    <option value="">اختر المجموعة</option>
+                    <option value="sat_tue">السبت والثلاثاء</option>
+                    <option value="sun_wed">الأحد والأربعاء</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="timeSelect">
+                <label for="time">الموعد</label>
+                <select id="time" name="entry.869564185" required>
+                    <option value="">اختر الموعد</option>
+                </select>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-paper-plane ms-2"></i>
+                تسجيل
+            </button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="registration.js"></script>
+</body>
+</html> 

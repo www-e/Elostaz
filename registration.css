@@ -1,0 +1,467 @@
+:root {
+    /* Light Mode Colors */
+    --primary: #5E35B1;
+    --primary-light: #9575CD;
+    --primary-dark: #4527A0;
+    --secondary: #3949AB;
+    --secondary-light: #7986CB;
+    --secondary-dark: #283593;
+    --accent: #FF7043;
+    --accent-light: #FFAB91;
+    --accent-dark: #D84315;
+    --background: #F5F5F5;
+    --card-bg: #FAFAFA;
+    --text-primary: #212121;
+    --text-secondary: #757575;
+    --border-color: #E0E0E0;
+    --primary-rgb: 94, 53, 177;
+    --secondary-rgb: 57, 73, 171;
+    --accent-rgb: 255, 112, 67;
+}
+
+[data-theme="dark"] {
+    --primary: #7E57C2;
+    --primary-light: #9575CD;
+    --primary-dark: #311B92;
+    --secondary: #536DFE;
+    --secondary-light: #7986CB;
+    --secondary-dark: #1A237E;
+    --accent: #FF8A65;
+    --accent-light: #FFAB91;
+    --accent-dark: #BF360C;
+    --background: #121212;
+    --card-bg: #1E1E1E;
+    --text-primary: #FFFFFF;
+    --text-secondary: #BDBDBD;
+    --border-color: #424242;
+}
+
+.registration-container {
+    max-width: 800px;
+    margin: 6rem auto 2rem;
+    padding: 2.5rem;
+    background: var(--card-bg);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(var(--primary-rgb), 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+}
+
+.registration-container h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.registration-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    position: relative;
+    background: linear-gradient(135deg, 
+        rgba(var(--primary-rgb), 0.03) 0%,
+        rgba(var(--secondary-rgb), 0.03) 100%);
+    padding: 1.5rem;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+.form-group:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, 
+        rgba(var(--primary-rgb), 0.05) 0%,
+        rgba(var(--secondary-rgb), 0.05) 100%);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.8rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 1rem 1.2rem;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--card-bg);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.25);
+    outline: none;
+}
+
+.submit-btn {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    padding: 1.2rem 2rem;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3);
+}
+
+/* Add glow effect for the registration button */
+.glow-button {
+    animation: glowPulse 2s infinite;
+}
+
+@keyframes glowPulse {
+    0% {
+        box-shadow: 0 0 5px rgba(var(--primary-rgb), 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.8);
+    }
+    100% {
+        box-shadow: 0 0 5px rgba(var(--primary-rgb), 0.5);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .registration-container {
+        margin: 5rem 1rem 1rem;
+        padding: 1.5rem;
+    }
+    
+    .registration-container h1 {
+        font-size: 2rem;
+    }
+
+    .form-group {
+        padding: 1rem;
+    }
+    .navbar-toggler .fas.fa-bars {
+        font-size: 1.5rem;
+        color: var(--primary);
+    }
+}
+
+/* Success Message Styles */
+.success-message {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.success-content {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.2);
+    border: 1px solid var(--border-color);
+    max-width: 90%;
+    width: 400px;
+    animation: slideIn 0.3s ease-out;
+}
+
+.success-icon {
+    font-size: 4rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+    animation: scaleIn 0.5s ease-out;
+}
+
+.success-content h3 {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.success-content p {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+}
+
+.ok-btn {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.ok-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+.validation-message {
+    color: var(--accent);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    display: none;
+}
+
+.form-group input:invalid:focus + .validation-message,
+.form-group select:invalid:focus + .validation-message {
+    display: block;
+    animation: fadeIn 0.3s ease-in;
+}
+
+/* Receipt Styles */
+.receipt-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(5px);
+    padding: 5rem 1rem 1rem;
+    overflow-y: auto;
+}
+
+.receipt-content {
+    background: var(--card-bg);
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.2);
+    border: 1px solid var(--border-color);
+    width: 600px;
+    max-width: 90%;
+    margin: 2rem auto;
+    animation: slideIn 0.3s ease-out;
+    position: relative;
+    left: 0;
+    right: 0;
+    transform: none;
+}
+
+/* Add these styles for the cloned receipt during capture */
+.receipt-clone {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: var(--card-bg);
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: none;
+    border: 1px solid var(--border-color);
+}
+
+.receipt-clone .receipt-header {
+    text-align: center;
+}
+
+.receipt-clone .data-row {
+    text-align: right;
+}
+
+.receipt-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-color);
+    position: relative;
+}
+
+.receipt-header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 25%;
+    right: 25%;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--primary) 50%, 
+        transparent 100%
+    );
+}
+
+.receipt-header h2 {
+    color: var(--primary);
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.receipt-header p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.receipt-data {
+    margin-bottom: 2.5rem;
+}
+
+.data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 0.8rem 1.2rem;
+    border-radius: 12px;
+    background: rgba(var(--primary-rgb), 0.03);
+    transition: all 0.3s ease;
+}
+
+.data-row:hover {
+    background: rgba(var(--primary-rgb), 0.06);
+    transform: translateX(-5px);
+}
+
+.data-label {
+    color: var(--text-secondary);
+    font-weight: 600;
+    min-width: 120px;
+    margin-left: 1rem;
+}
+
+.data-value {
+    color: var(--text-primary);
+    font-weight: 500;
+    text-align: left;
+    flex: 1;
+}
+
+.receipt-actions {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0 1rem;
+}
+
+.receipt-btn {
+    padding: 0.8rem 1.8rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    min-width: 160px;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.save-btn {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+}
+
+.whatsapp-btn {
+    background: #25D366;
+    color: white;
+    border: none;
+}
+
+.receipt-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3);
+}
+
+.receipt-btn i {
+    font-size: 1.2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .receipt-content {
+        padding: 1.5rem;
+    }
+
+    .receipt-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .data-row {
+        padding: 0.6rem 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .data-label {
+        margin-left: 0;
+        color: var(--primary);
+    }
+
+    .data-value {
+        width: 100%;
+        text-align: right;
+    }
+
+    .receipt-actions {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .receipt-btn {
+        width: 100%;
+        padding: 1rem;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+} 
