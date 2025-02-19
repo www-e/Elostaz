@@ -9,15 +9,22 @@ const BASE_PATH = isGitHubPages ? '/Elostaz' : '';
 const ASSETS = [
     `${BASE_PATH}/`,
     `${BASE_PATH}/index.html`,
+    `${BASE_PATH}/manifest.json`,
+    `${BASE_PATH}/sw.js`,
     `${BASE_PATH}/pages/registration.html`,
     `${BASE_PATH}/pages/about.html`,
     `${BASE_PATH}/pages/schedule.html`,
+    `${BASE_PATH}/pages/grades/grade1.html`,
+    `${BASE_PATH}/pages/grades/grade2.html`,
+    `${BASE_PATH}/pages/grades/grade3.html`,
     `${BASE_PATH}/css/styles.css`,
     `${BASE_PATH}/css/mobile.css`,
     `${BASE_PATH}/css/about-styles.css`,
     `${BASE_PATH}/css/grade-styles.css`,
     `${BASE_PATH}/css/registration.css`,
+    `${BASE_PATH}/css/navbar.css`,
     `${BASE_PATH}/js/main.js`,
+    `${BASE_PATH}/js/path-handler.js`,
     `${BASE_PATH}/js/registration.js`,
     `${BASE_PATH}/js/form-validation.js`,
     `${BASE_PATH}/js/google-sheets.js`,
@@ -31,9 +38,11 @@ const ASSETS = [
     `${BASE_PATH}/components/install-prompt/install-prompt.js`,
     // External resources
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css',
+    'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css',
     'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
-    'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js'
+    'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
+    'https://unpkg.com/aos@next/dist/aos.css'
 ];
 
 // Install event - cache initial assets
@@ -120,7 +129,7 @@ self.addEventListener('fetch', event => {
                         }
                         // If the request is for an HTML page, return the offline page
                         if (event.request.headers.get('accept').includes('text/html')) {
-                            return caches.match(`${BASE_PATH}/offline.html`);
+                            return caches.match(`${BASE_PATH}/index.html`);
                         }
                         return new Response('Offline content not available');
                     });
