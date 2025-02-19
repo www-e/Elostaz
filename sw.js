@@ -1,5 +1,6 @@
-const CACHE_NAME = 'elostaz-cache-v1';
-const DYNAMIC_CACHE = 'elostaz-dynamic-v1';
+const CACHE_VERSION = 'v2';
+const CACHE_NAME = `elostaz-cache-${CACHE_VERSION}`;
+const DYNAMIC_CACHE = `elostaz-dynamic-${CACHE_VERSION}`;
 
 // Detect if we're on GitHub Pages and set the base path accordingly
 const isGitHubPages = self.location.hostname === 'www-e.github.io';
@@ -33,6 +34,7 @@ const ASSETS = [
     `${BASE_PATH}/js/Private_form.js`,
     `${BASE_PATH}/js/ActiveState.js`,
     `${BASE_PATH}/js/DOMloader.js`,
+    `${BASE_PATH}/js/theme.js`,
     `${BASE_PATH}/assets/icons/edu.ico`,
     `${BASE_PATH}/components/install-prompt/install-prompt.css`,
     `${BASE_PATH}/components/install-prompt/install-prompt.js`,
@@ -47,6 +49,7 @@ const ASSETS = [
 
 // Install event - cache initial assets
 self.addEventListener('install', event => {
+    console.log(`[Service Worker] Installing new version ${CACHE_VERSION}`);
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
@@ -61,23 +64,39 @@ self.addEventListener('install', event => {
                 );
             })
     );
+    // Force activation of the new service worker
     self.skipWaiting();
 });
 
 // Activate event - clean up old caches
 self.addEventListener('activate', event => {
+    console.log(`[Service Worker] Activating new version ${CACHE_VERSION}`);
     event.waitUntil(
         Promise.all([
+            // Delete old caches
             caches.keys().then(keys => {
                 return Promise.all(
-                    keys.filter(key => ![CACHE_NAME, DYNAMIC_CACHE].includes(key))
-                        .map(key => {
-                            console.log('Deleting old cache:', key);
-                            return caches.delete(key);
-                        })
+                    keys.filter(key => {
+                        // Delete if it's our cache but not the current version
+                        return key.startsWith('elostaz-') && ![CACHE_NAME, DYNAMIC_CACHE].includes(key);
+                    }).map(key => {
+                        console.log('[Service Worker] Removing old cache:', key);
+                        return caches.delete(key);
+                    })
                 );
             }),
-            clients.claim()
+            // Take control of all clients immediately
+            clients.claim().then(() => {
+                // Optional: Notify clients about the update
+                clients.matchAll().then(clients => {
+                    clients.forEach(client => {
+                        client.postMessage({
+                            type: 'CACHE_UPDATED',
+                            version: CACHE_VERSION
+                        });
+                    });
+                });
+            })
         ])
     );
 });
