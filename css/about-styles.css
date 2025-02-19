@@ -6,7 +6,6 @@
 }
 .about-hero {
     padding: 120px 0 80px;
-    margin-top: 60px;
     background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.03), rgba(var(--secondary-rgb), 0.03));
     position: relative;
     overflow: hidden;

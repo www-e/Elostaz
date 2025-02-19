@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نبذة عني - أ/ أشرف حسن</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/about-styles.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/mobile.css">
+    <link rel="stylesheet" href="../css/about-styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
@@ -24,26 +26,26 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light floating-nav">
         <div class="container">
-            <a class="navbar-brand" href="index.html">أ/ أشرف حسن</a>
+            <a class="navbar-brand" href="../index.html">أ/ أشرف حسن</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+                <i class="fas fa-bars"></i>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html">الرئيسية</a>
+                        <a class="nav-link" href="../index.html">الرئيسية</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="about.html">نبذة عني</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html#courses">الصفوف الدراسية</a>
+                        <a class="nav-link" href="../index.html#courses">الصفوف الدراسية</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="schedule.html">جدول الحصص</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.html#contact">تواصل معي</a>
+                        <a class="nav-link" href="../index.html#contact">تواصل معي</a>
                     </li>
                 </ul>
             </div>
@@ -61,13 +63,13 @@
             <div class="row align-items-center">
                 <div class="col-lg-6 order-2 order-lg-1">
                     <div class="hero-content" data-aos="fade-up">
-                        <h1 class="glowing-text">أ/ أشرف حسن</h1>
+                        <h2 class="glowing-text">الأستاذ</h2>
                         <div class="mobile-profile-wrapper order-1 d-lg-none">
                             <div class="hero-image-wrapper">
                                 <div class="hero-image-container">
                                     <div class="hero-image-shape">
                                         <div class="hero-image-clip">
-                                            <img src="assets/images-optimized/profile-placeholder.webp" alt="أ/ أشرف حسن" class="hero-image">
+                                            <img src="../assets/images-optimized/profile-placeholder.webp" alt="أ/ أشرف حسن" class="hero-image">
                                         </div>
                                         <div class="hero-image-border"></div>
                                     </div>
@@ -103,7 +105,7 @@
                         <div class="hero-image-container">
                             <div class="hero-image-shape">
                                 <div class="hero-image-clip">
-                                    <img src="assets/images-optimized/profile-placeholder.webp" alt="أ/ أشرف حسن" class="hero-image">
+                                    <img src="../assets/images-optimized/profile-placeholder.webp" alt="أ/ أشرف حسن" class="hero-image">
                                 </div>
                                 <div class="hero-image-border"></div>
                             </div>
@@ -542,6 +544,14 @@
             once: true
         });
     </script>
-    <script src="js/main.js"></script>
+    <script src="../js/DOMloader.js" type="module"></script>
+    <script src="../js/main.js" type="module"></script>
+    <script src="../js/theme.js" type="module"></script>
+    <script src="../js/ActiveState.js" type="module"></script>
+    <script src="../js/form-validation.js" type="module"></script>
+    <script src="../js/google-sheets.js" type="module"></script>
+    <script src="../js/navbar.js" type="module"></script>
+    <script src="../js/Private_form.js" type="module"></script>
+    <script src="../js/booking-form.js" type="module"></script>
 </body>
 </html>

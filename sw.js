@@ -2,21 +2,29 @@ const CACHE_NAME = 'elostaz-cache-v1';
 const DYNAMIC_CACHE = 'elostaz-dynamic-v1';
 
 // Detect if we're on GitHub Pages and set the base path accordingly
-const BASE_PATH = location.hostname === 'www-e.github.io' ? '/Elostaz' : '';
+const BASE_PATH = '';
 
 // Add BASE_PATH to all assets
 const ASSETS = [
   `${BASE_PATH}/`,
   `${BASE_PATH}/index.html`,
-  `${BASE_PATH}/registration.html`,
-  `${BASE_PATH}/about.html`,
+  `${BASE_PATH}/pages/registration.html`,
+  `${BASE_PATH}/pages/about.html`,
+  `${BASE_PATH}/pages/schedule.html`,
   `${BASE_PATH}/css/styles.css`,
   `${BASE_PATH}/css/mobile.css`,
   `${BASE_PATH}/css/about-styles.css`,
   `${BASE_PATH}/css/grade-styles.css`,
-  `${BASE_PATH}/registration.css`,
+  `${BASE_PATH}/css/registration.css`,
   `${BASE_PATH}/js/main.js`,
-  `${BASE_PATH}/registration.js`,
+  `${BASE_PATH}/js/registration.js`,
+  `${BASE_PATH}/js/form-validation.js`,
+  `${BASE_PATH}/js/google-sheets.js`,
+  `${BASE_PATH}/js/ID_Flip.js`,
+  `${BASE_PATH}/js/navbar.js`,
+  `${BASE_PATH}/js/Private_form.js`,
+  `${BASE_PATH}/js/ActiveState.js`,
+  `${BASE_PATH}/js/DOMloader.js`,
   `${BASE_PATH}/assets/icons/edu.ico`,
   `${BASE_PATH}/components/install-prompt/install-prompt.css`,
   `${BASE_PATH}/components/install-prompt/install-prompt.js`,
@@ -33,11 +41,14 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Caching assets...');
-        return cache.addAll(ASSETS).catch(error => {
-          console.error('Error caching assets:', error);
-          // Continue even if some assets fail to cache
-          return Promise.resolve();
-        });
+        return Promise.allSettled(
+          ASSETS.map(asset => 
+            cache.add(asset).catch(error => {
+              console.error(`Failed to cache asset ${asset}:`, error);
+              return Promise.resolve(); // Continue with other assets
+            })
+          )
+        );
       })
   );
   // Force the waiting service worker to become the active service worker
