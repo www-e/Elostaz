@@ -35,6 +35,7 @@ const ASSETS = [
     `${BASE_PATH}/js/ActiveState.js`,
     `${BASE_PATH}/js/DOMloader.js`,
     `${BASE_PATH}/js/theme.js`,
+    `${BASE_PATH}/js/secondTermValidator.js`,
     `${BASE_PATH}/assets/icons/edu.ico`,
     `${BASE_PATH}/components/install-prompt/install-prompt.css`,
     `${BASE_PATH}/components/install-prompt/install-prompt.js`,
@@ -77,7 +78,6 @@ self.addEventListener('activate', event => {
             caches.keys().then(keys => {
                 return Promise.all(
                     keys.filter(key => {
-                        // Delete if it's our cache but not the current version
                         return key.startsWith('elostaz-') && ![CACHE_NAME, DYNAMIC_CACHE].includes(key);
                     }).map(key => {
                         console.log('[Service Worker] Removing old cache:', key);
@@ -87,12 +87,13 @@ self.addEventListener('activate', event => {
             }),
             // Take control of all clients immediately
             clients.claim().then(() => {
-                // Optional: Notify clients about the update
+                // Notify all clients about the update
                 clients.matchAll().then(clients => {
                     clients.forEach(client => {
                         client.postMessage({
                             type: 'CACHE_UPDATED',
-                            version: CACHE_VERSION
+                            version: CACHE_VERSION,
+                            reloadRequired: true
                         });
                     });
                 });
@@ -126,6 +127,23 @@ self.addEventListener('fetch', event => {
     if (!event.request.url.startsWith('http')) return;
 
     const normalizedUrl = normalizeUrl(event.request.url);
+
+    // Special handling for manifest.json and icons
+    if (event.request.url.includes('manifest.json') || 
+        event.request.url.includes('/assets/icons/')) {
+        event.respondWith(
+            fetch(event.request)
+                .then(response => {
+                    const clonedResponse = response.clone();
+                    caches.open(CACHE_NAME).then(cache => {
+                        cache.put(event.request, clonedResponse);
+                    });
+                    return response;
+                })
+                .catch(() => caches.match(event.request))
+        );
+        return;
+    }
 
     event.respondWith(
         fetch(event.request)

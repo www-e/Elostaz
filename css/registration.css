@@ -360,6 +360,29 @@
 }
 
 .validation-message {
+    display: none;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.form-group input.invalid,
+.form-group select.invalid {
+    border-color: #dc3545;
+}
+
+.form-group input.invalid:focus,
+.form-group select.invalid:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.form-group input:valid,
+.form-group select:valid {
+    border-color: #28a745;
+}
+
+.validation-message {
     color: var(--accent);
     font-size: 0.9rem;
     margin-top: 0.5rem;
