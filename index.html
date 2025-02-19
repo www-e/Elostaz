@@ -630,34 +630,23 @@
     <script src="js/registration.js" type="module"></script>
     <script src="./components/install-prompt/install-prompt.js" defer type="module"></script>
     <script>
+        // Check if we're on GitHub Pages
+        const isGitHubPages = window.location.hostname === 'www-e.github.io';
+        const basePath = isGitHubPages ? '/Elostaz' : '';
+        
+        // Register service worker with correct scope
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', async () => {
-                try {
-                    const registration = await navigator.serviceWorker.register('./sw.js', {
-                        scope: '/'
+            window.addEventListener('load', () => {
+                navigator.serviceWorker
+                    .register(`${basePath}/sw.js`, {
+                        scope: basePath + '/'
+                    })
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
                     });
-                    console.log('ServiceWorker registration successful with scope:', registration.scope);
-                    
-                    // Check for updates
-                    registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
-                        newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                // New content is available, show refresh prompt
-                                if (confirm('تم تحديث المحتوى. هل تريد تحديث الصفحة؟')) {
-                                    window.location.reload();
-                                }
-                            }
-                        });
-                    });
-                } catch (err) {
-                    console.error('ServiceWorker registration failed:', err);
-                }
-            });
-
-            // Check for updates when page loads
-            navigator.serviceWorker.ready.then(registration => {
-                registration.update();
             });
         }
     </script>

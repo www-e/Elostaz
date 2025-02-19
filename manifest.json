@@ -2,8 +2,8 @@
   "name": "مركز أ/ أشرف حسن للرياضيات",
   "short_name": "أ/ أشرف حسن",
   "description": "مركز تعليمي متخصص في تدريس الرياضيات للمرحلة الثانوية",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": ".",
+  "scope": ".",
   "display": "standalone",
   "background_color": "#5E35B1",
   "theme_color": "#5E35B1",
@@ -12,12 +12,12 @@
   "lang": "ar",
   "icons": [
     {
-      "src": "./assets/icons/edu.ico",
+      "src": "assets/icons/edu.ico",
       "sizes": "16x16 32x32 48x48 64x64 128x128 256x256",
       "type": "image/x-icon"
     },
     {
-      "src": "./assets/icons/edu.ico",
+      "src": "assets/icons/edu.ico",
       "sizes": "192x192",
       "type": "image/x-icon",
       "purpose": "any maskable"
@@ -25,7 +25,7 @@
   ],
   "screenshots": [
     {
-      "src": "./assets/screenshots/home.png",
+      "src": "assets/screenshots/home.png",
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
