@@ -3,12 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أ/ أشرف حسن</title>
+    <title>مركز أ/ أشرف حسن للرياضيات</title>
+    <script>
+        // Dynamically set manifest path
+        const manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        manifestLink.href = window.location.hostname === 'www-e.github.io' ? '/Elostaz/manifest.json' : './manifest.json';
+        document.head.appendChild(manifestLink);
+    </script>
     <!-- Favicons -->
     <link rel="icon" type="image/x-icon" href="assets/icons/edu.ico">
     <link rel="shortcut icon" type="image/x-icon" href="assets/icons/edu.ico">
     <link rel="apple-touch-icon" href="assets/icons/edu.ico">
-    <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#5E35B1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">

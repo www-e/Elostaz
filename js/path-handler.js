@@ -21,30 +21,37 @@ const PathHandler = {
         
         // Adjust for GitHub Pages
         if (isGitHub) {
-            // Remove /Elostaz from path when calculating depth
-            const adjustedPath = path.replace('/Elostaz', '');
-            const adjustedDepth = (adjustedPath.match(/\//g) || []).length;
-            return '../'.repeat(Math.max(0, adjustedDepth));
+            return '/Elostaz/'; // Always return absolute path for GitHub Pages
         }
         
         // Local development
         return '../'.repeat(Math.max(0, depth - 1));
     },
 
-    updateIconPaths: () => {
-        const currentPath = window.location.pathname;
-        const inSubfolder = currentPath.split('/').length > 2;
-        const relativePath = PathHandler.getRelativePath();
+    updatePaths: () => {
+        const isGitHub = PathHandler.isGitHubPages();
+        const basePath = PathHandler.getBasePath();
         
-        // Update all icon and manifest links
-        document.querySelectorAll('link[rel*="icon"], link[rel="manifest"], link[rel="apple-touch-icon"]').forEach(link => {
+        // Handle manifest
+        const existingManifest = document.querySelector('link[rel="manifest"]');
+        if (!existingManifest) {
+            const manifestLink = document.createElement('link');
+            manifestLink.rel = 'manifest';
+            manifestLink.href = isGitHub ? `${basePath}/manifest.json` : './manifest.json';
+            document.head.appendChild(manifestLink);
+        }
+
+        // Update all icon links
+        document.querySelectorAll('link[rel*="icon"], link[rel="apple-touch-icon"]').forEach(link => {
             const href = link.getAttribute('href');
-            if (href && (href.includes('assets/') || href.includes('manifest.json'))) {
-                // For assets in root directory
-                if (href.startsWith('./') || href.startsWith('/')) {
-                    link.href = relativePath + href.replace(/^\.\/|^\//, '');
+            if (href && href.includes('assets/')) {
+                if (isGitHub) {
+                    // Use absolute paths for GitHub Pages
+                    link.href = `${basePath}/${href.replace(/^\.\/|^\//, '')}`;
                 } else {
-                    link.href = relativePath + href;
+                    // Use relative paths for local development
+                    const relativePath = PathHandler.getRelativePath();
+                    link.href = relativePath + href.replace(/^\.\/|^\//, '');
                 }
             }
         });
@@ -52,6 +59,8 @@ const PathHandler = {
 };
 
 // Run when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    PathHandler.updateIconPaths();
-});
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', PathHandler.updatePaths);
+} else {
+    PathHandler.updatePaths();
+}
