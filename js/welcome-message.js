@@ -4,6 +4,26 @@
  * that appears when users visit the site.
  */
 
+// Import PathHandler if it exists in the global scope
+const PathHandler = window.PathHandler || {
+    isGitHubPages: () => window.location.hostname === 'www-e.github.io',
+    getBasePath: () => window.location.hostname === 'www-e.github.io' ? '/Elostaz' : '',
+    isIndexPage: () => {
+        const path = window.location.pathname;
+        const isGitHub = window.location.hostname === 'www-e.github.io';
+        const basePath = isGitHub ? '/Elostaz' : '';
+        
+        if (isGitHub) {
+            return path === `${basePath}/` || path === `${basePath}/index.html`;
+        } else {
+            return path === '/' || 
+                   path === '/index.html' || 
+                   path.endsWith('/index.html') || 
+                   (path.endsWith('/') && !path.includes('/pages/'));
+        }
+    }
+};
+
 // Create and initialize the welcome message component
 function initializeWelcomeMessage() {
     // Create welcome message container
@@ -126,18 +146,16 @@ function shouldShowWelcomeMessage() {
 
 // Initialize when DOM is loaded - only on index.html
 document.addEventListener('DOMContentLoaded', function() {
-    // Only show on index.html
-    const path = window.location.pathname;
+    // For debugging
+    console.log('Current path:', window.location.pathname);
+    console.log('Is GitHub Pages:', PathHandler.isGitHubPages());
+    console.log('Base path:', PathHandler.getBasePath());
+    console.log('Is index page:', PathHandler.isIndexPage());
     
-    // Check if this is the index page
-    const isIndexPage = path === '/' || 
-                       path === '/index.html' || 
-                       path.endsWith('/index.html') || 
-                       path.endsWith('/') && !path.includes('/pages/');
-    
-    // Only show on the index page and if the user hasn't closed it before
-    if (isIndexPage && shouldShowWelcomeMessage()) {
+    // Check if this is the index page using PathHandler
+    if (PathHandler.isIndexPage() && shouldShowWelcomeMessage()) {
         // Initialize welcome message on index page
+        console.log('Initializing welcome message on index page');
         initializeWelcomeMessage();
     }
 });

@@ -55,8 +55,32 @@ const PathHandler = {
                 }
             }
         });
+    },
+    
+    // Check if the current page is the index/home page
+    isIndexPage: () => {
+        const path = window.location.pathname;
+        const isGitHub = PathHandler.isGitHubPages();
+        const basePath = PathHandler.getBasePath();
+        
+        if (isGitHub) {
+            // For GitHub Pages, the paths will be like:
+            // /Elostaz/ or /Elostaz/index.html
+            return path === `${basePath}/` || 
+                   path === `${basePath}/index.html`;
+        } else {
+            // For local or other hosts, the paths will be like:
+            // / or /index.html
+            return path === '/' || 
+                   path === '/index.html' || 
+                   path.endsWith('/index.html') || 
+                   (path.endsWith('/') && !path.includes('/pages/'));
+        }
     }
 };
+
+// Expose PathHandler to global scope for other scripts
+window.PathHandler = PathHandler;
 
 // Run when DOM is loaded
 if (document.readyState === 'loading') {
