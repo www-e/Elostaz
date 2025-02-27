@@ -127,6 +127,9 @@ self.addEventListener('fetch', event => {
     if (!event.request.url.startsWith('http')) return;
 
     const normalizedUrl = normalizeUrl(event.request.url);
+    
+    // Check if this is a navigation request (HTML page)
+    const isNavigationRequest = event.request.mode === 'navigate';
 
     // Special handling for manifest.json and icons
     if (event.request.url.includes('manifest.json') || 
@@ -145,6 +148,36 @@ self.addEventListener('fetch', event => {
         return;
     }
 
+    // For navigation requests (like back button), prioritize network and don't show loading indicator
+    if (isNavigationRequest) {
+        event.respondWith(
+            fetch(event.request)
+                .then(response => {
+                    // Cache successful responses
+                    if (response.ok && shouldCache(normalizedUrl)) {
+                        const clonedResponse = response.clone();
+                        caches.open(DYNAMIC_CACHE).then(cache => {
+                            cache.put(event.request, clonedResponse);
+                        });
+                    }
+                    return response;
+                })
+                .catch(() => {
+                    // Fallback to cache if network fails
+                    return caches.match(event.request)
+                        .then(cachedResponse => {
+                            if (cachedResponse) {
+                                return cachedResponse;
+                            }
+                            // If no cached response, return the index page
+                            return caches.match(`${BASE_PATH}/index.html`);
+                        });
+                })
+        );
+        return;
+    }
+
+    // For non-navigation requests, use the original strategy
     event.respondWith(
         fetch(event.request)
             .then(response => {

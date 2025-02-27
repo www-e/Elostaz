@@ -113,6 +113,8 @@
     text-decoration: none;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 10px rgba(88, 101, 242, 0.3);
+    position: relative;
+    overflow: hidden;
 }
 
 .discord-button:hover {
@@ -123,6 +125,23 @@
 
 .discord-button i {
     font-size: 1.2rem;
+}
+
+/* Pulse effect for Discord button */
+.pulse-effect {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(88, 101, 242, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(88, 101, 242, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(88, 101, 242, 0);
+    }
 }
 
 /* Confetti Animation */

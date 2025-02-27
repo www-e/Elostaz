@@ -21,6 +21,9 @@ function initializeWelcomeMessage() {
     closeButton.innerHTML = '<i class="fas fa-times"></i>';
     closeButton.addEventListener('click', () => {
         hideWelcomeMessage();
+        
+        // Save to localStorage that the user has closed the message
+        localStorage.setItem('welcomeMessageClosed', 'true');
     });
     
     // Create welcome message header
@@ -48,9 +51,12 @@ function initializeWelcomeMessage() {
     // Create Discord button
     const discordButton = document.createElement('a');
     discordButton.className = 'discord-button';
-    discordButton.href = 'https://discord.gg/mywT2j6CeW'; // Replace with your actual Discord server link
+    discordButton.href = 'https://discord.gg/mywT2j6CeW';
     discordButton.target = '_blank';
     discordButton.innerHTML = '<i class="fab fa-discord"></i> انضم إلى سيرفر الديسكورد';
+    
+    // Add pulse effect to Discord button
+    discordButton.classList.add('pulse-effect');
     
     // Assemble the welcome message
     welcomeHeader.appendChild(celebrationIcons.cloneNode(true));
@@ -82,8 +88,10 @@ function initializeWelcomeMessage() {
         welcomeContainer.classList.add('show');
     }, 1000);
     
-    // Store in session storage that message was shown
-    sessionStorage.setItem('welcomeMessageShown', 'true');
+    // Auto-hide after 15 seconds
+    setTimeout(() => {
+        hideWelcomeMessage();
+    }, 15000);
 }
 
 // Hide welcome message with animation
@@ -110,15 +118,26 @@ function getRandomColor() {
     return colors[Math.floor(Math.random() * colors.length)];
 }
 
-// Check if welcome message should be shown
+// Check if we should show the welcome message
 function shouldShowWelcomeMessage() {
-    // Always show on first visit of the session
-    return !sessionStorage.getItem('welcomeMessageShown');
+    // If the user has explicitly closed the message, don't show it again
+    return localStorage.getItem('welcomeMessageClosed') !== 'true';
 }
 
-// Initialize when DOM is loaded
+// Initialize when DOM is loaded - only on index.html
 document.addEventListener('DOMContentLoaded', function() {
-    if (shouldShowWelcomeMessage()) {
+    // Only show on index.html
+    const path = window.location.pathname;
+    
+    // Check if this is the index page
+    const isIndexPage = path === '/' || 
+                       path === '/index.html' || 
+                       path.endsWith('/index.html') || 
+                       path.endsWith('/') && !path.includes('/pages/');
+    
+    // Only show on the index page and if the user hasn't closed it before
+    if (isIndexPage && shouldShowWelcomeMessage()) {
+        // Initialize welcome message on index page
         initializeWelcomeMessage();
     }
 });
