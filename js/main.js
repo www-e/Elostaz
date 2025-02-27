@@ -1,6 +1,7 @@
 import { initializeContactForm } from './contact-form.js';
 import { initializeMultiStepForm } from './booking-form.js';
 import { initializeModalHandlers } from './modal-handler.js';
+import { initializeWelcomeMessage } from './welcome-message.js';
 
 // Initialize all components when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -15,6 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize modal handlers
     initializeModalHandlers();
+
+    // Initialize welcome message
+    initializeWelcomeMessage();
 
     // Initialize date picker with min date
     const dateInput = document.getElementById('sessionDate');
