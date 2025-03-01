@@ -1,0 +1,529 @@
+/* Admin Dashboard Styles */
+
+.admin-container {
+    max-width: 1200px;
+    margin: 100px auto 50px;
+    padding: 0 20px;
+}
+
+.admin-card {
+    background-color: var(--card-bg);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    transition: all 0.3s ease;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.25);
+}
+
+.validation-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 5px;
+    display: none;
+}
+
+/* Button Styles */
+.btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+/* Table Styles */
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table th, 
+.table td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    border-top: 1px solid var(--border-color);
+}
+
+.table thead th {
+    background-color: var(--table-header-bg);
+    border-bottom: 2px solid var(--border-color);
+    font-weight: 600;
+}
+
+.table tbody tr:nth-of-type(odd) {
+    background-color: var(--table-stripe-bg);
+}
+
+.table tbody tr:hover {
+    background-color: var(--table-hover-bg);
+}
+
+/* Action Buttons */
+.action-btn {
+    padding: 6px 10px;
+    margin: 0 3px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.edit-btn {
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+}
+
+.edit-btn:hover {
+    background-color: #138496;
+}
+
+.delete-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
+}
+
+/* Search Box */
+.search-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.search-container input {
+    padding-right: 40px;
+}
+
+.search-container::after {
+    content: '\f002';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+
+/* Tabs Styling */
+.nav-tabs {
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+.nav-tabs .nav-link {
+    margin-bottom: -1px;
+    border: 1px solid transparent;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: var(--border-color) var(--border-color) var(--border-color);
+    color: var(--primary-color);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--text-color);
+    background-color: var(--card-bg);
+    border-color: var(--border-color) var(--border-color) var(--card-bg);
+}
+
+/* Modal Styling */
+.modal-content {
+    background-color: var(--card-bg);
+    border-radius: 15px;
+    border: none;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-color);
+    padding: 15px 20px;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-color);
+    padding: 15px 20px;
+}
+
+/* Grade Filters */
+.grade-filters {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.grade-filters .btn-group {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.grade-filters .btn {
+    margin: 0 5px 5px 0;
+    transition: all 0.3s ease;
+}
+
+.grade-filters .btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.grade-filters {
+    margin-bottom: 1rem;
+}
+
+.grade-filters .btn {
+    margin-right: 0.5rem;
+    transition: all 0.3s;
+}
+
+.grade-filters .btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Attendance Styles */
+.attendance-table-container {
+    margin-bottom: 1.5rem;
+}
+
+.attendance-table {
+    min-width: 800px;
+}
+
+.attendance-table th, 
+.attendance-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.attendance-table th.student-info {
+    min-width: 200px;
+}
+
+.attendance-table .student-info-cell {
+    text-align: right;
+}
+
+.attendance-table .student-name {
+    font-weight: bold;
+    display: block;
+}
+
+.attendance-table .student-details {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.attendance-cell {
+    cursor: pointer;
+    position: relative;
+    width: 60px;
+    height: 40px;
+    transition: all 0.2s ease;
+}
+
+.attendance-cell.present {
+    background-color: rgba(40, 167, 69, 0.2);
+    border: 2px solid rgba(40, 167, 69, 0.8);
+}
+
+.attendance-cell.absent {
+    background-color: rgba(220, 53, 69, 0.2);
+    border: 2px solid rgba(220, 53, 69, 0.8);
+}
+
+.attendance-cell.excused {
+    background-color: rgba(255, 193, 7, 0.2);
+    border: 2px solid rgba(255, 193, 7, 0.8);
+}
+
+.attendance-cell.present::after {
+    content: "✓";
+    color: rgb(40, 167, 69);
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.attendance-cell.absent::after {
+    content: "×";
+    color: rgb(220, 53, 69);
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2rem;
+}
+
+.attendance-cell.excused::after {
+    content: "!";
+    color: rgb(255, 193, 7);
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.attendance-legend {
+    margin-top: 1rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-right: 1rem;
+}
+
+.legend-color {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-left: 5px;
+    border-radius: 3px;
+    position: relative;
+}
+
+.legend-color.present {
+    background-color: rgba(40, 167, 69, 0.2);
+    border: 2px solid rgba(40, 167, 69, 0.8);
+}
+
+.legend-color.present::after {
+    content: "✓";
+    color: rgb(40, 167, 69);
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.8rem;
+}
+
+.legend-color.absent {
+    background-color: rgba(220, 53, 69, 0.2);
+    border: 2px solid rgba(220, 53, 69, 0.8);
+}
+
+.legend-color.absent::after {
+    content: "×";
+    color: rgb(220, 53, 69);
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.9rem;
+}
+
+.legend-color.excused {
+    background-color: rgba(255, 193, 7, 0.2);
+    border: 2px solid rgba(255, 193, 7, 0.8);
+}
+
+.legend-color.excused::after {
+    content: "!";
+    color: rgb(255, 193, 7);
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.8rem;
+}
+
+.month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#currentMonth {
+    min-width: 120px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Responsive Attendance Tables */
+@media (max-width: 992px) {
+    .attendance-table {
+        min-width: 600px;
+    }
+}
+
+/* CSV Import Section */
+.card-title {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+#importResults {
+    animation: fadeIn 0.5s ease;
+}
+
+#errorsList {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 10px;
+}
+
+#errorsList li {
+    margin-bottom: 5px;
+    color: #721c24;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Table Improvements */
+@media (max-width: 768px) {
+    .admin-container {
+        margin-top: 80px;
+        padding: 0 15px;
+    }
+    
+    .admin-card {
+        padding: 20px;
+    }
+    
+    .table thead {
+        display: none;
+    }
+    
+    .table, .table tbody, .table tr, .table td {
+        display: block;
+        width: 100%;
+    }
+    
+    .table tr {
+        margin-bottom: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .table td {
+        text-align: right;
+        padding-right: 50%;
+        position: relative;
+        border-top: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .table td:last-child {
+        border-bottom: none;
+    }
+    
+    .table td::before {
+        content: attr(data-label);
+        position: absolute;
+        right: 15px;
+        width: 45%;
+        padding-left: 15px;
+        font-weight: 600;
+        text-align: right;
+    }
+    
+    .table-responsive table td[data-label="الرقم"]:before {
+        content: "الرقم: ";
+    }
+    
+    .table-responsive table td[data-label="تاريخ التسجيل"]:before {
+        content: "تاريخ التسجيل: ";
+    }
+}
+
+/* Dark Mode Adjustments */
+[data-theme="dark"] .table thead th {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .table tbody tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="dark"] .table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}

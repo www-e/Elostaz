@@ -13,6 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.nav-link').forEach(link => {
         const href = link.getAttribute('href');
         
+        // Skip if href is null or undefined
+        if (!href) return;
+        
         if (href.includes('#')) {
             // For hash links (sections within a page)
             if (currentHash && href === currentHash) {

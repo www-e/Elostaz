@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>لوحة تحكم الإدارة - مركز أ/ أشرف حسن للرياضيات</title>
+    <link rel="icon" type="image/x-icon" href="../assets/icons/edu.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../assets/icons/edu.ico">
+    <link rel="apple-touch-icon" href="../assets/icons/edu.ico">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/mobile.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="../js/path-handler.js"></script>
+    <script src="../js/pwa-updater.js"></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light floating-nav">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">أ/ أشرف حسن</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html">الرئيسية</a>
+                    </li>
+                    <li class="nav-item admin-logout-btn" style="display: none;">
+                        <a class="nav-link" href="#" id="logoutBtn">
+                            <i class="fas fa-sign-out-alt ml-1"></i>
+                            تسجيل الخروج
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" aria-label="Toggle Theme">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Admin Login Section -->
+    <div class="admin-container" id="adminLoginSection">
+        <div class="admin-card">
+            <h2 class="text-center mb-4">تسجيل دخول المسؤول</h2>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="adminPassword">كلمة المرور</label>
+                    <input type="password" id="adminPassword" class="form-control" required>
+                    <div class="validation-message"></div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mt-3">
+                    <i class="fas fa-sign-in-alt ml-1"></i>
+                    تسجيل الدخول
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard Section -->
+    <div class="admin-container" id="adminDashboardSection" style="display: none;">
+        <div class="admin-card">
+            <h2 class="text-center mb-4">لوحة تحكم الإدارة</h2>
+            
+            <!-- Admin Tabs -->
+            <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button" role="tab">
+                        <i class="fas fa-users ml-1"></i>
+                        إدارة الطلاب
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="add-student-tab" data-bs-toggle="tab" data-bs-target="#add-student" type="button" role="tab">
+                        <i class="fas fa-user-plus ml-1"></i>
+                        إضافة طالب
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button" role="tab">
+                        <i class="fas fa-calendar-check ml-1"></i>
+                        أيام الحضور
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab">
+                        <i class="fas fa-cog ml-1"></i>
+                        الإعدادات
+                    </button>
+                </li>
+            </ul>
+            
+            <!-- Tab Content -->
+            <div class="tab-content p-3" id="adminTabContent">
+                <!-- Students Management Tab -->
+                <div class="tab-pane fade show active" id="students" role="tabpanel">
+                    <div class="search-container mb-3">
+                        <input type="text" id="studentSearch" class="form-control" placeholder="بحث عن طالب...">
+                    </div>
+                    
+                    <div class="grade-filters mb-3">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary grade-filter active" data-grade="all">جميع الصفوف</button>
+                            <button type="button" class="btn btn-outline-primary grade-filter" data-grade="الصف الأول الثانوي">الصف الأول</button>
+                            <button type="button" class="btn btn-outline-primary grade-filter" data-grade="الصف الثاني الثانوي">الصف الثاني</button>
+                            <button type="button" class="btn btn-outline-primary grade-filter" data-grade="الصف الثالث الثانوي">الصف الثالث</button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>الرقم</th>
+                                    <th>معرف الطالب</th>
+                                    <th>اسم الطالب</th>
+                                    <th>الصف</th>
+                                    <th>المجموعة</th>
+                                    <th>تاريخ التسجيل</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTableBody">
+                                <!-- Students will be loaded here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="noStudentsMessage" class="text-center p-3" style="display: none;">
+                        <p>لا يوجد طلاب مسجلين حاليًا</p>
+                    </div>
+                </div>
+                
+                <!-- Add Student Tab -->
+                <div class="tab-pane fade" id="add-student" role="tabpanel">
+                    <ul class="nav nav-pills mb-3" id="addStudentTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="single-student-tab" data-bs-toggle="pill" data-bs-target="#single-student" type="button" role="tab">إضافة طالب</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="bulk-import-tab" data-bs-toggle="pill" data-bs-target="#bulk-import" type="button" role="tab">استيراد من ملف CSV</button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="addStudentTabContent">
+                        <!-- Single Student Form -->
+                        <div class="tab-pane fade show active" id="single-student" role="tabpanel">
+                            <form id="addStudentForm">
+                                <div class="form-group mb-3">
+                                    <label for="studentId">معرف الطالب</label>
+                                    <input type="text" id="studentId" class="form-control" required>
+                                    <div class="validation-message"></div>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="studentPassword">كلمة المرور</label>
+                                    <input type="password" id="studentPassword" class="form-control" required>
+                                    <div class="validation-message"></div>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="studentNameInput">اسم الطالب</label>
+                                    <input type="text" id="studentNameInput" class="form-control" required>
+                                    <div class="validation-message"></div>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="studentGrade">الصف الدراسي</label>
+                                    <select id="studentGrade" class="form-control" required>
+                                        <option value="">اختر الصف</option>
+                                        <option value="الصف الأول الثانوي">الصف الأول الثانوي</option>
+                                        <option value="الصف الثاني الثانوي">الصف الثاني الثانوي</option>
+                                        <option value="الصف الثالث الثانوي">الصف الثالث الثانوي</option>
+                                    </select>
+                                    <div class="validation-message"></div>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="studentGroup">المجموعة</label>
+                                    <select id="studentGroup" class="form-control" required>
+                                        <option value="">اختر المجموعة</option>
+                                        <option value="السبت - الثلاثاء">السبت - الثلاثاء</option>
+                                        <option value="الأحد - الأربعاء">الأحد - الأربعاء</option>
+                                        <option value="الاثنين - الخميس">الاثنين - الخميس</option>
+                                    </select>
+                                    <div class="validation-message"></div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary w-100">إضافة الطالب</button>
+                            </form>
+                        </div>
+                        
+                        <!-- Bulk Import Form -->
+                        <div class="tab-pane fade" id="bulk-import" role="tabpanel">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">تنسيق ملف CSV</h5>
+                                    <p class="card-text">يجب أن يحتوي ملف CSV على الأعمدة التالية:</p>
+                                    <ol>
+                                        <li>معرف الطالب (id)</li>
+                                        <li>اسم الطالب (name)</li>
+                                        <li>الصف الدراسي (grade)</li>
+                                        <li>المجموعة (group)</li>
+                                        <li>كلمة المرور (password)</li>
+                                    </ol>
+                                    <p class="card-text">مثال: <code>12345,أحمد محمد,الصف الأول الثانوي,السبت - الثلاثاء,password123</code></p>
+                                </div>
+                            </div>
+                            
+                            <form id="csvImportForm">
+                                <div class="form-group mb-3">
+                                    <label for="csvFile">اختر ملف CSV</label>
+                                    <input type="file" id="csvFile" class="form-control" accept=".csv" required>
+                                    <div class="validation-message"></div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary w-100">استيراد الطلاب</button>
+                            </form>
+                            
+                            <div id="importResults" class="mt-3" style="display: none;">
+                                <div class="alert alert-info">
+                                    <h5>نتائج الاستيراد</h5>
+                                    <p id="importSummary"></p>
+                                    <div id="importErrors" style="display: none;">
+                                        <h6>الأخطاء:</h6>
+                                        <ul id="errorsList"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Attendance Tab -->
+                <div class="tab-pane fade" id="attendance" role="tabpanel">
+                    <div class="attendance-header mb-3">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <h4 class="mb-3 mb-md-0">سجل الحضور</h4>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex justify-content-md-end">
+                                    <div class="month-nav">
+                                        <button class="btn btn-sm btn-outline-primary" id="prevMonth">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                        <span id="currentMonth" class="mx-2"></span>
+                                        <button class="btn btn-sm btn-outline-primary" id="nextMonth">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <ul class="nav nav-pills mb-3" id="attendanceTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="sat-tue-tab" data-bs-toggle="pill" data-bs-target="#sat-tue-attendance" type="button" role="tab" data-group="السبت - الثلاثاء">
+                                السبت - الثلاثاء
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="sun-wed-tab" data-bs-toggle="pill" data-bs-target="#sun-wed-attendance" type="button" role="tab" data-group="الأحد - الأربعاء">
+                                الأحد - الأربعاء
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="mon-thu-tab" data-bs-toggle="pill" data-bs-target="#mon-thu-attendance" type="button" role="tab" data-group="الاثنين - الخميس">
+                                الاثنين - الخميس
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="attendanceTabContent">
+                        <!-- Saturday-Tuesday Group -->
+                        <div class="tab-pane fade show active" id="sat-tue-attendance" role="tabpanel">
+                            <div class="attendance-table-container">
+                                <div id="satTueNoStudents" class="alert alert-warning text-center" style="display: none;">
+                                    لا يوجد طلاب مسجلين في هذه المجموعة
+                                </div>
+                                <div id="satTueNoDays" class="alert alert-info text-center" style="display: none;">
+                                    لا توجد أيام دراسية في هذا الشهر لهذه المجموعة
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered attendance-table" id="satTueTable">
+                                        <thead>
+                                            <tr>
+                                                <th class="student-info">الطالب</th>
+                                                <!-- Days will be added dynamically -->
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Students will be added dynamically -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sunday-Wednesday Group -->
+                        <div class="tab-pane fade" id="sun-wed-attendance" role="tabpanel">
+                            <div class="attendance-table-container">
+                                <div id="sunWedNoStudents" class="alert alert-warning text-center" style="display: none;">
+                                    لا يوجد طلاب مسجلين في هذه المجموعة
+                                </div>
+                                <div id="sunWedNoDays" class="alert alert-info text-center" style="display: none;">
+                                    لا توجد أيام دراسية في هذا الشهر لهذه المجموعة
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered attendance-table" id="sunWedTable">
+                                        <thead>
+                                            <tr>
+                                                <th class="student-info">الطالب</th>
+                                                <!-- Days will be added dynamically -->
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Students will be added dynamically -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Monday-Thursday Group -->
+                        <div class="tab-pane fade" id="mon-thu-attendance" role="tabpanel">
+                            <div class="attendance-table-container">
+                                <div id="monThuNoStudents" class="alert alert-warning text-center" style="display: none;">
+                                    لا يوجد طلاب مسجلين في هذه المجموعة
+                                </div>
+                                <div id="monThuNoDays" class="alert alert-info text-center" style="display: none;">
+                                    لا توجد أيام دراسية في هذا الشهر لهذه المجموعة
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered attendance-table" id="monThuTable">
+                                        <thead>
+                                            <tr>
+                                                <th class="student-info">الطالب</th>
+                                                <!-- Days will be added dynamically -->
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Students will be added dynamically -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="attendance-legend mt-3">
+                        <div class="d-flex justify-content-center flex-wrap">
+                            <div class="legend-item mx-2">
+                                <span class="legend-color present"></span> حاضر
+                            </div>
+                            <div class="legend-item mx-2">
+                                <span class="legend-color absent"></span> غائب
+                            </div>
+                            <div class="legend-item mx-2">
+                                <span class="legend-color excused"></span> غائب بعذر
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-3">
+                        <button id="saveAttendance" class="btn btn-primary">
+                            <i class="fas fa-save"></i> حفظ الحضور
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Settings Tab -->
+                <div class="tab-pane fade" id="settings" role="tabpanel">
+                    <form id="changePasswordForm">
+                        <div class="form-group mb-3">
+                            <label for="currentPassword">كلمة المرور الحالية</label>
+                            <input type="password" id="currentPassword" class="form-control" required>
+                            <div class="validation-message"></div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="newPassword">كلمة المرور الجديدة</label>
+                            <input type="password" id="newPassword" class="form-control" required>
+                            <div class="validation-message"></div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="confirmPassword">تأكيد كلمة المرور الجديدة</label>
+                            <input type="password" id="confirmPassword" class="form-control" required>
+                            <div class="validation-message"></div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 mt-3">
+                            <i class="fas fa-save ml-1"></i>
+                            تغيير كلمة المرور
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Student Modal -->
+    <div class="modal fade" id="editStudentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">تعديل بيانات الطالب</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editStudentForm">
+                        <input type="hidden" id="editStudentId">
+                        
+                        <div class="form-group mb-3">
+                            <label for="editStudentName">اسم الطالب</label>
+                            <input type="text" id="editStudentName" class="form-control" required>
+                            <div class="validation-message"></div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="editStudentGrade">الصف الدراسي</label>
+                            <select id="editStudentGrade" class="form-control" required>
+                                <option value="">اختر الصف</option>
+                                <option value="الصف الأول الثانوي">الصف الأول الثانوي</option>
+                                <option value="الصف الثاني الثانوي">الصف الثاني الثانوي</option>
+                                <option value="الصف الثالث الثانوي">الصف الثالث الثانوي</option>
+                            </select>
+                            <div class="validation-message"></div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="editStudentGroup">أيام المجموعة</label>
+                            <select id="editStudentGroup" class="form-control" required>
+                                <option value="">اختر المجموعة</option>
+                                <option value="السبت و الثلاثاء">السبت و الثلاثاء</option>
+                                <option value="الاحد و الاربعاء">الاحد و الاربعاء</option>
+                                <option value="الاثنين و الخميس">الاثنين و الخميس</option>
+                            </select>
+                            <div class="validation-message"></div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="editStudentPassword">كلمة المرور الجديدة (اتركها فارغة للإبقاء على كلمة المرور الحالية)</label>
+                            <input type="password" id="editStudentPassword" class="form-control">
+                            <div class="validation-message"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="saveEditButton">حفظ التغييرات</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">تأكيد الحذف</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>هل أنت متأكد من رغبتك في حذف هذا الطالب؟</p>
+                    <p id="deleteStudentName" class="fw-bold"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteButton">تأكيد الحذف</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div class="modal fade" id="alertModal" tabindex="-1" aria-modal="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="alertModalTitle">تنبيه</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="alertModalMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">موافق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+    <script src="../js/database.js" type="module"></script>
+    <script src="../js/DOMloader.js" type="module"></script>
+    <script src="../js/theme.js" type="module"></script>
+    <script src="../js/main.js" type="module"></script>
+    <script src="../js/ActiveState.js" type="module"></script>
+    <script src="../js/navbar.js" type="module"></script>
+    <script src="../js/admin.js" type="module"></script>
+    <script src="../js/attendance.js" type="module"></script>
+</body>
+</html>
