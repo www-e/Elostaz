@@ -34,47 +34,72 @@ const FirebaseDatabase = {
 
     // Detect connection issues with Firebase
     async detectConnectionIssues() {
-        console.log('Checking for Firebase connection issues...');
+        console.log('Checking for connection issues...');
 
         // Reset detection flag
         this.connectionIssuesDetected = false;
         
-        // Don't use Google Analytics for detection as it's commonly blocked by browsers
-        // Instead, test direct Firebase connectivity
+        // Test direct Firebase connectivity using multiple methods
+        let connectionSuccessful = false;
+        
         try {
-            // Try to connect directly to Firebase
+            // Method 1: Try to access a document
             const testRef = doc(db, this.COLLECTIONS.SETTINGS, 'connection_test');
             await getDoc(testRef);
-            
             console.log('Firebase connection test successful');
-            return false;
-        } catch (error) {
-            // Check if this is a Firebase-specific error
-            const errorString = error.toString().toLowerCase();
+            connectionSuccessful = true;
+        } catch (error1) {
+            console.warn('Firebase document access test failed:', error1.message);
             
-            // Look for specific Firebase error patterns
-            const isFirebaseError = 
-                errorString.includes('firestore') || 
-                errorString.includes('firebase') || 
-                errorString.includes('permission denied') ||
-                errorString.includes('quota exceeded') ||
-                errorString.includes('unavailable') ||
-                errorString.includes('network error');
+            // Method 2: Try to list a collection
+            try {
+                const testCollection = collection(db, this.COLLECTIONS.SETTINGS);
+                await getDocs(testCollection);
+                console.log('Firebase collection access test successful');
+                connectionSuccessful = true;
+            } catch (error2) {
+                console.warn('Firebase collection access test failed:', error2.message);
                 
-            if (isFirebaseError) {
-                console.warn('Firebase connection issue detected:', error.message);
-                this.connectionIssuesDetected = true;
-                this.showConnectionWarning(error.message);
-                return true;
-            } else {
-                console.log('Error occurred, but not a Firebase connection issue:', error.message);
-                return false;
+                // Method 3: Try to access Firestore metadata
+                try {
+                    await db._getAppCompat().firestore()._getClient();
+                    console.log('Firebase metadata access test successful');
+                    connectionSuccessful = true;
+                } catch (error3) {
+                    console.error('All Firebase connection tests failed');
+                    
+                    // Analyze errors to determine if it's a connection issue
+                    const errorMessages = [
+                        error1.message.toLowerCase(),
+                        error2.message.toLowerCase(),
+                        error3.message.toLowerCase()
+                    ];
+                    
+                    const connectionErrorKeywords = [
+                        'network', 'offline', 'unavailable', 'timeout', 
+                        'connection', 'failed to fetch', 'cors', 'blocked',
+                        'permission denied', 'unauthorized', 'not allowed',
+                        'access', 'firewall', 'proxy'
+                    ];
+                    
+                    const isConnectionIssue = errorMessages.some(msg => 
+                        connectionErrorKeywords.some(keyword => msg.includes(keyword))
+                    );
+                    
+                    if (isConnectionIssue) {
+                        this.connectionIssuesDetected = true;
+                        this.showConnectionWarning();
+                        return true;
+                    }
+                }
             }
         }
+        
+        return !connectionSuccessful;
     },
 
     // Show connection warning to the user
-    showConnectionWarning(errorDetails) {
+    showConnectionWarning() {
         // Only show if we're in a browser environment
         if (typeof document === 'undefined') return;
 
@@ -124,6 +149,25 @@ const FirebaseDatabase = {
     async init() {
         try {
             console.log('Initializing Firebase database...');
+            
+            // Check if we're running on GitHub Pages
+            const isGitHubPages = 
+                window.location.hostname.includes('github.io') || 
+                document.referrer.includes('github.io');
+                
+            if (isGitHubPages) {
+                console.log('Running on GitHub Pages, using CORS-friendly initialization');
+                
+                // Add extra CORS headers for GitHub Pages
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
+                    'Access-Control-Allow-Headers': 'Content-Type'
+                };
+                
+                // Store this information for future reference
+                localStorage.setItem('isGitHubPages', 'true');
+            }
             
             // First, check for connection issues
             const hasConnectionIssues = await this.detectConnectionIssues();

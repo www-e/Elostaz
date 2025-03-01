@@ -172,3 +172,8 @@ The Student Management System currently uses client-side storage (localStorage) 
 This roadmap outlines a progressive enhancement approach, starting with immediate fixes to the current system, then gradually migrating to a more robust cloud-based solution. The plan allows for incremental improvements while maintaining system availability throughout the transition.
 
 Each phase builds upon the previous one, ensuring that the system evolves in a structured manner while addressing both technical debt and new feature requirements.
+
+deployment
+git add .
+git commit -m "new cloud based sign in"
+git push origin main
