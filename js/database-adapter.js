@@ -19,34 +19,32 @@ const DatabaseAdapter = {
     
     // Initialize the database adapter
     async init() {
-        // Check if Firebase is enabled in localStorage
-        const useFirebase = localStorage.getItem('useFirebase') === 'true';
-        this.setMode(useFirebase ? 'firebase' : 'local');
-        
-        // Initialize the appropriate database
-        if (this.mode === 'firebase') {
-            try {
-                await FirebaseDatabase.init();
+        try {
+            // Always try Firebase first to see if it's available
+            const firebaseInitResult = await FirebaseDatabase.init();
+            
+            // If Firebase initialization was successful and no connection issues detected
+            if (firebaseInitResult && !FirebaseDatabase.connectionIssuesDetected) {
                 console.log('Firebase database initialized successfully');
+                this.setMode('firebase');
                 this.firebaseConnectionFailed = false;
                 
                 // Add a connection status listener
                 this.monitorFirebaseConnection();
-            } catch (error) {
-                console.error('Failed to initialize Firebase database:', error);
-                // Fallback to localStorage if Firebase initialization fails
-                this.firebaseConnectionFailed = true;
+            } else {
+                // Firebase had issues, use localStorage
+                console.log('Using local storage due to Firebase connection issues');
                 this.setMode('local');
+                this.firebaseConnectionFailed = true;
                 await LocalDatabase.init();
-                
-                // Show error message to user if in a browser environment
-                if (typeof document !== 'undefined') {
-                    this.showConnectionError(error);
-                }
             }
-        } else {
+        } catch (error) {
+            // Something went wrong with initialization
+            console.error('Error during database initialization:', error);
+            this.setMode('local');
+            this.firebaseConnectionFailed = true;
             await LocalDatabase.init();
-            console.log('Local database initialized successfully');
+            console.log('Local database initialized successfully (fallback)');
         }
     },
     
@@ -190,74 +188,92 @@ const DatabaseAdapter = {
     auth: {
         // Login user
         async login(username, password) {
+            console.log(`DatabaseAdapter: Login attempt for user ${username}`);
+            
             try {
-                // Get the current database based on mode
-                const db = DatabaseAdapter.getDatabase();
-                console.log(`DatabaseAdapter: Attempting login with ${DatabaseAdapter.mode} database`);
+                // Try to login with the current database mode
+                let result;
                 
-                // If we're in Firebase mode but had connection issues, show a warning
-                if (DatabaseAdapter.mode === 'firebase' && DatabaseAdapter.firebaseConnectionFailed) {
-                    console.warn('DatabaseAdapter: Using local database due to Firebase connection failure');
+                if (DatabaseAdapter.mode === 'firebase') {
+                    console.log('DatabaseAdapter: Attempting Firebase login');
+                    result = await FirebaseDatabase.auth.login(username, password);
                     
-                    // Try to reconnect to Firebase
-                    try {
-                        await FirebaseDatabase.init();
-                        DatabaseAdapter.firebaseConnectionFailed = false;
-                        console.log('DatabaseAdapter: Successfully reconnected to Firebase');
-                    } catch (reconnectError) {
-                        console.error('DatabaseAdapter: Failed to reconnect to Firebase:', reconnectError);
+                    // If login failed due to connection issues, try local login
+                    if (!result.success && result.connectionIssue) {
+                        console.warn('DatabaseAdapter: Firebase login failed due to connection issues, trying local login');
+                        
+                        // Update connection status
+                        DatabaseAdapter.firebaseConnectionFailed = true;
+                        
+                        // Try local login
+                        const localResult = LocalDatabase.auth.login(username, password);
+                        
+                        if (localResult.success) {
+                            console.log('DatabaseAdapter: Local login successful');
+                            // Store the login mode for future reference
+                            localStorage.setItem('lastLoginMode', 'local');
+                            return {
+                                ...localResult,
+                                message: 'تم تسجيل الدخول باستخدام التخزين المحلي (وضع عدم الاتصال)'
+                            };
+                        } else {
+                            console.error('DatabaseAdapter: Local login fallback failed');
+                            return {
+                                success: false,
+                                error: 'فشل تسجيل الدخول: بيانات الاعتماد غير صالحة',
+                                details: 'تعذر الاتصال بقاعدة البيانات عبر الإنترنت، وفشل تسجيل الدخول المحلي'
+                            };
+                        }
                     }
+                    
+                    return result;
+                } else {
+                    console.log('DatabaseAdapter: Attempting local login');
+                    result = LocalDatabase.auth.login(username, password);
+                    return result;
                 }
-                
-                // Attempt login with the appropriate database
-                const result = await db.auth.login(username, password);
-                
-                // If login was successful and we're using Firebase, store a flag in localStorage
-                if (result.success && DatabaseAdapter.mode === 'firebase') {
-                    localStorage.setItem('lastLoginMode', 'firebase');
-                }
-                
-                return result;
             } catch (error) {
                 console.error('DatabaseAdapter: Error during login:', error);
                 
-                // If we're in Firebase mode and encounter an error, try falling back to local
+                // If Firebase login fails, try local login as fallback
                 if (DatabaseAdapter.mode === 'firebase') {
                     console.warn('DatabaseAdapter: Falling back to local database for login');
                     
                     try {
-                        // Try local login as fallback
-                        const localResult = await LocalDatabase.auth.login(username, password);
+                        // Try local login as a fallback
+                        console.log('DatabaseAdapter: Trying local login as fallback');
+                        const localResult = LocalDatabase.auth.login(username, password);
                         
-                        // If local login succeeds, update the connection status
                         if (localResult.success) {
-                            DatabaseAdapter.firebaseConnectionFailed = true;
-                            DatabaseAdapter.setMode('local');
-                            
-                            // Show connection error
-                            DatabaseAdapter.showConnectionError(error);
-                            
+                            console.log('DatabaseAdapter: Local login successful');
+                            // Store the login mode for future reference
+                            localStorage.setItem('lastLoginMode', 'local');
                             return {
                                 ...localResult,
-                                warning: 'تم تسجيل الدخول باستخدام التخزين المحلي بسبب مشكلة في الاتصال بالخادم'
+                                message: 'تم تسجيل الدخول باستخدام التخزين المحلي (وضع عدم الاتصال)'
+                            };
+                        } else {
+                            console.error('DatabaseAdapter: Local login fallback failed:', localResult);
+                            return {
+                                success: false,
+                                error: 'فشل تسجيل الدخول: بيانات الاعتماد غير صالحة',
+                                details: 'تعذر الاتصال بقاعدة البيانات عبر الإنترنت، وفشل تسجيل الدخول المحلي'
                             };
                         }
-                        
-                        return localResult;
                     } catch (localError) {
-                        console.error('DatabaseAdapter: Local login fallback also failed:', localError);
+                        console.error('DatabaseAdapter: Local login fallback error:', localError);
                         return {
                             success: false,
                             error: 'فشل تسجيل الدخول: تعذر الاتصال بقاعدة البيانات',
-                            details: error.message
+                            details: error.message || localError.message
                         };
                     }
                 }
                 
-                // Return error for local mode
+                // If we're already in local mode, just return the error
                 return {
                     success: false,
-                    error: 'حدث خطأ أثناء تسجيل الدخول',
+                    error: 'فشل تسجيل الدخول',
                     details: error.message
                 };
             }
@@ -315,32 +331,86 @@ const DatabaseAdapter = {
         
         // Admin login
         async adminLogin(password) {
+            console.log('DatabaseAdapter: Admin login attempt');
+            
             try {
-                const db = DatabaseAdapter.getDatabase();
-                console.log(`DatabaseAdapter: Attempting admin login with ${DatabaseAdapter.mode} database`);
+                // Try to login with the current database mode
+                let result;
                 
-                // Attempt admin login with the appropriate database
-                const result = await db.auth.adminLogin(password);
-                
-                return result;
+                if (DatabaseAdapter.mode === 'firebase') {
+                    console.log('DatabaseAdapter: Attempting Firebase admin login');
+                    result = await FirebaseDatabase.auth.adminLogin(password);
+                    
+                    // If login failed due to connection issues, try local login
+                    if (!result.success && result.connectionIssue) {
+                        console.warn('DatabaseAdapter: Firebase admin login failed due to connection issues, trying local login');
+                        
+                        // Update connection status
+                        DatabaseAdapter.firebaseConnectionFailed = true;
+                        
+                        // Try local login
+                        const localResult = LocalDatabase.auth.adminLogin(password);
+                        
+                        if (localResult.success) {
+                            console.log('DatabaseAdapter: Local admin login successful');
+                            // Store the login mode for future reference
+                            localStorage.setItem('lastLoginMode', 'local');
+                            return {
+                                ...localResult,
+                                message: 'تم تسجيل الدخول كمسؤول باستخدام التخزين المحلي (وضع عدم الاتصال)'
+                            };
+                        } else {
+                            console.error('DatabaseAdapter: Local admin login fallback failed');
+                            return {
+                                success: false,
+                                error: 'فشل تسجيل الدخول: كلمة المرور غير صالحة',
+                                details: 'تعذر الاتصال بقاعدة البيانات عبر الإنترنت، وفشل تسجيل الدخول المحلي'
+                            };
+                        }
+                    }
+                    
+                    return result;
+                } else {
+                    console.log('DatabaseAdapter: Attempting local admin login');
+                    result = LocalDatabase.auth.adminLogin(password);
+                    return result;
+                }
             } catch (error) {
                 console.error('DatabaseAdapter: Error during admin login:', error);
                 
-                // If we're in Firebase mode and encounter an error, try falling back to local
+                // If Firebase login fails, try local login as fallback
                 if (DatabaseAdapter.mode === 'firebase') {
                     console.warn('DatabaseAdapter: Falling back to local database for admin login');
                     
                     try {
-                        // Try local admin login as fallback
-                        return await LocalDatabase.auth.adminLogin(password);
+                        const localResult = LocalDatabase.auth.adminLogin(password);
+                        
+                        if (localResult.success) {
+                            console.log('DatabaseAdapter: Local admin login successful');
+                            // Store the login mode for future reference
+                            localStorage.setItem('lastLoginMode', 'local');
+                            return {
+                                ...localResult,
+                                message: 'تم تسجيل الدخول كمسؤول باستخدام التخزين المحلي (وضع عدم الاتصال)'
+                            };
+                        } else {
+                            console.error('DatabaseAdapter: Local admin login fallback failed');
+                            return localResult;
+                        }
                     } catch (localError) {
-                        console.error('DatabaseAdapter: Local admin login fallback also failed:', localError);
+                        console.error('DatabaseAdapter: Local admin login fallback error:', localError);
+                        return {
+                            success: false,
+                            error: 'فشل تسجيل الدخول كمسؤول: تعذر الاتصال بقاعدة البيانات',
+                            details: error.message || localError.message
+                        };
                     }
                 }
                 
+                // If we're already in local mode, just return the error
                 return {
                     success: false,
-                    error: 'حدث خطأ أثناء تسجيل دخول المسؤول',
+                    error: 'فشل تسجيل الدخول كمسؤول',
                     details: error.message
                 };
             }

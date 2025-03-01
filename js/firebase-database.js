@@ -29,81 +29,60 @@ const FirebaseDatabase = {
     query,
     where,
 
-    // Flag to track if ad blocker is detected
-    adBlockerDetected: false,
+    // Flag to track if connection issues are detected
+    connectionIssuesDetected: false,
 
-    // Detect ad blockers and other connection issues
+    // Detect connection issues with Firebase
     async detectConnectionIssues() {
-        console.log('Checking for connection issues...');
+        console.log('Checking for Firebase connection issues...');
 
-        // Create a test image URL that ad blockers typically block
-        const testImageUrl = 'https://www.google-analytics.com/collect?v=1&t=event';
-
+        // Reset detection flag
+        this.connectionIssuesDetected = false;
+        
+        // Don't use Google Analytics for detection as it's commonly blocked by browsers
+        // Instead, test direct Firebase connectivity
         try {
-            // Try to fetch a resource that ad blockers typically block
-            const testFetch = await fetch(testImageUrl, { 
-                method: 'HEAD',
-                mode: 'no-cors',
-                cache: 'no-cache',
-                credentials: 'omit',
-                redirect: 'error',
-                referrerPolicy: 'no-referrer'
-            });
-
-            // If we get here, ad blocker might not be active
-            console.log('No ad blocker detected via fetch test');
-            this.adBlockerDetected = false;
+            // Try to connect directly to Firebase
+            const testRef = doc(db, this.COLLECTIONS.SETTINGS, 'connection_test');
+            await getDoc(testRef);
+            
+            console.log('Firebase connection test successful');
+            return false;
         } catch (error) {
-            // Fetch failed, might be an ad blocker
-            console.warn('Possible ad blocker detected via fetch test:', error);
-            this.adBlockerDetected = true;
-        }
-
-        // Additional test using image loading
-        const testImage = new Image();
-        let imageLoaded = false;
-
-        // Set up timeout to check if image loads
-        const imageTimeout = setTimeout(() => {
-            if (!imageLoaded) {
-                console.warn('Possible ad blocker detected via image load test (timeout)');
-                this.adBlockerDetected = true;
-                this.showAdBlockerWarning();
+            // Check if this is a Firebase-specific error
+            const errorString = error.toString().toLowerCase();
+            
+            // Look for specific Firebase error patterns
+            const isFirebaseError = 
+                errorString.includes('firestore') || 
+                errorString.includes('firebase') || 
+                errorString.includes('permission denied') ||
+                errorString.includes('quota exceeded') ||
+                errorString.includes('unavailable') ||
+                errorString.includes('network error');
+                
+            if (isFirebaseError) {
+                console.warn('Firebase connection issue detected:', error.message);
+                this.connectionIssuesDetected = true;
+                this.showConnectionWarning(error.message);
+                return true;
+            } else {
+                console.log('Error occurred, but not a Firebase connection issue:', error.message);
+                return false;
             }
-        }, 2000);
-
-        // Image loaded successfully
-        testImage.onload = () => {
-            imageLoaded = true;
-            clearTimeout(imageTimeout);
-            console.log('No ad blocker detected via image load test');
-        };
-
-        // Image failed to load
-        testImage.onerror = () => {
-            imageLoaded = true; // Set to true to prevent timeout from firing
-            clearTimeout(imageTimeout);
-            console.warn('Possible ad blocker detected via image load test (error)');
-            this.adBlockerDetected = true;
-            this.showAdBlockerWarning();
-        };
-
-        // Start loading the test image
-        testImage.src = testImageUrl;
-
-        return this.adBlockerDetected;
+        }
     },
 
-    // Show ad blocker warning to the user
-    showAdBlockerWarning() {
+    // Show connection warning to the user
+    showConnectionWarning(errorDetails) {
         // Only show if we're in a browser environment
         if (typeof document === 'undefined') return;
 
         // Create warning element if it doesn't exist
-        let warning = document.getElementById('ad-blocker-warning');
+        let warning = document.getElementById('firebase-connection-warning');
         if (!warning) {
             warning = document.createElement('div');
-            warning.id = 'ad-blocker-warning';
+            warning.id = 'firebase-connection-warning';
             warning.style.position = 'fixed';
             warning.style.top = '10px';
             warning.style.left = '50%';
@@ -122,12 +101,13 @@ const FirebaseDatabase = {
             warning.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: space-between;">
                     <div style="flex: 1;">
-                        <strong style="font-size: 16px;">⚠️ تم اكتشاف مانع إعلانات</strong>
+                        <strong style="font-size: 16px;">⚠️ مشكلة في الاتصال بقاعدة البيانات</strong>
                         <p style="margin: 8px 0 0; font-size: 14px;">
-                            قد يمنع مانع الإعلانات الخاص بك الاتصال بخدمة Firebase. يرجى تعطيل مانع الإعلانات أو السماح بالوصول إلى النطاقات التالية:
+                            تم اكتشاف مشكلة في الاتصال بخدمة Firebase. سيتم استخدام التخزين المحلي كبديل.
                             <br>
-                            <code style="background: #f8f9fa; padding: 2px 4px; border-radius: 3px; font-size: 12px;">*.firebaseio.com</code>,
-                            <code style="background: #f8f9fa; padding: 2px 4px; border-radius: 3px; font-size: 12px;">*.googleapis.com</code>
+                            <span style="font-size: 12px; color: #666;">
+                                تأكد من اتصالك بالإنترنت وأن الموقع يعمل بشكل صحيح.
+                            </span>
                         </p>
                     </div>
                     <button onclick="this.parentNode.parentNode.style.display='none'" style="background: none; border: none; cursor: pointer; font-size: 18px; margin-right: 10px; color: #856404;">×</button>
@@ -144,40 +124,50 @@ const FirebaseDatabase = {
     async init() {
         try {
             console.log('Initializing Firebase database...');
-
-            // Check Firebase connectivity by making a simple request
-            try {
-                await getDocs(collection(db, this.COLLECTIONS.SETTINGS));
-                console.log('Firebase connection test successful');
-            } catch (error) {
-                console.error('Firebase connection test failed:', error);
-                throw new Error('فشل الاتصال بقاعدة البيانات. تأكد من اتصالك بالإنترنت وعدم وجود مانع للإعلانات.');
+            
+            // First, check for connection issues
+            const hasConnectionIssues = await this.detectConnectionIssues();
+            
+            if (hasConnectionIssues) {
+                console.warn('Firebase connection issues detected, falling back to local storage');
+                localStorage.setItem('useFirebase', 'false');
+                return false;
             }
-
-            // Detect ad blockers and other connection issues
-            await this.detectConnectionIssues();
-
+            
+            // If we get here, connection is successful
+            localStorage.setItem('useFirebase', 'true');
+            
             // Check if admin settings exist, create if not
-            const adminDoc = await getDoc(doc(db, this.COLLECTIONS.SETTINGS, 'admin'));
-            if (!adminDoc.exists()) {
-                await setDoc(doc(db, this.COLLECTIONS.SETTINGS, 'admin'), {
-                    password: 'admin123'
-                });
-                console.log('Admin settings initialized');
+            try {
+                const adminDoc = await getDoc(doc(db, this.COLLECTIONS.SETTINGS, 'admin'));
+                if (!adminDoc.exists()) {
+                    await setDoc(doc(db, this.COLLECTIONS.SETTINGS, 'admin'), {
+                        password: 'admin123'
+                    });
+                    console.log('Admin settings initialized');
+                }
+                
+                // Check if counter exists, create if not
+                const counterDoc = await getDoc(doc(db, this.COLLECTIONS.SETTINGS, 'counter'));
+                if (!counterDoc.exists()) {
+                    await setDoc(doc(db, this.COLLECTIONS.SETTINGS, 'counter'), {
+                        lastStudentIndex: 0
+                    });
+                    console.log('Counter initialized');
+                }
+                
+                console.log('Firebase Database initialized successfully');
+                return true;
+            } catch (error) {
+                console.error('Error initializing Firebase settings:', error);
+                // If we can't initialize settings, we should fall back to local storage
+                localStorage.setItem('useFirebase', 'false');
+                return false;
             }
-
-            // Check if counter exists, create if not
-            const counterDoc = await getDoc(doc(db, this.COLLECTIONS.SETTINGS, 'counter'));
-            if (!counterDoc.exists()) {
-                await setDoc(doc(db, this.COLLECTIONS.SETTINGS, 'counter'), {
-                    lastStudentIndex: 0
-                });
-                console.log('Counter initialized');
-            }
-
-            console.log('Firebase Database initialized');
         } catch (error) {
             console.error('Error initializing Firebase Database:', error);
+            localStorage.setItem('useFirebase', 'false');
+            return false;
         }
     },
 
@@ -442,16 +432,38 @@ const FirebaseDatabase = {
                     };
                 }
                 
+                // Check if we're connected to Firebase
+                if (this.connectionIssuesDetected) {
+                    console.warn('Login: Firebase connection issues detected, cannot proceed with Firebase login');
+                    return { 
+                        success: false, 
+                        error: 'تعذر الاتصال بقاعدة البيانات',
+                        details: 'Firebase connection issues detected',
+                        connectionIssue: true
+                    };
+                }
+                
                 // Get user document from Firestore
                 let userDoc;
                 try {
                     userDoc = await getDoc(doc(db, FirebaseDatabase.COLLECTIONS.USERS, id));
                 } catch (firestoreError) {
                     console.error('Firestore error during login:', firestoreError);
+                    
+                    // Check if this is a network-related error
+                    const errorMessage = firestoreError.message.toLowerCase();
+                    const isNetworkError = 
+                        errorMessage.includes('network') || 
+                        errorMessage.includes('offline') || 
+                        errorMessage.includes('unavailable') ||
+                        errorMessage.includes('timeout') ||
+                        errorMessage.includes('connection');
+                        
                     return { 
                         success: false, 
                         error: 'خطأ في الاتصال بقاعدة البيانات',
-                        details: `Firestore error: ${firestoreError.message}`
+                        details: `Firestore error: ${firestoreError.message}`,
+                        connectionIssue: isNetworkError
                     };
                 }
                 
@@ -480,10 +492,12 @@ const FirebaseDatabase = {
                         grade: userData.grade,
                         group: userData.group,
                         role: userData.role || 'student',
-                        loginTime: new Date().toISOString()
+                        loginTime: new Date().toISOString(),
+                        loginMode: 'firebase'
                     };
                     
                     localStorage.setItem('sms_current_user', JSON.stringify(userInfo));
+                    localStorage.setItem('lastLoginMode', 'firebase');
                     
                     return { 
                         success: true, 
@@ -499,10 +513,22 @@ const FirebaseDatabase = {
                 }
             } catch (error) {
                 console.error('Unexpected error during login:', error);
+                
+                // Check if this might be a connection issue
+                const errorMessage = error.message.toLowerCase();
+                const isConnectionIssue = 
+                    errorMessage.includes('network') || 
+                    errorMessage.includes('offline') || 
+                    errorMessage.includes('unavailable') ||
+                    errorMessage.includes('timeout') ||
+                    errorMessage.includes('connection') ||
+                    errorMessage.includes('failed to fetch');
+                    
                 return { 
                     success: false, 
                     error: 'حدث خطأ غير متوقع أثناء تسجيل الدخول',
-                    details: error.message 
+                    details: error.message,
+                    connectionIssue: isConnectionIssue
                 };
             }
         },
@@ -522,22 +548,66 @@ const FirebaseDatabase = {
                     };
                 }
                 
+                // Check if we're connected to Firebase
+                if (this.connectionIssuesDetected) {
+                    console.warn('Admin Login: Firebase connection issues detected, cannot proceed with Firebase login');
+                    return { 
+                        success: false, 
+                        error: 'تعذر الاتصال بقاعدة البيانات',
+                        details: 'Firebase connection issues detected',
+                        connectionIssue: true
+                    };
+                }
+                
                 // Get admin document from Firestore
                 let adminDoc;
                 try {
                     adminDoc = await getDoc(doc(db, FirebaseDatabase.COLLECTIONS.SETTINGS, 'admin'));
                 } catch (firestoreError) {
                     console.error('Firestore error during admin login:', firestoreError);
+                    
+                    // Check if this is a network-related error
+                    const errorMessage = firestoreError.message.toLowerCase();
+                    const isNetworkError = 
+                        errorMessage.includes('network') || 
+                        errorMessage.includes('offline') || 
+                        errorMessage.includes('unavailable') ||
+                        errorMessage.includes('timeout') ||
+                        errorMessage.includes('connection');
+                        
                     return { 
                         success: false, 
                         error: 'خطأ في الاتصال بقاعدة البيانات',
-                        details: `Firestore error: ${firestoreError.message}`
+                        details: `Firestore error: ${firestoreError.message}`,
+                        connectionIssue: isNetworkError
                     };
                 }
                 
-                // Check if admin document exists
+                // Check if admin settings exist
                 if (!adminDoc.exists()) {
                     console.error('Admin login failed: Admin settings not found');
+                    
+                    // Create default admin settings if they don't exist
+                    try {
+                        await setDoc(doc(db, FirebaseDatabase.COLLECTIONS.SETTINGS, 'admin'), {
+                            password: 'admin123'
+                        });
+                        console.log('Created default admin settings');
+                        
+                        // Check if the provided password matches the default
+                        if (password === 'admin123') {
+                            console.log('Admin login successful with default password');
+                            
+                            // Set admin status in localStorage
+                            localStorage.setItem('sms_admin_logged_in', 'true');
+                            localStorage.setItem('sms_admin_login_time', new Date().toISOString());
+                            
+                            return { success: true };
+                        }
+                    } catch (error) {
+                        console.error('Failed to create default admin settings:', error);
+                    }
+                    
                     return { 
                         success: false, 
                         error: 'إعدادات المسؤول غير موجودة',
@@ -552,9 +622,10 @@ const FirebaseDatabase = {
                 if (adminData.password === password) {
                     console.log('Admin password correct, login successful');
                     
-                    // Store admin session in localStorage
+                    // Set admin status in localStorage
                     localStorage.setItem('sms_admin_logged_in', 'true');
                     localStorage.setItem('sms_admin_login_time', new Date().toISOString());
+                    localStorage.setItem('lastLoginMode', 'firebase');
                     
                     return { success: true };
                 } else {
@@ -567,10 +638,22 @@ const FirebaseDatabase = {
                 }
             } catch (error) {
                 console.error('Unexpected error during admin login:', error);
+                
+                // Check if this might be a connection issue
+                const errorMessage = error.message.toLowerCase();
+                const isConnectionIssue = 
+                    errorMessage.includes('network') || 
+                    errorMessage.includes('offline') || 
+                    errorMessage.includes('unavailable') ||
+                    errorMessage.includes('timeout') ||
+                    errorMessage.includes('connection') ||
+                    errorMessage.includes('failed to fetch');
+                    
                 return { 
                     success: false, 
                     error: 'حدث خطأ غير متوقع أثناء تسجيل الدخول',
-                    details: error.message 
+                    details: error.message,
+                    connectionIssue: isConnectionIssue
                 };
             }
         },
