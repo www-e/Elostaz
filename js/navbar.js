@@ -27,10 +27,10 @@ window.addEventListener('scroll', function() {
 
 // Add profile and admin links to navbar
 document.addEventListener('DOMContentLoaded', function() {
-    // Import Database if it exists
+    // Import DatabaseAdapter
     let Database;
     try {
-        import('./database.js').then(module => {
+        import('./database-adapter.js').then(module => {
             Database = module.default;
             updateNavbarLinks();
         });
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!navbarNav) return;
 
         // Check if links already exist to avoid duplicates
-        if (document.querySelector('.profile-link') || document.querySelector('.admin-link')) {
+        if (document.querySelector('.profile-link') || document.querySelector('.admin-link') || document.querySelector('.settings-link')) {
             return;
         }
 
@@ -73,12 +73,26 @@ document.addEventListener('DOMContentLoaded', function() {
         adminLi.appendChild(adminLink);
         navbarNav.appendChild(adminLi);
 
+        // Add settings link
+        const settingsLi = document.createElement('li');
+        settingsLi.className = 'nav-item settings-link';
+        
+        const settingsLink = document.createElement('a');
+        settingsLink.className = 'nav-link';
+        settingsLink.href = PathHandler.getBasePath() + '/pages/settings.html';
+        settingsLink.innerHTML = '<i class="fas fa-sliders-h ml-1"></i> الإعدادات';
+        
+        settingsLi.appendChild(settingsLink);
+        navbarNav.appendChild(settingsLi);
+
         // Set active state for current page
         const currentPath = window.location.pathname;
         if (currentPath.includes('/profile.html')) {
             profileLink.classList.add('active');
         } else if (currentPath.includes('/admin.html')) {
             adminLink.classList.add('active');
+        } else if (currentPath.includes('/settings.html')) {
+            settingsLink.classList.add('active');
         }
     }
 });

@@ -1,6 +1,9 @@
 /**
  * Student Management System Database Module
  * Uses localStorage for persistent storage of user accounts and related data
+ * 
+ * NOTE: This is the original localStorage implementation.
+ * For global data access, use database-adapter.js instead.
  */
 
 const Database = {

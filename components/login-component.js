@@ -15,8 +15,8 @@ class LoginComponent extends HTMLElement {
     }
 
     render() {
-        // Import Database
-        import('../js/database.js').then(module => {
+        // Import DatabaseAdapter
+        import('../js/database-adapter.js').then(module => {
             this.Database = module.default;
             
             // Check if user is already logged in

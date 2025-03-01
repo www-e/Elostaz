@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const CACHE_NAME = `elostaz-cache-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `elostaz-dynamic-${CACHE_VERSION}`;
 
@@ -15,6 +15,9 @@ const ASSETS = [
     `${BASE_PATH}/pages/registration.html`,
     `${BASE_PATH}/pages/about.html`,
     `${BASE_PATH}/pages/schedule.html`,
+    `${BASE_PATH}/pages/profile.html`,
+    `${BASE_PATH}/pages/admin.html`,
+    `${BASE_PATH}/pages/settings.html`,
     `${BASE_PATH}/pages/grades/grade1.html`,
     `${BASE_PATH}/pages/grades/grade2.html`,
     `${BASE_PATH}/pages/grades/grade3.html`,
@@ -35,8 +38,16 @@ const ASSETS = [
     `${BASE_PATH}/js/ActiveState.js`,
     `${BASE_PATH}/js/DOMloader.js`,
     `${BASE_PATH}/js/theme.js`,
+    `${BASE_PATH}/js/database.js`,
+    `${BASE_PATH}/js/firebase-config.js`,
+    `${BASE_PATH}/js/firebase-database.js`,
+    `${BASE_PATH}/js/database-adapter.js`,
+    `${BASE_PATH}/js/data-migration.js`,
+    `${BASE_PATH}/js/settings.js`,
+    `${BASE_PATH}/js/profile-attendance.js`,
     `${BASE_PATH}/js/secondTermValidator.js`,
     `${BASE_PATH}/assets/icons/edu.ico`,
+    `${BASE_PATH}/components/login-component.js`,
     `${BASE_PATH}/components/install-prompt/install-prompt.css`,
     `${BASE_PATH}/components/install-prompt/install-prompt.js`,
     // External resources
@@ -45,7 +56,11 @@ const ASSETS = [
     'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
-    'https://unpkg.com/aos@next/dist/aos.css'
+    'https://unpkg.com/aos@next/dist/aos.css',
+    // Firebase CDN resources
+    'https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js',
+    'https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js',
+    'https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js'
 ];
 
 // Install event - cache initial assets
