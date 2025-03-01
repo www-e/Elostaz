@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Admin Login Handler
-    function handleAdminLogin(e) {
+    async function handleAdminLogin(e) {
         e.preventDefault();
         
         const password = adminPassword.value.trim();
@@ -101,15 +101,56 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        const result = Database.auth.adminLogin(password);
-        
-        if (result.success) {
-            isAdminLoggedIn = true;
-            sessionStorage.setItem('adminLoggedIn', 'true');
-            updateUIBasedOnAuthStatus();
-            loadStudentsTable();
-        } else {
-            showValidationError(adminPassword, 'كلمة المرور غير صحيحة');
+        try {
+            // Show loading state
+            const submitButton = adminLoginForm.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري تسجيل الدخول...';
+            submitButton.disabled = true;
+            
+            // Check if we're using Firebase
+            const isUsingFirebase = localStorage.getItem('useFirebase') === 'true';
+            console.log('Admin login: Using Firebase storage:', isUsingFirebase);
+            
+            // Attempt login
+            console.log('Attempting admin login');
+            const result = await Database.auth.adminLogin(password);
+            
+            // Reset button state
+            submitButton.innerHTML = originalButtonText;
+            submitButton.disabled = false;
+            
+            if (result.success) {
+                console.log('Admin login successful');
+                isAdminLoggedIn = true;
+                localStorage.setItem('sms_admin_logged_in', 'true');
+                sessionStorage.setItem('adminLoggedIn', 'true');
+                
+                // Store login timestamp
+                localStorage.setItem('sms_admin_login_time', new Date().toISOString());
+                
+                updateUIBasedOnAuthStatus();
+                loadStudentsTable();
+            } else {
+                console.error('Admin login failed:', result);
+                
+                // Check for specific error types
+                if (isUsingFirebase && result.details && result.details.includes('Firestore error')) {
+                    // Firebase connection error
+                    showAlert('خطأ في الاتصال', 'فشل الاتصال بقاعدة البيانات. تأكد من اتصالك بالإنترنت وعدم وجود مانع للإعلانات.', 'danger');
+                    
+                    // Check for ad blockers
+                    if (typeof FirebaseDatabase !== 'undefined') {
+                        FirebaseDatabase.detectConnectionIssues();
+                    }
+                } else {
+                    // Standard authentication error
+                    showValidationError(adminPassword, result.error || 'كلمة المرور غير صحيحة');
+                }
+            }
+        } catch (error) {
+            console.error('Unexpected error during admin login:', error);
+            showAlert('خطأ غير متوقع', 'حدث خطأ أثناء محاولة تسجيل الدخول. يرجى المحاولة مرة أخرى لاحقًا.', 'danger');
         }
     }
 
@@ -434,12 +475,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Logout Handler
-    function handleLogout(e) {
+    async function handleLogout(e) {
         e.preventDefault();
         
-        isAdminLoggedIn = false;
-        sessionStorage.removeItem('adminLoggedIn');
-        updateUIBasedOnAuthStatus();
+        try {
+            console.log('Admin logout: Attempting to log out');
+            
+            // Call the database logout function
+            if (typeof Database.auth.logout === 'function') {
+                await Database.auth.logout();
+                console.log('Admin logout: Database logout function called');
+            }
+            
+            // Clear all admin session data
+            isAdminLoggedIn = false;
+            localStorage.removeItem('sms_admin_logged_in');
+            localStorage.removeItem('sms_admin_login_time');
+            sessionStorage.removeItem('adminLoggedIn');
+            
+            console.log('Admin logout: Session data cleared');
+            
+            // Update UI
+            updateUIBasedOnAuthStatus();
+            
+            // Redirect to login page if needed
+            if (adminLoginSection && adminDashboardSection) {
+                adminDashboardSection.style.display = 'none';
+                adminLoginSection.style.display = 'block';
+            }
+            
+            // Show success message
+            showAlert('تم تسجيل الخروج', 'تم تسجيل الخروج بنجاح', 'success');
+        } catch (error) {
+            console.error('Error during admin logout:', error);
+            
+            // Ensure logout happens even if there's an error
+            isAdminLoggedIn = false;
+            localStorage.removeItem('sms_admin_logged_in');
+            localStorage.removeItem('sms_admin_login_time');
+            sessionStorage.removeItem('adminLoggedIn');
+            updateUIBasedOnAuthStatus();
+        }
     }
 
     // Load Students Table
@@ -515,14 +591,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Update UI Based on Auth Status
     function updateUIBasedOnAuthStatus() {
+        // Check multiple sources for admin login status
+        const isLoggedInLocalStorage = localStorage.getItem('sms_admin_logged_in') === 'true';
+        const isLoggedInSessionStorage = sessionStorage.getItem('adminLoggedIn') === 'true';
+        
+        // Update the global variable
+        isAdminLoggedIn = isLoggedInLocalStorage || isLoggedInSessionStorage;
+        
+        console.log('Admin auth status check:', {
+            isAdminLoggedIn,
+            isLoggedInLocalStorage,
+            isLoggedInSessionStorage
+        });
+        
+        // Check if the admin is actually logged in via the Database API
+        if (typeof Database.auth.isAdmin === 'function') {
+            try {
+                const isAdminViaAPI = Database.auth.isAdmin();
+                console.log('Admin status via API:', isAdminViaAPI);
+                
+                // If there's a mismatch between localStorage and the API, trust the API
+                if (isAdminLoggedIn !== isAdminViaAPI) {
+                    console.warn('Admin login status mismatch between localStorage and API');
+                    isAdminLoggedIn = isAdminViaAPI;
+                    
+                    // Update localStorage to match the API status
+                    if (isAdminViaAPI) {
+                        localStorage.setItem('sms_admin_logged_in', 'true');
+                        sessionStorage.setItem('adminLoggedIn', 'true');
+                    } else {
+                        localStorage.removeItem('sms_admin_logged_in');
+                        sessionStorage.removeItem('adminLoggedIn');
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking admin status via API:', error);
+            }
+        }
+        
+        // Update UI based on login status
         if (isAdminLoggedIn) {
             adminLoginSection.style.display = 'none';
             adminDashboardSection.style.display = 'block';
             adminLogoutBtn.style.display = 'block';
+            
+            // Load data if needed
+            if (studentsTableBody && studentsTableBody.children.length === 0) {
+                loadStudentsTable();
+            }
         } else {
             adminLoginSection.style.display = 'block';
             adminDashboardSection.style.display = 'none';
             adminLogoutBtn.style.display = 'none';
+            
+            // Clear any sensitive data from the UI
+            if (studentsTableBody) {
+                studentsTableBody.innerHTML = '';
+            }
         }
     }
 

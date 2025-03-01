@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initProfilePage();
 
     // Login Handler
-    function handleLogin(e) {
+    async function handleLogin(e) {
         e.preventDefault();
         
         const id = studentId.value.trim();
@@ -72,13 +72,49 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        const result = Database.auth.login(id, password);
-        
-        if (result.success) {
-            displayUserProfile(result.user);
-            loginForm.reset();
-        } else {
-            showValidationError(studentPassword, result.message);
+        try {
+            // Show loading state
+            const submitButton = loginForm.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري تسجيل الدخول...';
+            submitButton.disabled = true;
+            
+            // Check if we're using Firebase
+            const isUsingFirebase = localStorage.getItem('useFirebase') === 'true';
+            console.log('Using Firebase storage:', isUsingFirebase);
+            
+            // Attempt login
+            console.log(`Attempting to login with ID: ${id}`);
+            const result = await Database.auth.login(id, password);
+            
+            // Reset button state
+            submitButton.innerHTML = originalButtonText;
+            submitButton.disabled = false;
+            
+            if (result.success) {
+                console.log('Login successful:', result.user);
+                displayUserProfile(result.user);
+                loginForm.reset();
+            } else {
+                console.error('Login failed:', result);
+                
+                // Check for specific error types
+                if (isUsingFirebase && result.details && result.details.includes('Firestore error')) {
+                    // Firebase connection error
+                    showAlert('خطأ في الاتصال', 'فشل الاتصال بقاعدة البيانات. تأكد من اتصالك بالإنترنت وعدم وجود مانع للإعلانات.');
+                    
+                    // Check for ad blockers
+                    if (typeof FirebaseDatabase !== 'undefined') {
+                        FirebaseDatabase.detectConnectionIssues();
+                    }
+                } else {
+                    // Standard authentication error
+                    showValidationError(studentPassword, result.error || 'معرف الطالب أو كلمة المرور غير صحيحة');
+                }
+            }
+        } catch (error) {
+            console.error('Unexpected error during login:', error);
+            showAlert('خطأ غير متوقع', 'حدث خطأ أثناء محاولة تسجيل الدخول. يرجى المحاولة مرة أخرى لاحقًا.');
         }
     }
 
