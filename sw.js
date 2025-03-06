@@ -50,7 +50,6 @@ const ASSETS = [
     `${BASE_PATH}/js/secondTermValidator.js`,
     `${BASE_PATH}/js/admin.js`,
     `${BASE_PATH}/assets/icons/edu.ico`,
-    `${BASE_PATH}/components/login-component.js`,
     `${BASE_PATH}/components/install-prompt/install-prompt.css`,
     `${BASE_PATH}/components/install-prompt/install-prompt.js`,
     // External resources
