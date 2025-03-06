@@ -112,7 +112,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Get current month's days for this group
         const groupDays = getGroupDaysInMonth(currentYear, currentMonth, getGroupDaysForGroup(group));
-        const attendanceData = Database.attendance.getMonthAttendance(currentYear, currentMonth);
+        
+        // Safely check if Database and Database.attendance exist
+        let attendanceData = {};
+        if (window.Database && window.Database.attendance && typeof window.Database.attendance.getMonthAttendance === 'function') {
+            attendanceData = window.Database.attendance.getMonthAttendance(currentYear, currentMonth);
+        } else {
+            console.warn('Database.attendance not available - using empty attendance data');
+        }
         
         // Show no days message if applicable
         if (groupDays.length === 0) {
@@ -285,8 +292,27 @@ document.addEventListener('DOMContentLoaded', function() {
         // Save to database
         Database.attendance.saveMonthAttendance(currentYear, currentMonth, attendanceData);
         
-        // Show success message
-        showAlert('تم', 'تم حفظ بيانات الحضور بنجاح', 'success');
+        // Automatically sync with Firebase if Firebase is enabled
+        if (localStorage.getItem('useFirebase') === 'true') {
+            // Show syncing message
+            showAlert('جاري المزامنة', 'جاري مزامنة بيانات الحضور مع السحابة...', 'info');
+            
+            import('./firebase-database.js').then(module => {
+                const FirebaseDatabase = module.default;
+                FirebaseDatabase.attendance.saveMonthAttendance(currentYear, currentMonth, attendanceData)
+                    .then(() => {
+                        console.log('Attendance data synced with Firebase successfully');
+                        showAlert('تم', 'تم حفظ ومزامنة بيانات الحضور بنجاح', 'success');
+                    })
+                    .catch(error => {
+                        console.error('Error syncing attendance data with Firebase:', error);
+                        showAlert('تنبيه', 'تم حفظ بيانات الحضور محليًا ولكن فشلت المزامنة مع السحابة. يرجى التحقق من اتصالك بالإنترنت.', 'warning');
+                    });
+            });
+        } else {
+            // Show success message
+            showAlert('تم', 'تم حفظ بيانات الحضور بنجاح', 'success');
+        }
     }
     
     // Helper function to get day name in Arabic

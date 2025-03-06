@@ -1,18 +1,18 @@
 /**
  * Database Adapter
  * Provides a unified interface for both localStorage and Firebase
- * Allows for seamless transition between storage methods
+ * Always uses Firebase as the primary storage method
  */
 
 import FirebaseDatabase from './firebase-database.js';
 
-// Original localStorage-based Database
-import LocalDatabase from './database.js';
+// Original localStorage-based Database for fallback, accessed from window global
+const LocalDatabase = window.Database || {};
 
-// Database adapter that can switch between storage methods
+// Database adapter that primarily uses Firebase
 const DatabaseAdapter = {
-    // Storage mode: 'local' or 'firebase'
-    mode: 'local',
+    // Storage mode: always 'firebase' by default
+    mode: 'firebase',
     
     // Flag to track Firebase connection status
     firebaseConnectionFailed: false,
@@ -20,7 +20,7 @@ const DatabaseAdapter = {
     // Initialize the database adapter
     async init() {
         try {
-            // Always try Firebase first to see if it's available
+            // Always use Firebase
             const firebaseInitResult = await FirebaseDatabase.init();
             
             // If Firebase initialization was successful and no connection issues detected
@@ -32,11 +32,16 @@ const DatabaseAdapter = {
                 // Add a connection status listener
                 this.monitorFirebaseConnection();
             } else {
-                // Firebase had issues, use localStorage
-                console.log('Using local storage due to Firebase connection issues');
+                // Firebase had issues, use localStorage as fallback
+                console.log('Using local storage as fallback due to Firebase connection issues');
                 this.setMode('local');
                 this.firebaseConnectionFailed = true;
                 await LocalDatabase.init();
+                
+                // Show a warning to the user
+                if (typeof showAlert === 'function') {
+                    showAlert('تنبيه', 'تعذر الاتصال بقاعدة البيانات السحابية. سيتم استخدام التخزين المحلي مؤقتًا حتى يعود الاتصال.', 'warning');
+                }
             }
         } catch (error) {
             // Something went wrong with initialization
@@ -45,7 +50,15 @@ const DatabaseAdapter = {
             this.firebaseConnectionFailed = true;
             await LocalDatabase.init();
             console.log('Local database initialized successfully (fallback)');
+            
+            // Show a warning to the user
+            if (typeof showAlert === 'function') {
+                showAlert('تنبيه', 'حدث خطأ أثناء الاتصال بقاعدة البيانات السحابية. سيتم استخدام التخزين المحلي مؤقتًا.', 'warning');
+            }
         }
+        
+        // Always set useFirebase to true in localStorage
+        localStorage.setItem('useFirebase', 'true');
     },
     
     // Monitor Firebase connection status

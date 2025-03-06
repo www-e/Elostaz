@@ -13,19 +13,34 @@ const Database = {
         CURRENT_USER: 'sms_current_user',
         ADMIN_PASSWORD: 'sms_admin_password',
         LAST_STUDENT_INDEX: 'sms_last_student_index',
-        ATTENDANCE: 'sms_attendance'
+        ATTENDANCE: 'sms_attendance',
+        SETTINGS: 'sms_settings'
+    },
+
+    // Default settings
+    DEFAULT_SETTINGS: {
+        // Add default settings here if needed
     },
 
     // Initialize the database with default values if not already set
     init() {
+        console.log('Initializing local database...');
+        
+        // Initialize settings if not exist
+        if (!localStorage.getItem(Database.KEYS.SETTINGS)) {
+            localStorage.setItem(Database.KEYS.SETTINGS, JSON.stringify(Database.DEFAULT_SETTINGS));
+        }
+        
+        // Initialize admin password if not exist
+        if (!localStorage.getItem(Database.KEYS.ADMIN_PASSWORD)) {
+            console.log('Setting default admin password');
+            localStorage.setItem(Database.KEYS.ADMIN_PASSWORD, 'Elostaz@2025');
+            localStorage.setItem(this.KEYS.ADMIN_PASSWORD.replace('admin_', 'ADMIN_'), 'Elostaz@2025');
+        }
+        
         // Initialize users array if it doesn't exist
         if (!localStorage.getItem(this.KEYS.USERS)) {
             localStorage.setItem(this.KEYS.USERS, JSON.stringify([]));
-        }
-
-        // Set default admin password if not set
-        if (!localStorage.getItem(this.KEYS.ADMIN_PASSWORD)) {
-            localStorage.setItem(this.KEYS.ADMIN_PASSWORD, 'admin123'); // Default password
         }
         
         // Initialize last student index if it doesn't exist
@@ -37,6 +52,8 @@ const Database = {
         if (!localStorage.getItem(this.KEYS.ATTENDANCE)) {
             localStorage.setItem(this.KEYS.ATTENDANCE, JSON.stringify({}));
         }
+        
+        console.log('Local database initialized');
     },
 
     // User Management Functions
@@ -124,17 +141,35 @@ const Database = {
         },
 
         // Update existing user
-        update(id, updatedData) {
+        update(id, updatedUser) {
             const users = this.getAll();
             const index = users.findIndex(user => user.id === id);
             
             if (index === -1) {
-                return { success: false, message: 'الطالب غير موجود' };
+                return { success: false, message: 'لم يتم العثور على الطالب' };
             }
             
-            users[index] = { ...users[index], ...updatedData };
+            users[index] = { ...users[index], ...updatedUser };
             localStorage.setItem(Database.KEYS.USERS, JSON.stringify(users));
-            return { success: true, user: users[index] };
+            
+            return { success: true };
+        },
+
+        // Replace all users with data from Firebase
+        replaceAll(users) {
+            if (!Array.isArray(users)) {
+                console.error('replaceAll: Expected an array of users');
+                return { success: false, message: 'بيانات غير صالحة' };
+            }
+            
+            try {
+                localStorage.setItem(Database.KEYS.USERS, JSON.stringify(users));
+                console.log(`Replaced local users with ${users.length} users from Firebase`);
+                return { success: true };
+            } catch (error) {
+                console.error('Error replacing users:', error);
+                return { success: false, message: 'حدث خطأ أثناء تحديث البيانات' };
+            }
         },
 
         // Delete user
@@ -222,14 +257,66 @@ const Database = {
         },
 
         // Admin login
-        adminLogin(password) {
-            const adminPassword = localStorage.getItem(Database.KEYS.ADMIN_PASSWORD);
-            
-            if (password !== adminPassword) {
-                return { success: false, message: 'كلمة المرور غير صحيحة' };
+        async adminLogin(password) {
+            try {
+                console.log('Attempting admin login with password');
+                
+                // Get admin password from multiple possible locations
+                const adminPasswordSMS = localStorage.getItem(Database.KEYS.ADMIN_PASSWORD);
+                const adminPasswordLegacy = localStorage.getItem('admin_password');
+                const adminPasswordUppercase = localStorage.getItem('ADMIN_PASSWORD');
+                
+                // Use the first available password
+                const adminPassword = adminPasswordSMS || adminPasswordLegacy || adminPasswordUppercase;
+                
+                console.log('Admin password status:',
+                    'sms_admin_password exists:', !!adminPasswordSMS,
+                    'admin_password exists:', !!adminPasswordLegacy,
+                    'ADMIN_PASSWORD exists:', !!adminPasswordUppercase
+                );
+                
+                // Use global passwordUtils object instead of import
+                const passwordUtils = window.passwordUtils;
+                
+                // Check if the password is already hashed (if it starts with a hash pattern)
+                if (adminPassword && adminPassword.length === 64) {
+                    // Password is already hashed, verify it
+                    const isValid = await passwordUtils.verifyPassword(password, adminPassword);
+                    console.log('Password verification result:', isValid);
+                    
+                    if (!isValid) {
+                        return { success: false, message: 'كلمة المرور غير صحيحة' };
+                    }
+                } else if (adminPassword === 'Elostaz@2025') {
+                    // Default password, hash it and store it
+                    const hashedPassword = await passwordUtils.hashPassword(password);
+                    localStorage.setItem(Database.KEYS.ADMIN_PASSWORD, hashedPassword);
+                    // Also set in legacy locations
+                    localStorage.setItem('admin_password', hashedPassword);
+                    localStorage.setItem('ADMIN_PASSWORD', hashedPassword);
+                } else {
+                    // Old plaintext password comparison (for backward compatibility)
+                    if (password !== adminPassword) {
+                        return { success: false, message: 'كلمة المرور غير صحيحة' };
+                    }
+                    
+                    // Upgrade the plaintext password to a hashed one
+                    const hashedPassword = await passwordUtils.hashPassword(password);
+                    localStorage.setItem(Database.KEYS.ADMIN_PASSWORD, hashedPassword);
+                    // Also set in legacy locations
+                    localStorage.setItem('admin_password', hashedPassword);
+                    localStorage.setItem('ADMIN_PASSWORD', hashedPassword);
+                }
+                
+                // Set admin logged in flags
+                localStorage.setItem('sms_admin_logged_in', 'true');
+                sessionStorage.setItem('adminLoggedIn', 'true');
+                
+                return { success: true };
+            } catch (error) {
+                console.error('Error during admin login:', error);
+                return { success: false, message: 'حدث خطأ أثناء تسجيل الدخول' };
             }
-            
-            return { success: true };
         },
 
         // Logout current user
@@ -248,10 +335,49 @@ const Database = {
             return !!this.getCurrentUser();
         },
 
-        // Change admin password
-        changeAdminPassword(newPassword) {
-            localStorage.setItem(Database.KEYS.ADMIN_PASSWORD, newPassword);
+        // Check if admin is logged in
+        isAdmin() {
+            try {
+                // Check multiple sources for admin login status
+                const isLoggedInLocalStorage = localStorage.getItem(Database.KEYS.ADMIN_PASSWORD) !== null &&
+                                             localStorage.getItem('sms_admin_logged_in') === 'true';
+                const isLoggedInSessionStorage = sessionStorage.getItem('adminLoggedIn') === 'true';
+                
+                // Admin is logged in if either condition is true
+                return isLoggedInLocalStorage || isLoggedInSessionStorage;
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+                return false;
+            }
+        },
+
+        // Admin logout
+        adminLogout() {
+            localStorage.removeItem('sms_admin_logged_in');
+            sessionStorage.removeItem('adminLoggedIn');
             return { success: true };
+        },
+
+        // Change admin password
+        async changeAdminPassword(newPassword) {
+            try {
+                // Use global passwordUtils object instead of import
+                const passwordUtils = window.passwordUtils;
+                
+                // Hash the new password
+                const hashedPassword = await passwordUtils.hashPassword(newPassword);
+                
+                // Store the new password in all localStorage locations for consistency
+                console.log('Changing admin password in local storage');
+                localStorage.setItem(Database.KEYS.ADMIN_PASSWORD, hashedPassword);
+                localStorage.setItem('admin_password', hashedPassword);
+                localStorage.setItem('ADMIN_PASSWORD', hashedPassword);
+                
+                return { success: true };
+            } catch (error) {
+                console.error('Error changing admin password:', error);
+                return { success: false, message: 'حدث خطأ أثناء تغيير كلمة المرور' };
+            }
         }
     }
 };
@@ -262,4 +388,5 @@ Database.init();
 // Expose to global scope
 window.Database = Database;
 
-export default Database;
+// Note: ES6 export syntax has been removed to fix loading errors
+// Database is available globally via window.Database

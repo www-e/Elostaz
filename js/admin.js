@@ -3,7 +3,8 @@
  * Handles admin authentication, student management, and dashboard functionality
  */
 
-import Database from './database.js';
+// Use the global Database object without redeclaring it
+// This fixes the "Identifier 'Database' has already been declared" error
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
@@ -62,7 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
     adminLoginForm.addEventListener('submit', handleAdminLogin);
     addStudentForm.addEventListener('submit', handleAddStudent);
     csvImportForm.addEventListener('submit', handleCsvImport);
-    changePasswordForm.addEventListener('submit', handleChangePassword);
+    // Settings page has been removed, so we need to check if changePasswordForm exists
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener('submit', handleChangePassword);
+    }
     studentSearch.addEventListener('input', handleStudentSearch);
     logoutBtn.addEventListener('click', handleLogout);
     
@@ -112,9 +116,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const isUsingFirebase = localStorage.getItem('useFirebase') === 'true';
             console.log('Admin login: Using Firebase storage:', isUsingFirebase);
             
+            // Debug: Log existing passwords in localStorage
+            console.log('Password storage check:',
+                'sms_admin_password exists:', !!localStorage.getItem('sms_admin_password'),
+                'admin_password exists:', !!localStorage.getItem('admin_password'), 
+                'ADMIN_PASSWORD exists:', !!localStorage.getItem('ADMIN_PASSWORD')
+            );
+            
             // Attempt login
-            console.log('Attempting admin login');
-            const result = await Database.auth.adminLogin(password);
+            console.log('Attempting admin login with Database.auth.adminLogin');
+            const result = await window.Database.auth.adminLogin(password);
             
             // Reset button state
             submitButton.innerHTML = originalButtonText;
@@ -129,28 +140,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Store login timestamp
                 localStorage.setItem('sms_admin_login_time', new Date().toISOString());
                 
+                // Additional debug check to make sure admin login is properly marked
+                console.log('Admin login state after login:',
+                    'localStorage sms_admin_logged_in:', localStorage.getItem('sms_admin_logged_in'),
+                    'sessionStorage adminLoggedIn:', sessionStorage.getItem('adminLoggedIn')
+                );
+                
                 updateUIBasedOnAuthStatus();
                 loadStudentsTable();
             } else {
                 console.error('Admin login failed:', result);
                 
                 // Check for specific error types
-                if (isUsingFirebase && result.details && result.details.includes('Firestore error')) {
-                    // Firebase connection error
-                    showAlert('خطأ في الاتصال', 'فشل الاتصال بقاعدة البيانات. تأكد من اتصالك بالإنترنت وعدم وجود مانع للإعلانات.', 'danger');
-                    
-                    // Check for ad blockers
-                    if (typeof FirebaseDatabase !== 'undefined') {
-                        FirebaseDatabase.detectConnectionIssues();
-                    }
+                if (result.message) {
+                    showAlert('خطأ في تسجيل الدخول', result.message, 'danger');
                 } else {
-                    // Standard authentication error
-                    showValidationError(adminPassword, result.error || 'كلمة المرور غير صحيحة');
+                    showAlert('خطأ في تسجيل الدخول', 'كلمة المرور غير صحيحة أو حدث خطأ أثناء المصادقة. حاول مرة أخرى.', 'danger');
                 }
+                
+                // Clear password field for security
+                adminPassword.value = '';
+                adminPassword.focus();
             }
         } catch (error) {
-            console.error('Unexpected error during admin login:', error);
-            showAlert('خطأ غير متوقع', 'حدث خطأ أثناء محاولة تسجيل الدخول. يرجى المحاولة مرة أخرى لاحقًا.', 'danger');
+            console.error('Error during admin login:', error);
+            showAlert('خطأ في النظام', 'حدث خطأ غير متوقع أثناء محاولة تسجيل الدخول. حاول مرة أخرى.', 'danger');
+            
+            // Reset button state
+            const submitButton = adminLoginForm.querySelector('button[type="submit"]');
+            submitButton.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i> تسجيل الدخول';
+            submitButton.disabled = false;
+            
+            // Clear password field for security
+            adminPassword.value = '';
+            adminPassword.focus();
         }
     }
 
@@ -206,9 +229,24 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         
         // Add student to database
-        const result = Database.users.add(student);
+        const result = window.Database.users.add(student);
         
         if (result.success) {
+            // Automatically sync with Firebase if Firebase is enabled
+            if (localStorage.getItem('useFirebase') === 'true') {
+                import('./firebase-database.js').then(module => {
+                    const FirebaseDatabase = module.default;
+                    window.FirebaseDatabase.users.add(student)
+                        .then(() => {
+                            console.log('Student synced with Firebase successfully');
+                        })
+                        .catch(error => {
+                            console.error('Error syncing student with Firebase:', error);
+                            showAlert('تنبيه', 'تم إضافة الطالب محليًا ولكن فشلت المزامنة مع السحابة. يرجى التحقق من اتصالك بالإنترنت.', 'warning');
+                        });
+                });
+            }
+            
             showAlert('تم بنجاح', 'تم إضافة الطالب بنجاح');
             addStudentForm.reset();
             loadStudentsTable();
@@ -255,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             // Import students
-            const result = Database.users.addBulk(students);
+            const result = window.Database.users.addBulk(students);
             
             // Show import results
             importSummary.textContent = `تم استيراد ${result.successCount} طالب بنجاح. ${result.errorCount} طالب لم يتم استيرادهم.`;
@@ -315,47 +353,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleChangePassword(e) {
         e.preventDefault();
         
-        const currentPassword = document.getElementById('currentPassword').value.trim();
-        const newPassword = document.getElementById('newPassword').value.trim();
-        const confirmPassword = document.getElementById('confirmPassword').value.trim();
-        
-        // Validate inputs
-        let isValid = true;
-        
-        if (!currentPassword) {
-            showValidationError(document.getElementById('currentPassword'), 'يرجى إدخال كلمة المرور الحالية');
-            isValid = false;
-        }
-        
-        if (!newPassword) {
-            showValidationError(document.getElementById('newPassword'), 'يرجى إدخال كلمة المرور الجديدة');
-            isValid = false;
-        }
-        
-        if (!confirmPassword) {
-            showValidationError(document.getElementById('confirmPassword'), 'يرجى تأكيد كلمة المرور الجديدة');
-            isValid = false;
-        }
-        
-        if (newPassword !== confirmPassword) {
-            showValidationError(document.getElementById('confirmPassword'), 'كلمات المرور غير متطابقة');
-            isValid = false;
-        }
-        
-        if (!isValid) return;
-        
-        // Verify current password
-        const loginResult = Database.auth.adminLogin(currentPassword);
-        
-        if (!loginResult.success) {
-            showValidationError(document.getElementById('currentPassword'), 'كلمة المرور الحالية غير صحيحة');
-            return;
-        }
-        
-        // Change password
-        Database.auth.changeAdminPassword(newPassword);
-        showAlert('تم بنجاح', 'تم تغيير كلمة المرور بنجاح');
-        changePasswordForm.reset();
+        // Redirect to the dedicated password update page
+        window.location.href = 'update-password.html';
     }
 
     // Student Search and Filter Handler
@@ -366,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Apply all filters (search and grade)
     function applyFilters() {
         const searchTerm = studentSearch.value.trim().toLowerCase();
-        let students = Database.users.getAll();
+        let students = window.Database.users.getAll();
         
         // Apply grade filter
         if (currentGradeFilter !== 'all') {
@@ -387,7 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize edit modal
     function initEditModal(studentId) {
         currentEditingId = studentId;
-        const student = Database.users.getById(studentId);
+        const student = window.Database.users.getById(studentId);
         
         if (student) {
             document.getElementById('editStudentId').value = student.id;
@@ -426,7 +425,22 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         
         try {
-            Database.users.update(currentEditingId, updatedUser);
+            window.Database.users.update(currentEditingId, updatedUser);
+            
+            // Automatically sync with Firebase if Firebase is enabled
+            if (localStorage.getItem('useFirebase') === 'true') {
+                import('./firebase-database.js').then(module => {
+                    const FirebaseDatabase = module.default;
+                    window.FirebaseDatabase.users.update(currentEditingId, updatedUser)
+                        .then(() => {
+                            console.log('Student update synced with Firebase successfully');
+                        })
+                        .catch(error => {
+                            console.error('Error syncing student update with Firebase:', error);
+                            showAlert('تنبيه', 'تم تحديث بيانات الطالب محليًا ولكن فشلت المزامنة مع السحابة. يرجى التحقق من اتصالك بالإنترنت.', 'warning');
+                        });
+                });
+            }
             
             // Close the modal
             editModal.hide();
@@ -443,7 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize delete modal
     function initDeleteModal(studentId) {
         currentDeletingId = studentId;
-        const student = Database.users.getById(studentId);
+        const student = window.Database.users.getById(studentId);
         
         if (student) {
             document.getElementById('deleteStudentName').textContent = student.name;
@@ -460,7 +474,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentDeletingId) return;
         
         try {
-            Database.users.delete(currentDeletingId);
+            window.Database.users.delete(currentDeletingId);
+            
+            // Automatically sync with Firebase if Firebase is enabled
+            if (localStorage.getItem('useFirebase') === 'true') {
+                import('./firebase-database.js').then(module => {
+                    const FirebaseDatabase = module.default;
+                    window.FirebaseDatabase.users.delete(currentDeletingId)
+                        .then(() => {
+                            console.log('Student deletion synced with Firebase successfully');
+                        })
+                        .catch(error => {
+                            console.error('Error syncing student deletion with Firebase:', error);
+                            showAlert('تنبيه', 'تم حذف الطالب محليًا ولكن فشلت المزامنة مع السحابة. يرجى التحقق من اتصالك بالإنترنت.', 'warning');
+                        });
+                });
+            }
             
             // Close the modal
             deleteConfirmModal.hide();
@@ -482,8 +511,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Admin logout: Attempting to log out');
             
             // Call the database logout function
-            if (typeof Database.auth.logout === 'function') {
-                await Database.auth.logout();
+            if (typeof window.Database.auth.logout === 'function') {
+                await window.Database.auth.logout();
                 console.log('Admin logout: Database logout function called');
             }
             
@@ -519,9 +548,105 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Load Students Table
-    function loadStudentsTable() {
-        const students = Database.users.getAll();
-        renderStudentsTable(students);
+    async function loadStudentsTable() {
+        try {
+            let students = [];
+            const tableBody = document.getElementById('studentsTableBody');
+            
+            // Show loading indicator
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">جاري التحميل...</span>
+                        </div>
+                        <p class="mt-2">جاري تحميل بيانات الطلاب...</p>
+                    </td>
+                </tr>
+            `;
+            
+            // Check if we're using Firebase
+            const isUsingFirebase = localStorage.getItem('useFirebase') === 'true';
+            
+            if (isUsingFirebase) {
+                // Load students from Firebase
+                console.log('Loading students from Firebase...');
+                const FirebaseDatabase = (await import('./firebase-database.js')).default;
+                
+                try {
+                    // Make sure Firebase is initialized
+                    if (!window.FirebaseDatabase || !window.FirebaseDatabase.isInitialized) {
+                        console.log('Firebase not initialized yet, waiting 1 second...');
+                        await new Promise(resolve => {
+                            setTimeout(() => {
+                                if (window.FirebaseDatabase && window.FirebaseDatabase.isInitialized) {
+                                    console.log('Firebase initialized after waiting');
+                                    resolve();
+                                } else {
+                                    console.warn('Firebase still not initialized after waiting');
+                                    resolve(); // Continue anyway
+                                }
+                            }, 1000);
+                        });
+                    }
+                    
+                    // Get students from Firebase
+                    const result = await window.FirebaseDatabase.users.getAll();
+                    if (result.success) {
+                        students = result.data;
+                        console.log(`Loaded ${students.length} students from Firebase`);
+                        
+                        // If we got a message from Firebase about no students, display it
+                        if (result.message && students.length === 0) {
+                            showAlert('معلومات', result.message, 'info');
+                            renderEmptyStudentsTable(result.message);
+                            return;
+                        }
+                        
+                        // Update local storage with Firebase data to keep them in sync
+                        window.Database.users.replaceAll(students);
+                    } else {
+                        console.error('Failed to load students from Firebase:', result.error);
+                        showAlert('تنبيه', 'فشل تحميل بيانات الطلاب من السحابة. سيتم استخدام البيانات المحلية.', 'warning');
+                        students = window.Database.users.getAll();
+                    }
+                } catch (error) {
+                    console.error('Error loading students from Firebase:', error);
+                    showAlert('تنبيه', 'حدث خطأ أثناء تحميل بيانات الطلاب من السحابة. سيتم استخدام البيانات المحلية.', 'warning');
+                    students = window.Database.users.getAll();
+                }
+            } else {
+                // Load students from local storage
+                console.log('Loading students from local storage...');
+                students = window.Database.users.getAll();
+            }
+            
+            // Render the students table
+            if (students.length === 0) {
+                renderEmptyStudentsTable('لا يوجد طلاب في قاعدة البيانات');
+            } else {
+                renderStudentsTable(students);
+            }
+        } catch (error) {
+            console.error('Error in loadStudentsTable:', error);
+            showAlert('خطأ', 'حدث خطأ أثناء تحميل بيانات الطلاب.', 'danger');
+            renderEmptyStudentsTable('حدث خطأ أثناء تحميل بيانات الطلاب');
+        }
+    }
+    
+    // Render Empty Students Table
+    function renderEmptyStudentsTable(message) {
+        const tableBody = document.getElementById('studentsTableBody');
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center">
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        ${message || 'لا يوجد طلاب'}
+                    </div>
+                </td>
+            </tr>
+        `;
     }
 
     // Render Students Table
@@ -604,10 +729,10 @@ document.addEventListener('DOMContentLoaded', () => {
             isLoggedInSessionStorage
         });
         
-        // Check if the admin is actually logged in via the Database API
-        if (typeof Database.auth.isAdmin === 'function') {
+        // Safely check if Database exists and has auth.isAdmin method
+        if (window.Database && window.Database.auth && typeof window.Database.auth.isAdmin === 'function') {
             try {
-                const isAdminViaAPI = Database.auth.isAdmin();
+                const isAdminViaAPI = window.Database.auth.isAdmin();
                 console.log('Admin status via API:', isAdminViaAPI);
                 
                 // If there's a mismatch between localStorage and the API, trust the API

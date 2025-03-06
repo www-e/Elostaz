@@ -3,8 +3,11 @@
  * Provides functions for interacting with Firebase Firestore
  */
 
-import { db, auth } from './firebase-config.js';
+import { db, auth, app } from './firebase-config.js';
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js';
+import { getStorage } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-storage.js';
+import { browserLocalPersistence, setPersistence } from 'https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js';
+import { default as passwordUtils } from './password-utils.js';
 
 const FirebaseDatabase = {
     // Collection names
@@ -31,6 +34,9 @@ const FirebaseDatabase = {
 
     // Flag to track if connection issues are detected
     connectionIssuesDetected: false,
+
+    // Flag to track if Firebase is initialized
+    isInitialized: false,
 
     // Detect connection issues with Firebase
     async detectConnectionIssues() {
@@ -145,59 +151,110 @@ const FirebaseDatabase = {
         }
     },
 
-    // Initialize the database
+    // Initialize Firebase Database
     async init() {
         try {
-            console.log('Initializing Firebase database...');
-            
-            // Check if we're running on GitHub Pages
-            const isGitHubPages = 
-                window.location.hostname.includes('github.io') || 
-                document.referrer.includes('github.io');
-                
-            if (isGitHubPages) {
-                console.log('Running on GitHub Pages, using CORS-friendly initialization');
-                
-                // Add extra CORS headers for GitHub Pages
-                const corsHeaders = {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
-                    'Access-Control-Allow-Headers': 'Content-Type'
-                };
-                
-                // Store this information for future reference
-                localStorage.setItem('isGitHubPages', 'true');
-            }
-            
-            // First, check for connection issues
-            const hasConnectionIssues = await this.detectConnectionIssues();
-            
-            if (hasConnectionIssues) {
-                console.warn('Firebase connection issues detected, falling back to local storage');
+            // Check for connection issues
+            console.log('Checking for connection issues...');
+            try {
+                // Test internet connection by pinging Firebase
+                await fetch('https://firebasestorage.googleapis.com/v0/b/alostaz-student-system-2fffd.appspot.com/o?name=connection_test', {
+                    method: 'HEAD',
+                    mode: 'no-cors',
+                    cache: 'no-store',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+                console.log('Firebase connection test successful');
+            } catch (connectionError) {
+                console.error('Firebase connection test failed:', connectionError);
                 localStorage.setItem('useFirebase', 'false');
                 return false;
             }
-            
-            // If we get here, connection is successful
-            localStorage.setItem('useFirebase', 'true');
-            
-            // Check if admin settings exist, create if not
-            try {
-                const adminDoc = await getDoc(doc(db, this.COLLECTIONS.SETTINGS, 'admin'));
-                if (!adminDoc.exists()) {
-                    await setDoc(doc(db, this.COLLECTIONS.SETTINGS, 'admin'), {
-                        password: 'admin123'
-                    });
-                    console.log('Admin settings initialized');
+
+            // Initialize Firebase if not already initialized
+            if (!this.isInitialized) {
+                // Initialize Firebase Auth persistence
+                try {
+                    await setPersistence(auth, browserLocalPersistence);
+                    console.log('Firebase Auth persistence set to local');
+                } catch (authError) {
+                    console.error('Error setting auth persistence:', authError);
                 }
                 
-                // Check if counter exists, create if not
-                const counterDoc = await getDoc(doc(db, this.COLLECTIONS.SETTINGS, 'counter'));
-                if (!counterDoc.exists()) {
-                    await setDoc(doc(db, this.COLLECTIONS.SETTINGS, 'counter'), {
-                        lastStudentIndex: 0
+                // Set initialized flag
+                this.isInitialized = true;
+                localStorage.setItem('useFirebase', 'true');
+            }
+            
+            // Initialize settings
+            try {
+                // Check if settings collection exists
+                const settingsCollection = this.COLLECTIONS.SETTINGS;
+                const adminDoc = await getDoc(doc(db, settingsCollection, 'admin'));
+                
+                // If admin settings don't exist, create them
+                if (!adminDoc.exists()) {
+                    console.log('Admin settings not found, creating default settings...');
+                    
+                    // Create a secure default password
+                    const secureDefaultPassword = 'Elostaz@2025';
+                    const hashedPassword = await passwordUtils.hashPassword(secureDefaultPassword);
+                    
+                    // Create admin settings
+                    await setDoc(doc(db, settingsCollection, 'admin'), {
+                        password: hashedPassword,
+                        isHashed: true,
+                        createdAt: new Date().toISOString()
                     });
-                    console.log('Counter initialized');
+                    
+                    console.log('Default admin settings created in Firebase');
+                } else {
+                    console.log('Admin settings found in Firebase');
+                    
+                    // Check if password is hashed
+                    const adminData = adminDoc.data();
+                    if (!adminData.isHashed) {
+                        console.log('Admin password is not hashed, updating...');
+                        
+                        // Hash the password
+                        const hashedPassword = await passwordUtils.hashPassword(adminData.password);
+                        
+                        // Update admin settings
+                        await updateDoc(doc(db, settingsCollection, 'admin'), {
+                            password: hashedPassword,
+                            isHashed: true,
+                            updatedAt: new Date().toISOString()
+                        });
+                        
+                        console.log('Admin password hashed in Firebase');
+                    }
+                }
+                
+                // Create users collection if it doesn't exist
+                try {
+                    const usersCollection = this.COLLECTIONS.USERS;
+                    const usersSnapshot = await getDocs(collection(db, usersCollection));
+                    
+                    if (usersSnapshot.empty) {
+                        console.log('Users collection is empty, creating metadata document...');
+                        
+                        // Create a metadata document to indicate the collection exists
+                        await setDoc(doc(db, usersCollection, '_metadata'), {
+                            collectionExists: true,
+                            lastUpdated: new Date().toISOString(),
+                            message: 'No students have been added yet'
+                        });
+                        
+                        console.log('Metadata document created in users collection');
+                    } else {
+                        console.log(`Users collection exists with ${usersSnapshot.size} documents`);
+                    }
+                } catch (usersError) {
+                    console.error('Error checking users collection:', usersError);
                 }
                 
                 console.log('Firebase Database initialized successfully');
@@ -220,15 +277,94 @@ const FirebaseDatabase = {
         // Get all users
         async getAll() {
             try {
-                const usersSnapshot = await getDocs(collection(db, FirebaseDatabase.COLLECTIONS.USERS));
-                const users = [];
-                usersSnapshot.forEach(doc => {
-                    users.push({ id: doc.id, ...doc.data() });
-                });
-                return users;
+                // Check if Firebase is initialized
+                if (!this.isInitialized) {
+                    console.warn('Firebase is not initialized yet, trying to initialize...');
+                    const initialized = await this.init();
+                    if (!initialized) {
+                        console.error('Failed to initialize Firebase');
+                        return { 
+                            success: false, 
+                            error: 'فشل الاتصال بقاعدة البيانات',
+                            data: []
+                        };
+                    }
+                }
+                
+                const usersCollection = collection(db, FirebaseDatabase.COLLECTIONS.USERS);
+                
+                try {
+                    const usersSnapshot = await getDocs(usersCollection);
+                    
+                    // Check if the collection is empty
+                    if (usersSnapshot.empty) {
+                        console.log('No students found in Firebase database');
+                        
+                        // Create a metadata document to indicate the collection exists but is empty
+                        try {
+                            await setDoc(doc(db, FirebaseDatabase.COLLECTIONS.USERS, '_metadata'), {
+                                collectionExists: true,
+                                lastUpdated: new Date().toISOString(),
+                                message: 'No students have been added yet'
+                            });
+                            console.log('Created metadata document for empty users collection');
+                        } catch (metadataError) {
+                            console.error('Error creating metadata document:', metadataError);
+                        }
+                        
+                        return { 
+                            success: true, 
+                            data: [],
+                            message: 'لا يوجد طلاب في قاعدة البيانات'
+                        };
+                    }
+                    
+                    // Process the student data
+                    const users = [];
+                    usersSnapshot.forEach(doc => {
+                        // Skip the metadata document
+                        if (doc.id !== '_metadata') {
+                            users.push({ id: doc.id, ...doc.data() });
+                        }
+                    });
+                    
+                    console.log(`Retrieved ${users.length} students from Firebase`);
+                    
+                    return { 
+                        success: true, 
+                        data: users,
+                        count: users.length
+                    };
+                } catch (firestoreError) {
+                    console.error('Error accessing Firestore:', firestoreError);
+                    
+                    // Check if it's a network error
+                    if (firestoreError.code === 'unavailable' || 
+                        firestoreError.code === 'failed-precondition' ||
+                        firestoreError.message.includes('network') ||
+                        firestoreError.message.includes('connection')) {
+                        
+                        return { 
+                            success: false, 
+                            error: 'لا يمكن الوصول إلى قاعدة البيانات. يرجى التحقق من اتصالك بالإنترنت.',
+                            networkError: true,
+                            data: []
+                        };
+                    }
+                    
+                    return { 
+                        success: false, 
+                        error: firestoreError.message,
+                        data: []
+                    };
+                }
             } catch (error) {
-                console.error('Error getting users:', error);
-                return [];
+                console.error('Error getting users from Firebase:', error);
+                return { 
+                    success: false, 
+                    error: error.message,
+                    data: []
+                };
             }
         },
 
@@ -627,24 +763,32 @@ const FirebaseDatabase = {
                     };
                 }
                 
+                // Import password utilities
+                const passwordUtils = window.passwordUtils;
+                
                 // Check if admin settings exist
                 if (!adminDoc.exists()) {
                     console.error('Admin login failed: Admin settings not found');
                     
                     // Create default admin settings if they don't exist
                     try {
+                        // Hash a more secure default password
+                        const hashedDefaultPassword = await passwordUtils.hashPassword('Elostaz@2025');
+                        
                         await setDoc(doc(db, FirebaseDatabase.COLLECTIONS.SETTINGS, 'admin'), {
-                            password: 'admin123'
+                            password: hashedDefaultPassword,
+                            isHashed: true
                         });
-                        console.log('Created default admin settings');
+                        console.log('Created default admin settings with secure hashed password');
                         
                         // Check if the provided password matches the default
-                        if (password === 'admin123') {
+                        if (await passwordUtils.verifyPassword(password, hashedDefaultPassword)) {
                             console.log('Admin login successful with default password');
                             
                             // Set admin status in localStorage
                             localStorage.setItem('sms_admin_logged_in', 'true');
                             localStorage.setItem('sms_admin_login_time', new Date().toISOString());
+                            localStorage.setItem('lastLoginMode', 'firebase');
                             
                             return { success: true };
                         }
@@ -662,23 +806,55 @@ const FirebaseDatabase = {
                 // Get admin data
                 const adminData = adminDoc.data();
                 
-                // Check password
-                if (adminData.password === password) {
-                    console.log('Admin password correct, login successful');
+                // Check if password is hashed
+                if (adminData.isHashed) {
+                    // Verify the password against the stored hash
+                    const isValid = await passwordUtils.verifyPassword(password, adminData.password);
                     
-                    // Set admin status in localStorage
-                    localStorage.setItem('sms_admin_logged_in', 'true');
-                    localStorage.setItem('sms_admin_login_time', new Date().toISOString());
-                    localStorage.setItem('lastLoginMode', 'firebase');
-                    
-                    return { success: true };
+                    if (isValid) {
+                        console.log('Admin password correct, login successful');
+                        
+                        // Set admin status in localStorage
+                        localStorage.setItem('sms_admin_logged_in', 'true');
+                        localStorage.setItem('sms_admin_login_time', new Date().toISOString());
+                        localStorage.setItem('lastLoginMode', 'firebase');
+                        
+                        return { success: true };
+                    } else {
+                        console.error('Admin login failed: Incorrect password');
+                        return { 
+                            success: false, 
+                            error: 'كلمة المرور غير صحيحة',
+                            details: 'Incorrect password'
+                        };
+                    }
                 } else {
-                    console.error('Admin login failed: Incorrect password');
-                    return { 
-                        success: false, 
-                        error: 'كلمة المرور غير صحيحة',
-                        details: 'Incorrect password'
-                    };
+                    // Legacy plaintext password check
+                    if (adminData.password === password) {
+                        console.log('Admin password correct, login successful');
+                        
+                        // Upgrade to hashed password
+                        const hashedPassword = await passwordUtils.hashPassword(password);
+                        await updateDoc(doc(db, FirebaseDatabase.COLLECTIONS.SETTINGS, 'admin'), {
+                            password: hashedPassword,
+                            isHashed: true
+                        });
+                        console.log('Upgraded admin password to hashed version');
+                        
+                        // Set admin status in localStorage
+                        localStorage.setItem('sms_admin_logged_in', 'true');
+                        localStorage.setItem('sms_admin_login_time', new Date().toISOString());
+                        localStorage.setItem('lastLoginMode', 'firebase');
+                        
+                        return { success: true };
+                    } else {
+                        console.error('Admin login failed: Incorrect password');
+                        return { 
+                            success: false, 
+                            error: 'كلمة المرور غير صحيحة',
+                            details: 'Incorrect password'
+                        };
+                    }
                 }
             } catch (error) {
                 console.error('Unexpected error during admin login:', error);
@@ -722,9 +898,24 @@ const FirebaseDatabase = {
         // Change admin password
         async changeAdminPassword(newPassword) {
             try {
+                // Use global passwordUtils object instead of import
+                const passwordUtils = window.passwordUtils;
+                
+                // Hash the new password
+                const hashedPassword = await passwordUtils.hashPassword(newPassword);
+                
+                // Update in Firebase
+                console.log('Updating admin password in Firebase');
                 await updateDoc(doc(db, FirebaseDatabase.COLLECTIONS.SETTINGS, 'admin'), {
-                    password: newPassword
+                    password: hashedPassword,
+                    isHashed: true
                 });
+                
+                // Also update in localStorage for consistency
+                console.log('Updating admin password in localStorage for consistency');
+                localStorage.setItem('sms_admin_password', hashedPassword);
+                localStorage.setItem('admin_password', hashedPassword);
+                localStorage.setItem('ADMIN_PASSWORD', hashedPassword);
                 
                 return { success: true };
             } catch (error) {
@@ -732,15 +923,46 @@ const FirebaseDatabase = {
                 return { success: false, error: error.message };
             }
         }
+    },
+
+    // Utility methods for direct access to Firebase
+    getFirestore() {
+        return db;
+    },
+    
+    doc(firestore, collection, docId) {
+        return doc(firestore, collection, docId);
+    },
+    
+    setDoc(docRef, data) {
+        return setDoc(docRef, data);
+    },
+    
+    updateDoc(docRef, data) {
+        return updateDoc(docRef, data);
     }
 };
+
+// Initialize the isInitialized property
+FirebaseDatabase.isInitialized = false;
+
+// Set isInitialized to true when database is initialized successfully
+const originalInit = FirebaseDatabase.init;
+FirebaseDatabase.init = async function() {
+    const result = await originalInit.apply(this, arguments);
+    if (result && result.success) {
+        FirebaseDatabase.isInitialized = true;
+    }
+    return result;
+};
+
+// Expose FirebaseDatabase to the global window object
+window.FirebaseDatabase = FirebaseDatabase;
+
+// Also support ES6 modules
+export default FirebaseDatabase;
 
 // Initialize database when script loads
 FirebaseDatabase.init().catch(error => {
     console.error("Error initializing Firebase Database:", error);
 });
-
-// Expose to global scope
-window.FirebaseDatabase = FirebaseDatabase;
-
-export default FirebaseDatabase;
