@@ -14,7 +14,8 @@ const Database = {
         ADMIN_PASSWORD: 'sms_admin_password',
         LAST_STUDENT_INDEX: 'sms_last_student_index',
         ATTENDANCE: 'sms_attendance',
-        SETTINGS: 'sms_settings'
+        SETTINGS: 'sms_settings',
+        ADMIN_PASSWORD_LAST_SYNCED: 'sms_admin_password_last_synced'
     },
 
     // Default settings
@@ -34,8 +35,20 @@ const Database = {
         // Initialize admin password if not exist
         if (!localStorage.getItem(Database.KEYS.ADMIN_PASSWORD)) {
             console.log('Setting default admin password');
-            localStorage.setItem(Database.KEYS.ADMIN_PASSWORD, 'Elostaz@2025');
-            localStorage.setItem(this.KEYS.ADMIN_PASSWORD.replace('admin_', 'ADMIN_'), 'Elostaz@2025');
+            // Check if FirebaseDatabase is available for sync
+            if (window.FirebaseDatabase && typeof window.FirebaseDatabase.init === 'function') {
+                // Will initialize from Firebase instead
+                console.log('Firebase available, will initialize admin password from there');
+                this.syncAdminPasswordFromFirebase();
+            } else {
+                // Use default password as fallback
+                localStorage.setItem(Database.KEYS.ADMIN_PASSWORD, 'Elostaz@2025');
+                localStorage.setItem('admin_password', 'Elostaz@2025');
+                localStorage.setItem('ADMIN_PASSWORD', 'Elostaz@2025');
+            }
+        } else {
+            // If password exists, schedule a sync check
+            setTimeout(() => this.syncAdminPasswordFromFirebase(), 1000);
         }
         
         // Initialize users array if it doesn't exist
@@ -54,6 +67,67 @@ const Database = {
         }
         
         console.log('Local database initialized');
+    },
+
+    // Sync admin password from Firebase if available
+    async syncAdminPasswordFromFirebase() {
+        try {
+            // Check if FirebaseDatabase is available
+            if (!window.FirebaseDatabase || typeof window.FirebaseDatabase.getFirestore !== 'function') {
+                console.log('Firebase not available for password sync');
+                return false;
+            }
+
+            console.log('Attempting to sync admin password from Firebase...');
+            
+            // Get reference to Firestore
+            const db = window.FirebaseDatabase.getFirestore();
+            const FirebaseDatabase = window.FirebaseDatabase;
+            
+            // Check when we last synced
+            const lastSynced = localStorage.getItem(Database.KEYS.ADMIN_PASSWORD_LAST_SYNCED) || '0';
+            const currentTime = new Date().getTime();
+            const timeSinceLastSync = currentTime - parseInt(lastSynced);
+            
+            // Only sync if it's been more than 1 hour since last sync
+            const ONE_HOUR = 60 * 60 * 1000;
+            if (lastSynced !== '0' && timeSinceLastSync < ONE_HOUR) {
+                console.log('Password recently synced, skipping sync');
+                return true;
+            }
+            
+            // Get admin document from Firestore
+            const docRef = FirebaseDatabase.doc(db, FirebaseDatabase.COLLECTIONS.SETTINGS, 'admin');
+            const docSnap = await FirebaseDatabase.getDoc(docRef);
+            
+            if (!docSnap.exists()) {
+                console.log('Admin settings not found in Firebase, skipping sync');
+                return false;
+            }
+            
+            // Get admin data
+            const adminData = docSnap.data();
+            
+            if (adminData && adminData.password) {
+                console.log('Found admin password in Firebase, updating local storage');
+                
+                // Update all password locations
+                localStorage.setItem(Database.KEYS.ADMIN_PASSWORD, adminData.password);
+                localStorage.setItem('admin_password', adminData.password);
+                localStorage.setItem('ADMIN_PASSWORD', adminData.password);
+                
+                // Update last synced timestamp
+                localStorage.setItem(Database.KEYS.ADMIN_PASSWORD_LAST_SYNCED, currentTime.toString());
+                
+                return true;
+            } else {
+                console.warn('Admin document found but no password field');
+                return false;
+            }
+        } catch (error) {
+            console.error('Error syncing admin password from Firebase:', error);
+            return false;
+        }
     },
 
     // User Management Functions
@@ -261,6 +335,14 @@ const Database = {
             try {
                 console.log('Attempting admin login with password');
                 
+                // Try to sync admin password from Firebase first
+                try {
+                    await Database.syncAdminPasswordFromFirebase();
+                } catch (syncError) {
+                    console.warn('Failed to sync admin password from Firebase:', syncError);
+                    // Continue with login using local passwords
+                }
+                
                 // Get admin password from multiple possible locations
                 const adminPasswordSMS = localStorage.getItem(Database.KEYS.ADMIN_PASSWORD);
                 const adminPasswordLegacy = localStorage.getItem('admin_password');
@@ -294,6 +376,16 @@ const Database = {
                     // Also set in legacy locations
                     localStorage.setItem('admin_password', hashedPassword);
                     localStorage.setItem('ADMIN_PASSWORD', hashedPassword);
+                    
+                    // Sync to Firebase if available
+                    try {
+                        if (window.FirebaseDatabase && typeof window.FirebaseDatabase.auth.changeAdminPassword === 'function') {
+                            await window.FirebaseDatabase.auth.changeAdminPassword(password);
+                            console.log('Synced default password to Firebase');
+                        }
+                    } catch (fbError) {
+                        console.error('Failed to sync default password to Firebase:', fbError);
+                    }
                 } else {
                     // Old plaintext password comparison (for backward compatibility)
                     if (password !== adminPassword) {
@@ -306,6 +398,16 @@ const Database = {
                     // Also set in legacy locations
                     localStorage.setItem('admin_password', hashedPassword);
                     localStorage.setItem('ADMIN_PASSWORD', hashedPassword);
+                    
+                    // Sync to Firebase if available
+                    try {
+                        if (window.FirebaseDatabase && typeof window.FirebaseDatabase.auth.changeAdminPassword === 'function') {
+                            await window.FirebaseDatabase.auth.changeAdminPassword(password);
+                            console.log('Synced upgraded password to Firebase');
+                        }
+                    } catch (fbError) {
+                        console.error('Failed to sync upgraded password to Firebase:', fbError);
+                    }
                 }
                 
                 // Set admin logged in flags
@@ -318,7 +420,7 @@ const Database = {
                 return { success: false, message: 'حدث خطأ أثناء تسجيل الدخول' };
             }
         },
-
+        
         // Logout current user
         logout() {
             localStorage.removeItem(Database.KEYS.CURRENT_USER);
@@ -373,6 +475,19 @@ const Database = {
                 localStorage.setItem('admin_password', hashedPassword);
                 localStorage.setItem('ADMIN_PASSWORD', hashedPassword);
                 
+                // Sync to Firebase if available
+                try {
+                    if (window.FirebaseDatabase && typeof window.FirebaseDatabase.auth.changeAdminPassword === 'function') {
+                        await window.FirebaseDatabase.auth.changeAdminPassword(newPassword);
+                        console.log('Synced new password to Firebase');
+                        
+                        // Update last synced timestamp after successful sync
+                        localStorage.setItem(Database.KEYS.ADMIN_PASSWORD_LAST_SYNCED, new Date().getTime().toString());
+                    }
+                } catch (fbError) {
+                    console.error('Failed to sync new password to Firebase:', fbError);
+                }
+                
                 return { success: true };
             } catch (error) {
                 console.error('Error changing admin password:', error);
@@ -385,8 +500,5 @@ const Database = {
 // Initialize database when script loads
 Database.init();
 
-// Expose to global scope
+// Expose to window for compatibility with modules
 window.Database = Database;
-
-// Note: ES6 export syntax has been removed to fix loading errors
-// Database is available globally via window.Database

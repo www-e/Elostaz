@@ -1,6 +1,7 @@
 /**
  * Firebase Database Service
  * Provides functions for interacting with Firebase Firestore
+ * Enhanced with improved password synchronization and security
  */
 
 import { db, auth, app } from './firebase-config.js';
@@ -200,75 +201,114 @@ const FirebaseDatabase = {
                 if (!adminDoc.exists()) {
                     console.log('Admin settings not found, creating default settings...');
                     
-                    // Create a secure default password
-                    const secureDefaultPassword = 'Elostaz@2025';
-                    const hashedPassword = await passwordUtils.hashPassword(secureDefaultPassword);
+                    // Check if we have a local password to use
+                    const localPassword = localStorage.getItem('sms_admin_password') || 
+                                         localStorage.getItem('admin_password') || 
+                                         localStorage.getItem('ADMIN_PASSWORD');
                     
-                    // Create admin settings
-                    await setDoc(doc(db, settingsCollection, 'admin'), {
-                        password: hashedPassword,
-                        isHashed: true,
-                        createdAt: new Date().toISOString()
-                    });
-                    
-                    console.log('Default admin settings created in Firebase');
+                    if (localPassword && localPassword.length === 64) {
+                        // Use existing hashed password
+                        await setDoc(doc(db, settingsCollection, 'admin'), {
+                            password: localPassword,
+                            isHashed: true,
+                            lastModified: new Date().toISOString()
+                        });
+                        console.log('Created admin settings using existing hashed password');
+                    } else if (localPassword) {
+                        // Hash the existing plaintext password
+                        const hashedPassword = await passwordUtils.hashPassword(localPassword);
+                        await setDoc(doc(db, settingsCollection, 'admin'), {
+                            password: hashedPassword,
+                            isHashed: true,
+                            lastModified: new Date().toISOString()
+                        });
+                        console.log('Created admin settings using hashed version of existing password');
+                    } else {
+                        // Use default password
+                        const hashedDefaultPassword = await passwordUtils.hashPassword('Elostaz@2025');
+                        await setDoc(doc(db, settingsCollection, 'admin'), {
+                            password: hashedDefaultPassword,
+                            isHashed: true,
+                            lastModified: new Date().toISOString()
+                        });
+                        console.log('Created admin settings with default password');
+                    }
                 } else {
-                    console.log('Admin settings found in Firebase');
-                    
-                    // Check if password is hashed
+                    // Check if the admin document needs upgrading
                     const adminData = adminDoc.data();
-                    if (!adminData.isHashed) {
-                        console.log('Admin password is not hashed, updating...');
-                        
-                        // Hash the password
+                    let needsUpdate = false;
+                    
+                    if (!adminData.isHashed && adminData.password) {
+                        // Upgrade plaintext password to hashed
                         const hashedPassword = await passwordUtils.hashPassword(adminData.password);
-                        
-                        // Update admin settings
                         await updateDoc(doc(db, settingsCollection, 'admin'), {
                             password: hashedPassword,
                             isHashed: true,
-                            updatedAt: new Date().toISOString()
+                            lastModified: new Date().toISOString()
                         });
-                        
-                        console.log('Admin password hashed in Firebase');
+                        console.log('Upgraded admin password from plaintext to hashed');
+                        needsUpdate = true;
                     }
-                }
-                
-                // Create users collection if it doesn't exist
-                try {
-                    const usersCollection = this.COLLECTIONS.USERS;
-                    const usersSnapshot = await getDocs(collection(db, usersCollection));
                     
-                    if (usersSnapshot.empty) {
-                        console.log('Users collection is empty, creating metadata document...');
-                        
-                        // Create a metadata document to indicate the collection exists
-                        await setDoc(doc(db, usersCollection, '_metadata'), {
-                            collectionExists: true,
-                            lastUpdated: new Date().toISOString(),
-                            message: 'No students have been added yet'
+                    if (!adminData.lastModified) {
+                        // Add lastModified field if missing
+                        await updateDoc(doc(db, settingsCollection, 'admin'), {
+                            lastModified: new Date().toISOString()
                         });
-                        
-                        console.log('Metadata document created in users collection');
-                    } else {
-                        console.log(`Users collection exists with ${usersSnapshot.size} documents`);
+                        console.log('Added lastModified timestamp to admin settings');
+                        needsUpdate = true;
                     }
-                } catch (usersError) {
-                    console.error('Error checking users collection:', usersError);
+                    
+                    if (needsUpdate) {
+                        console.log('Admin settings were upgraded');
+                    } else {
+                        console.log('Admin settings are up to date');
+                    }
                 }
                 
-                console.log('Firebase Database initialized successfully');
-                return true;
-            } catch (error) {
-                console.error('Error initializing Firebase settings:', error);
-                // If we can't initialize settings, we should fall back to local storage
-                localStorage.setItem('useFirebase', 'false');
-                return false;
+                // Notify the local database to sync the admin password
+                this.triggerPasswordSync();
+            } catch (settingsError) {
+                console.error('Error initializing admin settings:', settingsError);
             }
+            
+            // Initialize users collection
+            try {
+                // Check if users collection exists
+                const usersCollection = this.COLLECTIONS.USERS;
+                const usersSnapshot = await getDocs(collection(db, usersCollection));
+                
+                if (usersSnapshot.empty) {
+                    console.log('Users collection is empty, creating metadata document...');
+                    
+                    // Create a metadata document to indicate the collection exists
+                    await setDoc(doc(db, usersCollection, '_metadata'), {
+                        collectionExists: true,
+                        lastUpdated: new Date().toISOString(),
+                        message: 'No students have been added yet'
+                    });
+                    
+                    console.log('Metadata document created in users collection');
+                } else {
+                    console.log(`Users collection exists with ${usersSnapshot.size} documents`);
+                }
+            } catch (usersError) {
+                console.error('Error checking users collection:', usersError);
+            }
+            
+            console.log('Firebase Database initialized successfully');
+            return true;
         } catch (error) {
             console.error('Error initializing Firebase Database:', error);
-            localStorage.setItem('useFirebase', 'false');
             return false;
+        }
+    },
+    
+    // Trigger a password sync in the local database
+    triggerPasswordSync() {
+        if (window.Database && typeof window.Database.syncAdminPasswordFromFirebase === 'function') {
+            console.log('Triggering password sync in local database');
+            window.Database.syncAdminPasswordFromFirebase();
         }
     },
 
@@ -777,7 +817,8 @@ const FirebaseDatabase = {
                         
                         await setDoc(doc(db, FirebaseDatabase.COLLECTIONS.SETTINGS, 'admin'), {
                             password: hashedDefaultPassword,
-                            isHashed: true
+                            isHashed: true,
+                            lastModified: new Date().toISOString()
                         });
                         console.log('Created default admin settings with secure hashed password');
                         
@@ -789,6 +830,12 @@ const FirebaseDatabase = {
                             localStorage.setItem('sms_admin_logged_in', 'true');
                             localStorage.setItem('sms_admin_login_time', new Date().toISOString());
                             localStorage.setItem('lastLoginMode', 'firebase');
+                            
+                            // Also sync password to local storage for other pages
+                            localStorage.setItem('sms_admin_password', hashedDefaultPassword);
+                            localStorage.setItem('admin_password', hashedDefaultPassword);
+                            localStorage.setItem('ADMIN_PASSWORD', hashedDefaultPassword);
+                            localStorage.setItem('sms_admin_password_last_synced', new Date().getTime().toString());
                             
                             return { success: true };
                         }
@@ -819,6 +866,12 @@ const FirebaseDatabase = {
                         localStorage.setItem('sms_admin_login_time', new Date().toISOString());
                         localStorage.setItem('lastLoginMode', 'firebase');
                         
+                        // Also sync password to local storage for other pages
+                        localStorage.setItem('sms_admin_password', adminData.password);
+                        localStorage.setItem('admin_password', adminData.password);
+                        localStorage.setItem('ADMIN_PASSWORD', adminData.password);
+                        localStorage.setItem('sms_admin_password_last_synced', new Date().getTime().toString());
+                        
                         return { success: true };
                     } else {
                         console.error('Admin login failed: Incorrect password');
@@ -837,7 +890,8 @@ const FirebaseDatabase = {
                         const hashedPassword = await passwordUtils.hashPassword(password);
                         await updateDoc(doc(db, FirebaseDatabase.COLLECTIONS.SETTINGS, 'admin'), {
                             password: hashedPassword,
-                            isHashed: true
+                            isHashed: true,
+                            lastModified: new Date().toISOString()
                         });
                         console.log('Upgraded admin password to hashed version');
                         
@@ -845,6 +899,12 @@ const FirebaseDatabase = {
                         localStorage.setItem('sms_admin_logged_in', 'true');
                         localStorage.setItem('sms_admin_login_time', new Date().toISOString());
                         localStorage.setItem('lastLoginMode', 'firebase');
+                        
+                        // Also sync password to local storage for other pages
+                        localStorage.setItem('sms_admin_password', hashedPassword);
+                        localStorage.setItem('admin_password', hashedPassword);
+                        localStorage.setItem('ADMIN_PASSWORD', hashedPassword);
+                        localStorage.setItem('sms_admin_password_last_synced', new Date().getTime().toString());
                         
                         return { success: true };
                     } else {
@@ -877,7 +937,7 @@ const FirebaseDatabase = {
                 };
             }
         },
-
+        
         // Logout current user
         logout() {
             localStorage.removeItem('sms_current_user');
@@ -908,7 +968,8 @@ const FirebaseDatabase = {
                 console.log('Updating admin password in Firebase');
                 await updateDoc(doc(db, FirebaseDatabase.COLLECTIONS.SETTINGS, 'admin'), {
                     password: hashedPassword,
-                    isHashed: true
+                    isHashed: true,
+                    lastModified: new Date().toISOString()
                 });
                 
                 // Also update in localStorage for consistency
@@ -916,6 +977,7 @@ const FirebaseDatabase = {
                 localStorage.setItem('sms_admin_password', hashedPassword);
                 localStorage.setItem('admin_password', hashedPassword);
                 localStorage.setItem('ADMIN_PASSWORD', hashedPassword);
+                localStorage.setItem('sms_admin_password_last_synced', new Date().getTime().toString());
                 
                 return { success: true };
             } catch (error) {
@@ -960,7 +1022,7 @@ FirebaseDatabase.init = async function() {
 window.FirebaseDatabase = FirebaseDatabase;
 
 // Also support ES6 modules
-export default FirebaseDatabase;
+export { FirebaseDatabase as default, FirebaseDatabase };
 
 // Initialize database when script loads
 FirebaseDatabase.init().catch(error => {
