@@ -73,3 +73,97 @@ document.addEventListener('visibilitychange', () => {
         checkForUpdates();
     }
 });
+
+// Cache version
+const CACHE_VERSION = 'v2025-1';
+
+// Files to cache
+const filesToCache = [
+    '/',
+    '/index.html',
+    '/pages/registration.html',
+    '/css/styles.css',
+    '/css/navbar.css',
+    '/css/mobile.css',
+    '/css/registration.css',
+    '/css/tags.css',
+    '/js/DOMloader.js',
+    '/js/theme.js',
+    '/js/main.js',
+    '/js/ActiveState.js',
+    '/js/form-validation.js',
+    '/js/navbar.js',
+    '/js/registration.js',
+    '/js/registration-service.js',
+    '/js/components/success-modal.js',
+    '/js/supabase-client.js',
+    '/assets/icons/edu.ico',
+    'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css',
+    'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap',
+    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
+    'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
+    'https://html2canvas.hertzen.com/dist/html2canvas.min.js',
+    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'
+];
+
+// Install event - cache files
+self.addEventListener('install', event => {
+    event.waitUntil(
+        caches.open(CACHE_VERSION)
+            .then(cache => {
+                console.log('Opened cache');
+                return cache.addAll(filesToCache);
+            })
+    );
+});
+
+// Activate event - clean up old caches
+self.addEventListener('activate', event => {
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => {
+                    if (cacheName !== CACHE_VERSION) {
+                        console.log('Deleting old cache:', cacheName);
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        })
+    );
+});
+
+// Fetch event - serve from cache, fallback to network
+self.addEventListener('fetch', event => {
+    event.respondWith(
+        caches.match(event.request)
+            .then(response => {
+                // Cache hit - return response
+                if (response) {
+                    return response;
+                }
+
+                // Clone the request
+                const fetchRequest = event.request.clone();
+
+                return fetch(fetchRequest).then(
+                    response => {
+                        // Check if we received a valid response
+                        if (!response || response.status !== 200 || response.type !== 'basic') {
+                            return response;
+                        }
+
+                        // Clone the response
+                        const responseToCache = response.clone();
+
+                        caches.open(CACHE_VERSION)
+                            .then(cache => {
+                                cache.put(event.request, responseToCache);
+                            });
+
+                        return response;
+                    }
+                );
+            })
+    );
+});

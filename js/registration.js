@@ -1,91 +1,111 @@
+import { 
+    schedules, 
+    gradeNames, 
+    sectionNames, 
+    groupNames,
+    submitRegistration,
+    getAvailableGroups,
+    getAvailableTimes,
+    isRestrictedGroup
+} from './registration-service.js';
+
+import { SuccessModal } from './components/success-modal.js';
+import { ThirdGradeModal } from './components/third-grade-modal.js';
+import { RestrictedGroupsModal } from './components/restricted-groups-modal.js';
+import { DuplicateRegistrationModal } from './components/duplicate-registration-modal.js';
+
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('registrationForm');
-    
-    // Only proceed if we're on a page with the registration form
     if (!form) return;
-    
+
     const gradeSelect = document.getElementById('grade');
     const sectionGroup = document.getElementById('sectionGroup');
+    const sectionSelect = document.getElementById('section');
     const groupSelect = document.getElementById('group');
     const timeSelect = document.getElementById('time');
+    const successModal = new SuccessModal();
+    const thirdGradeModal = new ThirdGradeModal();
+    const restrictedGroupsModal = new RestrictedGroupsModal();
+    const duplicateRegistrationModal = new DuplicateRegistrationModal();
     
-    // Google Form submission URL
-    const googleFormURL = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSf7hpFaBMXCJtvF_sXo9jJVL4QZB7YZ2GJve5fn6p0Suje-Fg/formResponse';
-
-    // Schedule data
-    const schedules = {
-        first: {
-            'sat_tue': ['٤:٠٠ مساءً', '٥:٣٠ مساءً', '٧:٠٠ مساءً'],
-            'sun_wed': ['١:٠٠ مساءً', '٢:٣٠ مساءً']
-        },
-        second: {
-            'sat_tue': ['١:٠٠ مساءً', '٢:٣٠ مساءً'],
-            'sun_wed': ['٤:٠٠ مساءً', '٥:٣٠ مساءً']
-        },
-        third: {} // No schedules for third grade
-    };
-
-    const gradeNames = {
-        'first': 'الصف الأول الثانوي',
-        'second': 'الصف الثاني الثانوي',
-        'third': 'الصف الثالث الثانوي'
-    };
-
-    const sectionNames = {
-        'scientific': 'علمي',
-        'literary': 'أدبي'
-    };
-
-    const groupNames = {
-        'sat_tue': 'السبت والثلاثاء',
-        'sun_wed': 'الأحد والأربعاء'
-    };
+    // Get form elements
+    const nameInput = document.getElementById('name');
+    const phoneInput = document.getElementById('phone');
+    const parentPhoneInput = document.getElementById('parent_phone');
+    const schoolInput = document.getElementById('school');
+    const errorContainer = document.getElementById('error-container');
+    const errorMessage = document.getElementById('error-message');
+    const successModalElement = document.getElementById('success-modal');
+    const closeModalBtn = document.getElementById('close-modal');
+    const registrationIdSpan = document.getElementById('registration-id');
+    const errorModal = document.getElementById('error-modal');
+    const closeErrorModalBtn = document.getElementById('close-error-modal');
+    const errorModalMessage = document.getElementById('error-modal-message');
+    
+    // Populate section options for third grade
+    if (sectionSelect) {
+        const sections = ['أدبي', 'علمي علوم', 'علمي رياضة'];
+        sections.forEach(section => {
+            const option = document.createElement('option');
+            option.value = section;
+            option.textContent = section;
+            sectionSelect.appendChild(option);
+        });
+    }
+    
+    // Initialize custom dropdowns for all select elements
+    function initializeCustomDropdowns() {
+        // Remove any existing custom dropdowns first
+        document.querySelectorAll('.custom-dropdown-container').forEach(dropdown => {
+            dropdown.parentElement.removeChild(dropdown);
+        });
+        
+        // Create fresh custom dropdowns
+        if (gradeSelect) createCustomDropdown(gradeSelect);
+        if (sectionSelect) createCustomDropdown(sectionSelect);
+        if (groupSelect) createCustomDropdown(groupSelect);
+    }
+    
+    // Initialize all dropdowns
+    initializeCustomDropdowns();
 
     // Handle grade change
     if (gradeSelect) {
         gradeSelect.addEventListener('change', function() {
             const grade = this.value;
             
-            // Show/hide section selection for 2nd and 3rd grade
-            if (sectionGroup) {
-                if (grade === 'second' || grade === 'third') {
+            // Show/hide section selection for 3rd grade
+            if (sectionGroup && sectionSelect) {
+                if (grade === 'third') {
                     sectionGroup.style.display = 'block';
-                    if (document.getElementById('section')) {
-                        document.getElementById('section').required = true;
-                    }
+                    sectionSelect.required = true;
+                    // Clear and update section options for third grade
+                    sectionSelect.innerHTML = '<option value="">اختر الشعبة</option>';
+                    Object.entries(sectionNames).forEach(([value, name]) => {
+                        const option = document.createElement('option');
+                        option.value = value;
+                        option.textContent = name;
+                        sectionSelect.appendChild(option);
+                    });
+                    // Show third grade info modal with a slight delay for better UX
+                    setTimeout(() => thirdGradeModal.show(), 300);
                 } else {
                     sectionGroup.style.display = 'none';
-                    if (document.getElementById('section')) {
-                        document.getElementById('section').required = false;
-                    }
+                    sectionSelect.required = false;
+                    sectionSelect.value = '';
                 }
             }
 
-            // Hide schedule for third grade
-            if (grade === 'third') {
-                if (groupSelect) {
-                    groupSelect.parentElement.style.display = 'none';
-                }
-                if (timeSelect) {
-                    timeSelect.parentElement.style.display = 'none';
-                    timeSelect.required = false;
-                }
-                if (groupSelect) {
-                    groupSelect.required = false;
-                }
-            } else {
-                if (groupSelect) {
-                    groupSelect.parentElement.style.display = 'block';
-                }
-                if (timeSelect) {
-                    timeSelect.parentElement.style.display = 'block';
-                    timeSelect.required = true;
-                }
-                if (groupSelect) {
-                    groupSelect.required = true;
-                    updateTimeOptions(grade, groupSelect.value);
-                }
-            }
+            updateGroupOptions(grade, sectionSelect?.value);
+        });
+    }
+
+    // Handle section change for 3rd grade
+    if (sectionSelect) {
+        sectionSelect.addEventListener('change', function() {
+            const grade = gradeSelect.value;
+            const section = this.value;
+            updateGroupOptions(grade, section);
         });
     }
 
@@ -93,133 +113,184 @@ document.addEventListener('DOMContentLoaded', function() {
     if (groupSelect) {
         groupSelect.addEventListener('change', function() {
             const grade = gradeSelect.value;
-            updateTimeOptions(grade, this.value);
+            const section = sectionSelect?.value;
+            const group = this.value;
+            updateTimeOptions(grade, group, section);
         });
     }
 
-    function updateTimeOptions(grade, group) {
-        if (timeSelect) {
-            timeSelect.innerHTML = '<option value="">اختر الموعد</option>';
+    function updateGroupOptions(grade, section = null) {
+        if (!groupSelect) return;
+
+        groupSelect.innerHTML = '<option value="">اختر المجموعة</option>';
+        timeSelect.innerHTML = '<option value="">اختر الموعد</option>';
+
+        if (!grade || (grade === 'third' && !section)) {
+            groupSelect.disabled = true;
+            timeSelect.disabled = true;
+            return;
+        }
+
+        const availableGroups = getAvailableGroups(grade, section);
+        availableGroups.forEach(group => {
+            const option = document.createElement('option');
+            option.value = group;
+            option.textContent = groupNames[group];
+            groupSelect.appendChild(option);
+        });
+
+        // Trigger change event to update custom dropdown
+        const event = new Event('change', { bubbles: true });
+        groupSelect.dispatchEvent(event);
+
+        groupSelect.disabled = false;
+        timeSelect.disabled = true;
+    }
+
+    function updateTimeOptions(grade, group, section = null) {
+        if (!timeSelect) return;
+        
+        // Get the parent container of the select element
+        const timeSelectContainer = timeSelect.parentElement;
+        
+        // Clear existing select and custom dropdown if it exists
+        timeSelect.innerHTML = '<option value="">اختر الموعد</option>';
+        const existingCustomDropdown = timeSelectContainer.querySelector('.custom-dropdown-container');
+        if (existingCustomDropdown) {
+            timeSelectContainer.removeChild(existingCustomDropdown);
+        }
+        
+        if (!grade || !group || (grade === 'third' && !section)) {
+            timeSelect.disabled = true;
+            return;
+        }
+        
+        // Get available times
+        const availableTimes = getAvailableTimes(grade, group, section);
+        
+        // Add options to the select element
+        availableTimes.forEach(({ time, displayTime, availability }) => {
+            // Add to the hidden select element (for form submission)
+            const option = document.createElement('option');
+            option.value = time;
+            option.textContent = displayTime;
+            option.setAttribute('data-status', availability.status);
+            option.setAttribute('data-text', availability.text);
+            timeSelect.appendChild(option);
+        });
+        
+        // Create custom dropdown for time select
+        const customDropdown = createCustomTimeDropdown(timeSelect);
+        
+        timeSelect.disabled = false;
+    }
+    
+    // Function to create custom dropdown specifically for time select
+    function createCustomTimeDropdown(selectElement) {
+        if (!selectElement) return;
+        
+        // Get the parent container of the select element
+        const selectContainer = selectElement.parentElement;
+        
+        // Create custom dropdown container
+        const customDropdownContainer = document.createElement('div');
+        customDropdownContainer.className = 'custom-dropdown-container';
+        
+        // Create selected display
+        const selectedDisplay = document.createElement('div');
+        selectedDisplay.className = 'selected-option';
+        selectedDisplay.textContent = 'اختر الموعد';
+        selectedDisplay.setAttribute('data-value', '');
+        
+        // Create dropdown options container
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'dropdown-options';
+        
+        // Add options to custom dropdown (skip the first empty/placeholder option)
+        Array.from(selectElement.options).forEach((option, index) => {
+            // Skip empty placeholder options
+            if (index === 0 && !option.value) return;
             
-            if (!schedules[grade] || !schedules[grade][group]) return;
-
-            schedules[grade][group].forEach(time => {
-                const option = document.createElement('option');
-                option.value = time;
-                option.textContent = time;
-                timeSelect.appendChild(option);
+            // Create custom dropdown option
+            const dropdownOption = document.createElement('div');
+            dropdownOption.className = 'dropdown-option';
+            dropdownOption.setAttribute('data-value', option.value);
+            
+            // Create option content with time and tag
+            const timeText = document.createElement('span');
+            timeText.className = 'time-text';
+            timeText.textContent = option.textContent;
+            
+            const tag = document.createElement('span');
+            const status = option.getAttribute('data-status') || 'available';
+            const tagText = option.getAttribute('data-text') || '';
+            tag.className = `new-badge tag-${status}`;
+            tag.textContent = tagText;
+            
+            // Ensure proper contrast for tag text in dark mode
+            if (status === 'limited') {
+                tag.style.fontWeight = '700';
+                tag.style.textShadow = '0px 0px 1px rgba(0,0,0,0.2)';
+            }
+            
+            dropdownOption.appendChild(timeText);
+            dropdownOption.appendChild(tag);
+            
+            optionsContainer.appendChild(dropdownOption);
+        });
+        
+        // Assemble custom dropdown
+        customDropdownContainer.appendChild(selectedDisplay);
+        customDropdownContainer.appendChild(optionsContainer);
+        
+        // Insert custom dropdown after the select element
+        selectElement.style.display = 'none'; // Hide the original select
+        selectContainer.appendChild(customDropdownContainer);
+        
+        // Add event listeners for custom dropdown
+        selectedDisplay.addEventListener('click', function() {
+            // Close all other open dropdowns first
+            document.querySelectorAll('.dropdown-options.show').forEach(dropdown => {
+                if (dropdown !== optionsContainer) {
+                    dropdown.classList.remove('show');
+                }
             });
-        }
-    }
-
-    // Remove the old receipt modal HTML
-    const successMessageHTML = `
-        <div class="success-message" style="display: none">
-            <div class="success-content">
-                <button class="close-btn" onclick="closeSuccessMessage()">
-                    <i class="fas fa-times"></i>
-                </button>
-                <i class="fas fa-check-circle success-icon"></i>
-                <h3>تم تسجيل بياناتك بنجاح</h3>
-                <div class="receipt-info">
-                    <div class="receipt-step step-1 active">
-                        <div class="receipt-info-group">
-                            <p><strong>اسم الطالب:</strong> <span class="student-name"></span></p>
-                            <p><strong>الصف:</strong> <span class="grade-name"></span></p>
-                            <p><strong>رقم الطالب:</strong> <span class="student-phone"></span></p>
-                            <p><strong>رقم ولي الأمر:</strong> <span class="parent-phone"></span></p>
-                            <p class="timestamp"></p>
-                        </div>
-                        <button class="receipt-btn next-btn" onclick="showStep(2)">
-                            <span>التالي</span>
-                            <i class="fas fa-arrow-left"></i>
-                        </button>
-                    </div>
-                    <div class="receipt-step step-2">
-                        <div class="receipt-info-group">
-                            <p class="section-info" style="display: none"><strong>الشعبة:</strong> <span class="section-name"></span></p>
-                            <p class="group-info" style="display: none"><strong>المجموعة:</strong> <span class="group-name"></span></p>
-                            <p class="time-info" style="display: none"><strong>الموعد:</strong> <span class="time-name"></span></p>
-                            <p class="timestamp"></p>
-                        </div>
-                        <button class="receipt-btn prev-btn" onclick="showStep(1)">
-                            <i class="fas fa-arrow-right"></i>
-                            <span>السابق</span>
-                        </button>
-                        <div class="receipt-actions">
-                            <button class="receipt-btn whatsapp-btn">
-                                <i class="fab fa-whatsapp"></i>
-                                إرسال عبر واتساب
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    // Remove any existing success message before adding the new one
-    const existingMessage = document.querySelector('.success-message');
-    if (existingMessage) {
-        existingMessage.remove();
-    }
-    document.body.insertAdjacentHTML('beforeend', successMessageHTML);
-
-    // Function to close success message
-    window.closeSuccessMessage = function() {
-        const successMessage = document.querySelector('.success-message');
-        if (successMessage) {
-            successMessage.style.display = 'none';
-        }
-    };
-
-    // Add step navigation function
-    window.showStep = function(step) {
-        document.querySelector('.step-1').classList.remove('active');
-        document.querySelector('.step-2').classList.remove('active');
-        document.querySelector('.step-' + step).classList.add('active');
-    };
-
-    // Function to format current time in Arabic
-    function formatCurrentTime() {
-        const now = new Date();
-        const options = {
-            year: 'numeric',
-            month: 'numeric',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: 'numeric',
-            hour12: true
-        };
-        return new Intl.DateTimeFormat('ar-EG', options).format(now);
-    }
-
-    // Improved image capture function
-    async function captureReceipt(element) {
-        try {
-            const canvas = await html2canvas(element, {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                allowTaint: true,
-                backgroundColor: null,
-                width: element.offsetWidth * 2,
-                height: element.offsetHeight * 2
+            
+            // Toggle this dropdown
+            optionsContainer.classList.toggle('show');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!customDropdownContainer.contains(e.target)) {
+                optionsContainer.classList.remove('show');
+            }
+        });
+        
+        // Handle option selection
+        const dropdownOptions = optionsContainer.querySelectorAll('.dropdown-option');
+        dropdownOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const value = this.getAttribute('data-value');
+                const text = this.querySelector('.time-text')?.textContent || this.textContent;
+                
+                // Update selected display
+                selectedDisplay.textContent = text;
+                selectedDisplay.setAttribute('data-value', value);
+                
+                // Update hidden select for form submission
+                selectElement.value = value;
+                
+                // Trigger change event on select
+                const event = new Event('change', { bubbles: true });
+                selectElement.dispatchEvent(event);
+                
+                // Close dropdown
+                optionsContainer.classList.remove('show');
             });
-
-            return new Promise((resolve, reject) => {
-                canvas.toBlob((blob) => {
-                    if (blob) {
-                        resolve(blob);
-                    } else {
-                        reject(new Error('Failed to create blob'));
-                    }
-                }, 'image/png', 1.0);
-            });
-        } catch (error) {
-            console.error('Error capturing receipt:', error);
-            throw error;
-        }
+        });
+        
+        return customDropdownContainer;
     }
 
     // Form submission handler
@@ -227,55 +298,59 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             const formData = new FormData(this);
+            
+            // Check if trying to register for a restricted group
+            const grade = formData.get('grade');
+            const section = formData.get('section');
+            const group = formData.get('days_group');
+            const timeSlot = formData.get('time_slot');
+            
+            if (isRestrictedGroup(grade, section, group, timeSlot)) {
+                restrictedGroupsModal.show();
+                return;
+            }
 
             try {
-                await fetch(googleFormURL, {
-                    method: 'POST',
-                    body: formData,
-                    mode: 'no-cors'
+                const result = await submitRegistration(formData);
+                
+                if (!result.success) {
+                    // Handle different error types with appropriate modals
+                    if (result.error.includes('مكتملة')) {
+                        restrictedGroupsModal.show();
+                        return;
+                    } else if (result.error.includes('مسجل بالفعل') || 
+                              result.errorCode === '23505' || 
+                              result.error.includes('duplicate key value')) {
+                        // Show duplicate registration modal
+                        duplicateRegistrationModal.show(formData.get('student_phone'));
+                        return;
+                    }
+                    throw new Error(result.error);
+                }
+
+                // Show success modal with registration data
+                successModal.show({
+                    studentName: formData.get('student_name'),
+                    gradeName: gradeNames[formData.get('grade')],
+                    studentPhone: formData.get('student_phone'),
+                    parentPhone: formData.get('parent_phone'),
+                    sectionName: sectionNames[formData.get('section')] || null,
+                    groupName: groupNames[formData.get('days_group')] || null,
+                    timeSlot: formData.get('time_slot')
                 });
 
-                const successMessage = document.querySelector('.success-message');
-                if (successMessage) {
-                    // Update content with Arabic values
-                    document.querySelector('.student-name').textContent = formData.get('entry.704942904');
-                    document.querySelector('.grade-name').textContent = gradeNames[formData.get('entry.1185658655')] || '';
-                    document.querySelector('.student-phone').textContent = formData.get('entry.1530055795');
-                    document.querySelector('.parent-phone').textContent = formData.get('entry.14816919');
-
-                    const sectionInfo = document.querySelector('.section-info');
-                    const sectionValue = formData.get('entry.1819611279');
-                    if (sectionValue && sectionNames[sectionValue]) {
-                        sectionInfo.style.display = 'block';
-                        document.querySelector('.section-name').textContent = sectionNames[sectionValue];
-                    }
-
-                    const groupInfo = document.querySelector('.group-info');
-                    const groupValue = formData.get('entry.1957842203');
-                    if (groupValue && groupNames[groupValue]) {
-                        groupInfo.style.display = 'block';
-                        document.querySelector('.group-name').textContent = groupNames[groupValue];
-                    }
-
-                    const timeInfo = document.querySelector('.time-info');
-                    const timeValue = formData.get('entry.869564185');
-                    if (timeValue) {
-                        timeInfo.style.display = 'block';
-                        document.querySelector('.time-name').textContent = timeValue;
-                    }
-
-                    // Set timestamp
-                    const timestamp = formatCurrentTime();
-                    document.querySelectorAll('.timestamp').forEach(el => {
-                        el.textContent = `تاريخ التسجيل: ${timestamp}`;
-                    });
-
-                    successMessage.style.display = 'flex';
-                    form.reset();
-                }
+                form.reset();
             } catch (error) {
                 console.error('Error submitting form:', error);
-                alert('حدث خطأ أثناء إرسال البيانات. يرجى المحاولة مرة أخرى.');
+                
+                // Check if it's a duplicate key error from the database
+                if (error.message.includes('duplicate key value') || 
+                    error.message.includes('idx_unique_student_registration')) {
+                    duplicateRegistrationModal.show(formData.get('student_phone'));
+                } else {
+                    // For other errors, show a generic alert
+                    alert(error.message || 'حدث خطأ أثناء إرسال البيانات. يرجى المحاولة مرة أخرى.');
+                }
             }
         });
     }
@@ -311,5 +386,212 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('حدث خطأ أثناء مشاركة الإيصال. يرجى المحاولة مرة أخرى.');
             }
         });
+    }
+
+    // Image capture function
+    async function captureReceipt(element) {
+        try {
+            const canvas = await html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                allowTaint: true,
+                backgroundColor: null,
+                width: element.offsetWidth * 2,
+                height: element.offsetHeight * 2
+            });
+
+            return new Promise((resolve, reject) => {
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        resolve(blob);
+                    } else {
+                        reject(new Error('Failed to create blob'));
+                    }
+                }, 'image/png', 1.0);
+            });
+        } catch (error) {
+            console.error('Error capturing receipt:', error);
+            throw error;
+        }
+    }
+    
+    // Function to create custom dropdowns for all select elements
+    function createCustomDropdown(selectElement) {
+        if (!selectElement) return;
+        
+        // Get the parent container of the select element
+        const selectContainer = selectElement.parentElement;
+        
+        // Skip if already has a custom dropdown
+        if (selectContainer.querySelector('.custom-dropdown-container')) return;
+        
+        // Create custom dropdown container
+        const customDropdownContainer = document.createElement('div');
+        customDropdownContainer.className = 'custom-dropdown-container';
+        
+        // Get the label text from the select element's label
+        const labelText = selectContainer.querySelector('label')?.textContent || '';
+        
+        // Create selected display
+        const selectedDisplay = document.createElement('div');
+        selectedDisplay.className = 'selected-option';
+        
+        // Set initial text - if no selection, use placeholder text instead of label
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        if (selectedOption && selectedOption.value) {
+            selectedDisplay.textContent = selectedOption.textContent;
+        } else {
+            // Use placeholder text based on the select element's ID
+            switch(selectElement.id) {
+                case 'grade':
+                    selectedDisplay.textContent = 'اختر الصف';
+                    break;
+                case 'section':
+                    selectedDisplay.textContent = 'اختر الشعبة';
+                    break;
+                case 'group':
+                    selectedDisplay.textContent = 'اختر المجموعة';
+                    break;
+                case 'time':
+                    selectedDisplay.textContent = 'اختر الموعد';
+                    break;
+                default:
+                    selectedDisplay.textContent = 'اختر';
+            }
+        }
+        
+        selectedDisplay.setAttribute('data-value', selectElement.value);
+        
+        // Create dropdown options container
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'dropdown-options';
+        
+        // Add options to custom dropdown (skip the first empty/placeholder option)
+        Array.from(selectElement.options).forEach((option, index) => {
+            // Skip empty placeholder options
+            if (index === 0 && !option.value) return;
+            
+            const dropdownOption = document.createElement('div');
+            dropdownOption.className = 'dropdown-option';
+            dropdownOption.textContent = option.textContent;
+            dropdownOption.setAttribute('data-value', option.value);
+            optionsContainer.appendChild(dropdownOption);
+        });
+        
+        // Assemble custom dropdown
+        customDropdownContainer.appendChild(selectedDisplay);
+        customDropdownContainer.appendChild(optionsContainer);
+        
+        // Insert custom dropdown after the select element
+        selectElement.style.display = 'none'; // Hide the original select
+        selectContainer.appendChild(customDropdownContainer);
+        
+        // Add event listeners for custom dropdown
+        selectedDisplay.addEventListener('click', function() {
+            // Close all other open dropdowns first
+            document.querySelectorAll('.dropdown-options.show').forEach(dropdown => {
+                if (dropdown !== optionsContainer) {
+                    dropdown.classList.remove('show');
+                }
+            });
+            
+            // Toggle this dropdown
+            optionsContainer.classList.toggle('show');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!customDropdownContainer.contains(e.target)) {
+                optionsContainer.classList.remove('show');
+            }
+        });
+        
+        // Handle option selection
+        const dropdownOptions = optionsContainer.querySelectorAll('.dropdown-option');
+        dropdownOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const value = this.getAttribute('data-value');
+                const text = this.textContent;
+                
+                // Update selected display
+                selectedDisplay.textContent = text;
+                selectedDisplay.setAttribute('data-value', value);
+                
+                // Update hidden select for form submission
+                selectElement.value = value;
+                
+                // Trigger change event on select
+                const event = new Event('change', { bubbles: true });
+                selectElement.dispatchEvent(event);
+                
+                // Close dropdown
+                optionsContainer.classList.remove('show');
+            });
+        });
+        
+        // Update custom dropdown when select changes programmatically
+        selectElement.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption && selectedOption.value) {
+                selectedDisplay.textContent = selectedOption.textContent;
+                selectedDisplay.setAttribute('data-value', selectedOption.value);
+            } else {
+                // Reset to placeholder if no selection
+                switch(selectElement.id) {
+                    case 'grade':
+                        selectedDisplay.textContent = 'اختر الصف';
+                        break;
+                    case 'section':
+                        selectedDisplay.textContent = 'اختر الشعبة';
+                        break;
+                    case 'group':
+                        selectedDisplay.textContent = 'اختر المجموعة';
+                        break;
+                    case 'time':
+                        selectedDisplay.textContent = 'اختر الموعد';
+                        break;
+                    default:
+                        selectedDisplay.textContent = 'اختر';
+                }
+            }
+            
+            // Update dropdown options
+            optionsContainer.innerHTML = '';
+            
+            // Add options to dropdown (skip the first empty/placeholder option)
+            Array.from(this.options).forEach((option, index) => {
+                // Skip empty placeholder options
+                if (index === 0 && !option.value) return;
+                
+                const dropdownOption = document.createElement('div');
+                dropdownOption.className = 'dropdown-option';
+                dropdownOption.textContent = option.textContent;
+                dropdownOption.setAttribute('data-value', option.value);
+                optionsContainer.appendChild(dropdownOption);
+                
+                // Re-add click event listener
+                dropdownOption.addEventListener('click', function() {
+                    const value = this.getAttribute('data-value');
+                    const text = this.textContent;
+                    
+                    // Update selected display
+                    selectedDisplay.textContent = text;
+                    selectedDisplay.setAttribute('data-value', value);
+                    
+                    // Update hidden select for form submission
+                    selectElement.value = value;
+                    
+                    // Trigger change event on select
+                    const event = new Event('change', { bubbles: true });
+                    selectElement.dispatchEvent(event);
+                    
+                    // Close dropdown
+                    optionsContainer.classList.remove('show');
+                });
+            });
+        });
+        
+        return customDropdownContainer;
     }
 }); 

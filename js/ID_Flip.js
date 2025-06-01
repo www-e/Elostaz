@@ -1,5 +1,3 @@
-
-// Smart Card Flip Functionality
 document.addEventListener('DOMContentLoaded', function() {
     const flipButton = document.querySelector('.flip-button');
     const smartCard = document.querySelector('.smart-card');
@@ -7,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (flipButton && smartCard) {
         flipButton.addEventListener('click', function() {
             smartCard.classList.toggle('flipped');
-            flipButton.textContent = smartCard.classList.contains('flipped') ? ' وجه الكارت' : 'ضهر الكارت';
+            flipButton.textContent = smartCard.classList.contains('flipped') ? 'وجه الكارت' : 'ضهر الكارت';
         });
     }
-});
+}); 

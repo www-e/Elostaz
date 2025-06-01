@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v2025-2';
 const CACHE_NAME = `elostaz-cache-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `elostaz-dynamic-${CACHE_VERSION}`;
 
@@ -24,18 +24,19 @@ const ASSETS = [
     `${BASE_PATH}/css/grade-styles.css`,
     `${BASE_PATH}/css/registration.css`,
     `${BASE_PATH}/css/navbar.css`,
+    `${BASE_PATH}/css/tags.css`,
     `${BASE_PATH}/js/main.js`,
     `${BASE_PATH}/js/path-handler.js`,
     `${BASE_PATH}/js/registration.js`,
+    `${BASE_PATH}/js/registration-service.js`,
     `${BASE_PATH}/js/form-validation.js`,
-    `${BASE_PATH}/js/google-sheets.js`,
-    `${BASE_PATH}/js/ID_Flip.js`,
     `${BASE_PATH}/js/navbar.js`,
-    `${BASE_PATH}/js/Private_form.js`,
     `${BASE_PATH}/js/ActiveState.js`,
     `${BASE_PATH}/js/DOMloader.js`,
     `${BASE_PATH}/js/theme.js`,
     `${BASE_PATH}/js/secondTermValidator.js`,
+    `${BASE_PATH}/js/supabase-client.js`,
+    `${BASE_PATH}/js/components/success-modal.js`,
     `${BASE_PATH}/assets/icons/edu.ico`,
     `${BASE_PATH}/components/install-prompt/install-prompt.css`,
     `${BASE_PATH}/components/install-prompt/install-prompt.js`,
@@ -45,7 +46,8 @@ const ASSETS = [
     'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
-    'https://unpkg.com/aos@next/dist/aos.css'
+    'https://unpkg.com/aos@next/dist/aos.css',
+    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'
 ];
 
 // Install event - cache initial assets

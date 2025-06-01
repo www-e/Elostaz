@@ -1,5 +1,5 @@
 import { validateBookingForm } from './form-validation.js';
-import { sendToGoogleSheets } from './google-sheets.js';
+import { supabase } from './supabase-client.js';
 
 // Multi-step Form Handling
 export function initializeMultiStepForm() {
@@ -119,7 +119,6 @@ export function initializeMultiStepForm() {
 export async function handleBookingSubmit(e) {
     e.preventDefault();
     
-    // Get form data
     const formData = {
         studentName: document.getElementById('studentName').value,
         studentPhone: document.getElementById('studentPhone').value,
@@ -131,53 +130,23 @@ export async function handleBookingSubmit(e) {
         notes: document.getElementById('notes').value
     };
 
-    // Validate form data
     if (!validateBookingForm(formData)) {
         return;
     }
 
     try {
-        // Show loading state
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
-        submitBtn.disabled = true;
+        const supabaseClient = await supabase();
+        const { data, error } = await supabaseClient
+            .from('bookings')
+            .insert([formData]);
 
-        // Prepare data for Google Sheets
-        const sheetData = [
-            [
-                new Date().toISOString(),
-                formData.studentName,
-                formData.studentPhone,
-                formData.parentPhone,
-                formData.country,
-                formData.studentGrade,
-                formData.sessionDate,
-                formData.sessionTime,
-                formData.notes
-            ]
-        ];
+        if (error) throw error;
 
-        // Send to Google Sheets
-        await sendToGoogleSheets(sheetData);
-
-        // Hide booking modal
-        const bookingModal = bootstrap.Modal.getInstance(document.getElementById('bookingModal'));
-        bookingModal.hide();
-
-        // Show success modal
-        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-        successModal.show();
-
-        // Reset form
-        e.target.reset();
+        // Show success message
+        showSuccessMessage();
+        resetForm();
     } catch (error) {
-        console.error('Error submitting form:', error);
-        alert('حدث خطأ أثناء إرسال النموذج. يرجى المحاولة مرة أخرى.');
-    } finally {
-        // Reset button state
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال الطلب';
-        submitBtn.disabled = false;
+        console.error('Error submitting booking:', error);
+        showErrorMessage(error.message);
     }
 }
