@@ -68,7 +68,7 @@ export class DuplicateRegistrationModal {
         const contactBtn = this.modal.querySelector('.contact-btn');
         contactBtn.addEventListener('click', () => {
             // Replace with actual center phone number
-            const centerPhone = '+201000000000'; // Update this with the actual number
+            const centerPhone = '+201154688628'; // Update this with the actual number
             window.open(`https://wa.me/${centerPhone}?text=استفسار بخصوص التسجيل`, '_blank');
         });
         

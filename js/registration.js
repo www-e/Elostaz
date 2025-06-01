@@ -42,16 +42,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeErrorModalBtn = document.getElementById('close-error-modal');
     const errorModalMessage = document.getElementById('error-modal-message');
     
-    // Populate section options for third grade
-    if (sectionSelect) {
-        const sections = ['أدبي', 'علمي علوم', 'علمي رياضة'];
-        sections.forEach(section => {
-            const option = document.createElement('option');
-            option.value = section;
-            option.textContent = section;
-            sectionSelect.appendChild(option);
-        });
-    }
+    // Don't pre-populate section options for third grade
+    // They will be populated dynamically when the grade is selected
     
     // Initialize custom dropdowns for all select elements
     function initializeCustomDropdowns() {
@@ -79,6 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (grade === 'third') {
                     sectionGroup.style.display = 'block';
                     sectionSelect.required = true;
+                    
                     // Clear and update section options for third grade
                     sectionSelect.innerHTML = '<option value="">اختر الشعبة</option>';
                     Object.entries(sectionNames).forEach(([value, name]) => {
@@ -87,6 +80,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         option.textContent = name;
                         sectionSelect.appendChild(option);
                     });
+                    
+                    // Reinitialize the custom dropdown for the section select
+                    if (document.querySelector(`#${sectionSelect.id} + .custom-dropdown-container`)) {
+                        document.querySelector(`#${sectionSelect.id} + .custom-dropdown-container`).remove();
+                    }
+                    createCustomDropdown(sectionSelect);
+                    
                     // Show third grade info modal with a slight delay for better UX
                     setTimeout(() => thirdGradeModal.show(), 300);
                 } else {

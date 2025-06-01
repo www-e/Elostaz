@@ -28,6 +28,9 @@
     }
 
     /* Hero Section */
+    .hero-section {
+        padding-top: 80px; /* Reduced padding at the top */
+    }
     .hero-content h1 {
         font-size: 2rem;
     }
@@ -35,7 +38,8 @@
         font-size: 1rem;
     }
     .hero-image-container {
-        margin-top: 2rem;
+        margin-top: 1rem; /* Reduced margin */
+        margin-bottom: 1rem; /* Added bottom margin to bring CTA button up */
     }
 
     /* Books Section */
@@ -66,5 +70,17 @@
     }
     .section-subtitle {
         font-size: 0.9rem;
+    }
+    
+    /* Improve CTA button visibility */
+    .row.min-vh-100.align-items-center {
+        min-height: auto !important; /* Override min-vh-100 to reduce empty space */
+        padding-bottom: 1rem;
+    }
+    
+    /* Make the booking button more prominent */
+    [href*="حجز"], [href*="2025"] {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
     }
 }

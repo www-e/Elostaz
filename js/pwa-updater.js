@@ -75,18 +75,32 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // Cache version
-const CACHE_VERSION = 'v2025-1';
+const CACHE_VERSION = 'v2025-3';
 
 // Files to cache
 const filesToCache = [
     '/',
     '/index.html',
     '/pages/registration.html',
+    '/pages/about.html',
+    '/pages/schedule.html',
+    '/pages/grades/grade1.html',
+    '/pages/grades/grade2.html',
+    '/pages/grades/grade3.html',
+    
+    // CSS files
     '/css/styles.css',
     '/css/navbar.css',
     '/css/mobile.css',
     '/css/registration.css',
     '/css/tags.css',
+    '/css/welcome-message.css',
+    '/css/about-styles.css',
+    '/css/grade-styles.css',
+    '/css/dropdown-fix.css',
+    '/css/modal.css',
+    
+    // JavaScript files
     '/js/DOMloader.js',
     '/js/theme.js',
     '/js/main.js',
@@ -95,8 +109,23 @@ const filesToCache = [
     '/js/navbar.js',
     '/js/registration.js',
     '/js/registration-service.js',
-    '/js/components/success-modal.js',
+    '/js/path-handler.js',
+    '/js/secondTermValidator.js',
+    '/js/ID_Flip.js',
+    '/js/booking-form.js',
+    '/js/contact-form.js',
+    '/js/modal-handler.js',
+    '/js/welcome-message.js',
+    '/js/pwa-updater.js',
     '/js/supabase-client.js',
+    
+    // Component files
+    '/js/components/success-modal.js',
+    '/js/components/duplicate-registration-modal.js',
+    '/js/components/restricted-groups-modal.js',
+    '/js/components/third-grade-modal.js',
+    
+    // Assets
     '/assets/icons/edu.ico',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css',
     'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap',

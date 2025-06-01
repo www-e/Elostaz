@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v2025-2';
+const CACHE_VERSION = 'v2025-3';
 const CACHE_NAME = `elostaz-cache-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `elostaz-dynamic-${CACHE_VERSION}`;
 
@@ -18,6 +18,8 @@ const ASSETS = [
     `${BASE_PATH}/pages/grades/grade1.html`,
     `${BASE_PATH}/pages/grades/grade2.html`,
     `${BASE_PATH}/pages/grades/grade3.html`,
+    
+    // CSS files
     `${BASE_PATH}/css/styles.css`,
     `${BASE_PATH}/css/mobile.css`,
     `${BASE_PATH}/css/about-styles.css`,
@@ -25,6 +27,11 @@ const ASSETS = [
     `${BASE_PATH}/css/registration.css`,
     `${BASE_PATH}/css/navbar.css`,
     `${BASE_PATH}/css/tags.css`,
+    `${BASE_PATH}/css/welcome-message.css`,
+    `${BASE_PATH}/css/dropdown-fix.css`,
+    `${BASE_PATH}/css/modal.css`,
+    
+    // JavaScript files
     `${BASE_PATH}/js/main.js`,
     `${BASE_PATH}/js/path-handler.js`,
     `${BASE_PATH}/js/registration.js`,
@@ -36,7 +43,21 @@ const ASSETS = [
     `${BASE_PATH}/js/theme.js`,
     `${BASE_PATH}/js/secondTermValidator.js`,
     `${BASE_PATH}/js/supabase-client.js`,
+    `${BASE_PATH}/js/ID_Flip.js`,
+    `${BASE_PATH}/js/booking-form.js`,
+    `${BASE_PATH}/js/contact-form.js`,
+    `${BASE_PATH}/js/modal-handler.js`,
+    `${BASE_PATH}/js/welcome-message.js`,
+    `${BASE_PATH}/js/pwa-updater.js`,
+    `${BASE_PATH}/js/mobile-drawer.js`,
+    
+    // Component files
     `${BASE_PATH}/js/components/success-modal.js`,
+    `${BASE_PATH}/js/components/duplicate-registration-modal.js`,
+    `${BASE_PATH}/js/components/restricted-groups-modal.js`,
+    `${BASE_PATH}/js/components/third-grade-modal.js`,
+    
+    // Assets
     `${BASE_PATH}/assets/icons/edu.ico`,
     `${BASE_PATH}/components/install-prompt/install-prompt.css`,
     `${BASE_PATH}/components/install-prompt/install-prompt.js`,
