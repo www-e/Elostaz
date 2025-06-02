@@ -66,20 +66,43 @@ document.addEventListener('DOMContentLoaded', function() {
         gradeSelect.addEventListener('change', function() {
             const grade = this.value;
             
-            // Show/hide section selection for 3rd grade
+            // Show/hide section selection for 2nd and 3rd grade
             if (sectionGroup && sectionSelect) {
-                if (grade === 'third') {
+                if (grade === 'third' || grade === 'second') {
                     sectionGroup.style.display = 'block';
                     sectionSelect.required = true;
                     
-                    // Clear and update section options for third grade
+                    // Clear and update section options
                     sectionSelect.innerHTML = '<option value="">اختر الشعبة</option>';
-                    Object.entries(sectionNames).forEach(([value, name]) => {
-                        const option = document.createElement('option');
-                        option.value = value;
-                        option.textContent = name;
-                        sectionSelect.appendChild(option);
-                    });
+                    
+                    if (grade === 'third') {
+                        // For third grade: show general (رياضة) and statistics (إحصاء)
+                        const thirdGradeOptions = [
+                            ['general', sectionNames['general']],
+                            ['statistics', sectionNames['statistics']]
+                        ];
+                        thirdGradeOptions.forEach(([value, name]) => {
+                            const option = document.createElement('option');
+                            option.value = value;
+                            option.textContent = name;
+                            sectionSelect.appendChild(option);
+                        });
+                        
+                        // Show third grade info modal with a slight delay for better UX
+                        setTimeout(() => thirdGradeModal.show(), 300);
+                    } else if (grade === 'second') {
+                        // For second grade: show science and arts
+                        const secondGradeOptions = [
+                            ['science', sectionNames['science']],
+                            ['arts', sectionNames['arts']]
+                        ];
+                        secondGradeOptions.forEach(([value, name]) => {
+                            const option = document.createElement('option');
+                            option.value = value;
+                            option.textContent = name;
+                            sectionSelect.appendChild(option);
+                        });
+                    }
                     
                     // Reinitialize the custom dropdown for the section select
                     if (document.querySelector(`#${sectionSelect.id} + .custom-dropdown-container`)) {
@@ -87,8 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     createCustomDropdown(sectionSelect);
                     
-                    // Show third grade info modal with a slight delay for better UX
-                    setTimeout(() => thirdGradeModal.show(), 300);
+
                 } else {
                     sectionGroup.style.display = 'none';
                     sectionSelect.required = false;

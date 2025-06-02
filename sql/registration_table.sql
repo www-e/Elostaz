@@ -1,6 +1,6 @@
 -- Create enum types for grade levels and sections
 CREATE TYPE grade_level AS ENUM ('first', 'second', 'third');
-CREATE TYPE section_type AS ENUM ('general', 'statistics');
+CREATE TYPE section_type AS ENUM ('general', 'statistics', 'science', 'arts');
 CREATE TYPE days_group AS ENUM (
     'sat_tue',      -- السبت والثلاثاء
     'sun_wed',      -- الأحد والأربعاء

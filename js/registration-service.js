@@ -50,8 +50,10 @@ export const gradeNames = {
 };
 
 export const sectionNames = {
-    'general': 'عام',
-    'statistics': 'إحصاء'
+    'general': 'علمي رياضة',
+    'statistics': 'إحصاء (أدبي)',
+    'science': 'علمي',
+    'arts': 'أدبي'
 };
 
 export const groupNames = {
