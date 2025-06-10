@@ -21,7 +21,19 @@ async function initializeSupabase() {
     const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6Y3V5cGRqeHNsZ2lmaWdqb2ZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc5NDA0NjYsImV4cCI6MjA2MzUxNjQ2Nn0.buO4qGzdvRRIWYoH6ZPgs_UqlrbcLPI0mAcYz1YbozY';
 
     if (!supabaseInstance) {
-        supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
+        supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'apikey': supabaseAnonKey,
+                'Authorization': `Bearer ${supabaseAnonKey}`
+            },
+            auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        });
     }
     return supabaseInstance;
 }

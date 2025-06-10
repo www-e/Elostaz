@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v2025-3';
+const CACHE_VERSION = 'v2025-4';
 const CACHE_NAME = `elostaz-cache-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `elostaz-dynamic-${CACHE_VERSION}`;
 
@@ -13,6 +13,7 @@ const ASSETS = [
     `${BASE_PATH}/manifest.json`,
     `${BASE_PATH}/sw.js`,
     `${BASE_PATH}/pages/registration.html`,
+    `${BASE_PATH}/pages/statistics.html`,
     `${BASE_PATH}/pages/about.html`,
     `${BASE_PATH}/pages/schedule.html`,
     `${BASE_PATH}/pages/grades/grade1.html`,
@@ -36,6 +37,8 @@ const ASSETS = [
     `${BASE_PATH}/js/path-handler.js`,
     `${BASE_PATH}/js/registration.js`,
     `${BASE_PATH}/js/registration-service.js`,
+    `${BASE_PATH}/js/statistics.js`,
+    `${BASE_PATH}/js/statistics-service.js`,
     `${BASE_PATH}/js/form-validation.js`,
     `${BASE_PATH}/js/navbar.js`,
     `${BASE_PATH}/js/ActiveState.js`,
@@ -53,6 +56,7 @@ const ASSETS = [
     
     // Component files
     `${BASE_PATH}/js/components/success-modal.js`,
+    `${BASE_PATH}/js/components/statistics-success-modal.js`,
     `${BASE_PATH}/js/components/duplicate-registration-modal.js`,
     `${BASE_PATH}/js/components/restricted-groups-modal.js`,
     `${BASE_PATH}/js/components/third-grade-modal.js`,

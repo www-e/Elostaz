@@ -196,3 +196,44 @@ self.addEventListener('fetch', event => {
             })
     );
 });
+
+const PWA_VERSION = 'v2025-4';
+
+// Function to check if PWA needs update
+function checkPWAVersion() {
+    const currentVersion = localStorage.getItem('pwa_version');
+    
+    if (!currentVersion || currentVersion !== PWA_VERSION) {
+        // Update version in localStorage
+        localStorage.setItem('pwa_version', PWA_VERSION);
+        
+        // Clear all caches
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => {
+                    return caches.delete(cacheName);
+                })
+            );
+        });
+        
+        // Show update message
+        showUpdateMessage();
+    }
+}
+
+// Function to show update message
+function showUpdateMessage() {
+    const updateMessage = document.createElement('div');
+    updateMessage.className = 'update-message';
+    updateMessage.innerHTML = `
+        <div class="update-content">
+            <i class="fas fa-sync-alt"></i>
+            <p>تم تحديث التطبيق</p>
+            <button onclick="location.reload()">تحديث الصفحة</button>
+        </div>
+    `;
+    document.body.appendChild(updateMessage);
+}
+
+// Check version on page load
+window.addEventListener('load', checkPWAVersion);

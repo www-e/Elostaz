@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>الإحصائيات - مركز أ/ أشرف حسن للرياضيات</title>
+    <link rel="icon" type="image/x-icon" href="assets/icons/edu.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="assets/icons/edu.ico">
+    <link rel="apple-touch-icon" href="assets/icons/edu.ico">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/mobile.css">
+    <link rel="stylesheet" href="../css/registration.css">
+    <link rel="stylesheet" href="../css/tags.css">
+    <link rel="stylesheet" href="../css/modal.css">
+    <link rel="stylesheet" href="../css/dropdown-fix.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="../js/path-handler.js"></script>
+    <script src="../js/pwa-updater.js"></script>
+    <script src="../js/secondTermValidator.js"></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light floating-nav">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">أ/ أشرف حسن</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html">الرئيسية</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" aria-label="Toggle Theme">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <div class="registration-container">
+        <h1>تسجيل مراجعة الإحصائيات 2025</h1>
+        <form id="registrationForm" class="registration-form">
+            <div class="form-group">
+                <label for="studentName">اسم الطالب</label>
+                <input type="text" id="studentName" name="student_name" required>
+                <div class="validation-message">يرجى إدخال اسم الطالب</div>
+            </div>
+
+            <div class="form-group">
+                <label for="studentPhone">رقم الطالب</label>
+                <input type="tel" id="studentPhone" name="student_phone" required>
+                <div class="validation-message">يرجى إدخال رقم الطالب</div>
+            </div>
+
+            <div class="form-group">
+                <label for="parentPhone">رقم ولي الأمر</label>
+                <input type="tel" id="parentPhone" name="parent_phone" required>
+                <div class="validation-message">يرجى إدخال رقم ولي الأمر</div>
+            </div>
+
+            <div class="form-group">
+                <label for="schoolType">الثانوية</label>
+                <select id="schoolType" name="school_type" required>
+                    <option value="">اختر نوع الثانوية</option>
+                    <option value="azhar">أزهري</option>
+                    <option value="general_arts">عام</option>
+                    <option value="general_arts">أدبي</option>
+                </select>
+                <div class="validation-message">يرجى اختيار نوع الثانوية</div>
+            </div>
+
+            <div class="form-group">
+                <label for="attendanceType">نوع الحضور</label>
+                <select id="attendanceType" name="attendance_type" required>
+                    <option value="">اختر نوع الحضور</option>
+                    <option value="zoom">Zoom</option>
+                    <option value="offline">حضوري</option>
+                </select>
+                <div class="validation-message">يرجى اختيار نوع الحضور</div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-paper-plane ms-2"></i>
+                تسجيل
+            </button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/DOMloader.js" type="module"></script>
+    <script src="../js/theme.js" type="module"></script>
+    <script src="../js/main.js" type="module"></script>
+    <script src="../js/ActiveState.js" type="module"></script>
+    <script src="../js/form-validation.js" type="module"></script>
+    <script src="../js/navbar.js" type="module"></script>
+    <script src="../js/statistics.js" type="module"></script>
+    <script src="../js/statistics-service.js" type="module"></script>
+</body>
+</html>
