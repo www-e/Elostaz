@@ -28,28 +28,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const restrictedGroupsModal = new RestrictedGroupsModal();
     const duplicateRegistrationModal = new DuplicateRegistrationModal();
     
-    // Get form elements
-    const nameInput = document.getElementById('name');
-    const phoneInput = document.getElementById('phone');
-    const parentPhoneInput = document.getElementById('parent_phone');
-    const schoolInput = document.getElementById('school');
-    const errorContainer = document.getElementById('error-container');
-    const errorMessage = document.getElementById('error-message');
-    const successModalElement = document.getElementById('success-modal');
-    const closeModalBtn = document.getElementById('close-modal');
-    const registrationIdSpan = document.getElementById('registration-id');
-    const errorModal = document.getElementById('error-modal');
-    const closeErrorModalBtn = document.getElementById('close-error-modal');
-    const errorModalMessage = document.getElementById('error-modal-message');
-    
-    // Don't pre-populate section options for third grade
-    // They will be populated dynamically when the grade is selected
+    // Global dropdown management
+    let activeDropdown = null;
     
     // Initialize custom dropdowns for all select elements
     function initializeCustomDropdowns() {
         // Remove any existing custom dropdowns first
         document.querySelectorAll('.custom-dropdown-container').forEach(dropdown => {
-            dropdown.parentElement.removeChild(dropdown);
+            dropdown.remove();
         });
         
         // Create fresh custom dropdowns
@@ -60,6 +46,336 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize all dropdowns
     initializeCustomDropdowns();
+
+    // Enhanced custom dropdown creation function
+    function createCustomDropdown(selectElement) {
+        if (!selectElement) return;
+        
+        const selectContainer = selectElement.parentElement;
+        
+        // Remove existing custom dropdown if present
+        const existingDropdown = selectContainer.querySelector('.custom-dropdown-container');
+        if (existingDropdown) {
+            existingDropdown.remove();
+        }
+        
+        // Create custom dropdown container
+        const customDropdownContainer = document.createElement('div');
+        customDropdownContainer.className = 'custom-dropdown-container';
+        
+        // Create selected display
+        const selectedDisplay = document.createElement('div');
+        selectedDisplay.className = 'selected-option';
+        selectedDisplay.setAttribute('tabindex', '0');
+        selectedDisplay.setAttribute('role', 'combobox');
+        selectedDisplay.setAttribute('aria-expanded', 'false');
+        
+        // Set initial placeholder text
+        const placeholderText = getPlaceholderText(selectElement.id);
+        selectedDisplay.textContent = placeholderText;
+        selectedDisplay.setAttribute('data-value', '');
+        
+        // Create dropdown options container
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'dropdown-options';
+        optionsContainer.setAttribute('role', 'listbox');
+        
+        // Function to update dropdown options
+        function updateDropdownOptions() {
+            optionsContainer.innerHTML = '';
+            
+            Array.from(selectElement.options).forEach((option, index) => {
+                // Skip empty placeholder options
+                if (index === 0 && !option.value) return;
+                
+                const dropdownOption = document.createElement('div');
+                dropdownOption.className = 'dropdown-option';
+                dropdownOption.setAttribute('role', 'option');
+                dropdownOption.setAttribute('data-value', option.value);
+                dropdownOption.textContent = option.textContent;
+                
+                // Add click event listener
+                dropdownOption.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    selectOption(option.value, option.textContent);
+                });
+                
+                optionsContainer.appendChild(dropdownOption);
+            });
+        }
+        
+        // Function to select an option
+        function selectOption(value, text) {
+            selectedDisplay.textContent = text;
+            selectedDisplay.setAttribute('data-value', value);
+            selectElement.value = value;
+            
+            // Trigger change event
+            const changeEvent = new Event('change', { bubbles: true });
+            selectElement.dispatchEvent(changeEvent);
+            
+            closeDropdown();
+        }
+        
+        // Function to open dropdown
+        function openDropdown() {
+            // Close any other open dropdown
+            closeAllDropdowns();
+            
+            // Set this as active dropdown
+            activeDropdown = customDropdownContainer;
+            
+            // Open this dropdown
+            customDropdownContainer.classList.add('active');
+            optionsContainer.classList.add('show');
+            selectedDisplay.setAttribute('aria-expanded', 'true');
+            
+            // Focus first option
+            const firstOption = optionsContainer.querySelector('.dropdown-option');
+            if (firstOption) {
+                firstOption.focus();
+            }
+        }
+        
+        // Function to close dropdown
+        function closeDropdown() {
+            customDropdownContainer.classList.remove('active');
+            optionsContainer.classList.remove('show');
+            selectedDisplay.setAttribute('aria-expanded', 'false');
+            
+            if (activeDropdown === customDropdownContainer) {
+                activeDropdown = null;
+            }
+        }
+        
+        // Event listeners
+        selectedDisplay.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (optionsContainer.classList.contains('show')) {
+                closeDropdown();
+            } else {
+                openDropdown();
+            }
+        });
+        
+        // Keyboard support
+        selectedDisplay.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case 'Enter':
+                case ' ':
+                    e.preventDefault();
+                    if (optionsContainer.classList.contains('show')) {
+                        closeDropdown();
+                    } else {
+                        openDropdown();
+                    }
+                    break;
+                case 'Escape':
+                    e.preventDefault();
+                    closeDropdown();
+                    break;
+                case 'ArrowDown':
+                    e.preventDefault();
+                    if (!optionsContainer.classList.contains('show')) {
+                        openDropdown();
+                    } else {
+                        const firstOption = optionsContainer.querySelector('.dropdown-option');
+                        if (firstOption) firstOption.focus();
+                    }
+                    break;
+            }
+        });
+        
+        // Keyboard navigation in options
+        optionsContainer.addEventListener('keydown', function(e) {
+            const options = Array.from(optionsContainer.querySelectorAll('.dropdown-option'));
+            const currentIndex = options.indexOf(document.activeElement);
+            
+            switch(e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    const nextIndex = currentIndex < options.length - 1 ? currentIndex + 1 : 0;
+                    options[nextIndex].focus();
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    const prevIndex = currentIndex > 0 ? currentIndex - 1 : options.length - 1;
+                    options[prevIndex].focus();
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (document.activeElement.classList.contains('dropdown-option')) {
+                        document.activeElement.click();
+                    }
+                    break;
+                case 'Escape':
+                    e.preventDefault();
+                    closeDropdown();
+                    selectedDisplay.focus();
+                    break;
+            }
+        });
+        
+        // Assemble dropdown
+        customDropdownContainer.appendChild(selectedDisplay);
+        customDropdownContainer.appendChild(optionsContainer);
+        
+        // Hide original select and insert custom dropdown
+        selectElement.style.display = 'none';
+        selectContainer.appendChild(customDropdownContainer);
+        
+        // Update options initially
+        updateDropdownOptions();
+        
+        // Update when select changes programmatically
+        selectElement.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption && selectedOption.value) {
+                selectedDisplay.textContent = selectedOption.textContent;
+                selectedDisplay.setAttribute('data-value', selectedOption.value);
+            } else {
+                selectedDisplay.textContent = getPlaceholderText(selectElement.id);
+                selectedDisplay.setAttribute('data-value', '');
+            }
+            updateDropdownOptions();
+        });
+        
+        return customDropdownContainer;
+    }
+    
+    // Enhanced time dropdown creation
+    function createCustomTimeDropdown(selectElement) {
+        if (!selectElement) return;
+        
+        const selectContainer = selectElement.parentElement;
+        
+        // Remove existing custom dropdown
+        const existingDropdown = selectContainer.querySelector('.custom-dropdown-container');
+        if (existingDropdown) {
+            existingDropdown.remove();
+        }
+        
+        // Create custom dropdown container
+        const customDropdownContainer = document.createElement('div');
+        customDropdownContainer.className = 'custom-dropdown-container';
+        
+        // Create selected display
+        const selectedDisplay = document.createElement('div');
+        selectedDisplay.className = 'selected-option';
+        selectedDisplay.setAttribute('tabindex', '0');
+        selectedDisplay.textContent = 'اختر الموعد';
+        selectedDisplay.setAttribute('data-value', '');
+        
+        // Create dropdown options container
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'dropdown-options';
+        
+        // Add options with tags
+        Array.from(selectElement.options).forEach((option, index) => {
+            if (index === 0 && !option.value) return;
+            
+            const dropdownOption = document.createElement('div');
+            dropdownOption.className = 'dropdown-option';
+            dropdownOption.setAttribute('data-value', option.value);
+            
+            // Create time text span
+            const timeText = document.createElement('span');
+            timeText.className = 'time-text';
+            timeText.textContent = option.textContent;
+            
+            // Create status tag
+            const tag = document.createElement('span');
+            const status = option.getAttribute('data-status') || 'available';
+            const tagText = option.getAttribute('data-text') || '';
+            tag.className = `new-badge tag-${status}`;
+            tag.textContent = tagText;
+            
+            dropdownOption.appendChild(timeText);
+            if (tagText) {
+                dropdownOption.appendChild(tag);
+            }
+            
+            // Add click event
+            dropdownOption.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const value = this.getAttribute('data-value');
+                const text = this.querySelector('.time-text')?.textContent || this.textContent;
+                
+                selectedDisplay.textContent = text;
+                selectedDisplay.setAttribute('data-value', value);
+                selectElement.value = value;
+                
+                const changeEvent = new Event('change', { bubbles: true });
+                selectElement.dispatchEvent(changeEvent);
+                
+                closeAllDropdowns();
+            });
+            
+            optionsContainer.appendChild(dropdownOption);
+        });
+        
+        // Event listeners
+        selectedDisplay.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            // Close other dropdowns
+            closeAllDropdowns();
+            
+            // Toggle this dropdown
+            if (!optionsContainer.classList.contains('show')) {
+                activeDropdown = customDropdownContainer;
+                customDropdownContainer.classList.add('active');
+                optionsContainer.classList.add('show');
+            }
+        });
+        
+        // Assemble and insert
+        customDropdownContainer.appendChild(selectedDisplay);
+        customDropdownContainer.appendChild(optionsContainer);
+        selectElement.style.display = 'none';
+        selectContainer.appendChild(customDropdownContainer);
+        
+        return customDropdownContainer;
+    }
+    
+    // Utility functions
+    function getPlaceholderText(selectId) {
+        const placeholders = {
+            'grade': 'اختر الصف',
+            'section': 'اختر الشعبة',
+            'group': 'اختر المجموعة',
+            'time': 'اختر الموعد'
+        };
+        return placeholders[selectId] || 'اختر';
+    }
+    
+    function closeAllDropdowns() {
+        document.querySelectorAll('.custom-dropdown-container').forEach(container => {
+            container.classList.remove('active');
+            const options = container.querySelector('.dropdown-options');
+            if (options) {
+                options.classList.remove('show');
+            }
+            const selectedOption = container.querySelector('.selected-option');
+            if (selectedOption) {
+                selectedOption.setAttribute('aria-expanded', 'false');
+            }
+        });
+        activeDropdown = null;
+    }
+    
+    // Global event listeners
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.custom-dropdown-container')) {
+            closeAllDropdowns();
+        }
+    });
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeAllDropdowns();
+        }
+    });
 
     // Handle grade change
     if (gradeSelect) {
@@ -104,13 +420,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                     }
                     
-                    // Reinitialize the custom dropdown for the section select
-                    if (document.querySelector(`#${sectionSelect.id} + .custom-dropdown-container`)) {
-                        document.querySelector(`#${sectionSelect.id} + .custom-dropdown-container`).remove();
-                    }
+                    // Recreate the custom dropdown for the section select
                     createCustomDropdown(sectionSelect);
-                    
-
                 } else {
                     sectionGroup.style.display = 'none';
                     sectionSelect.required = false;
@@ -172,15 +483,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateTimeOptions(grade, group, section = null) {
         if (!timeSelect) return;
         
-        // Get the parent container of the select element
-        const timeSelectContainer = timeSelect.parentElement;
-        
-        // Clear existing select and custom dropdown if it exists
+        // Clear existing select
         timeSelect.innerHTML = '<option value="">اختر الموعد</option>';
-        const existingCustomDropdown = timeSelectContainer.querySelector('.custom-dropdown-container');
-        if (existingCustomDropdown) {
-            timeSelectContainer.removeChild(existingCustomDropdown);
-        }
         
         if (!grade || !group || (grade === 'third' && !section)) {
             timeSelect.disabled = true;
@@ -192,7 +496,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Add options to the select element
         availableTimes.forEach(({ time, displayTime, availability }) => {
-            // Add to the hidden select element (for form submission)
             const option = document.createElement('option');
             option.value = time;
             option.textContent = displayTime;
@@ -202,117 +505,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Create custom dropdown for time select
-        const customDropdown = createCustomTimeDropdown(timeSelect);
+        createCustomTimeDropdown(timeSelect);
         
         timeSelect.disabled = false;
-    }
-    
-    // Function to create custom dropdown specifically for time select
-    function createCustomTimeDropdown(selectElement) {
-        if (!selectElement) return;
-        
-        // Get the parent container of the select element
-        const selectContainer = selectElement.parentElement;
-        
-        // Create custom dropdown container
-        const customDropdownContainer = document.createElement('div');
-        customDropdownContainer.className = 'custom-dropdown-container';
-        
-        // Create selected display
-        const selectedDisplay = document.createElement('div');
-        selectedDisplay.className = 'selected-option';
-        selectedDisplay.textContent = 'اختر الموعد';
-        selectedDisplay.setAttribute('data-value', '');
-        
-        // Create dropdown options container
-        const optionsContainer = document.createElement('div');
-        optionsContainer.className = 'dropdown-options';
-        
-        // Add options to custom dropdown (skip the first empty/placeholder option)
-        Array.from(selectElement.options).forEach((option, index) => {
-            // Skip empty placeholder options
-            if (index === 0 && !option.value) return;
-            
-            // Create custom dropdown option
-            const dropdownOption = document.createElement('div');
-            dropdownOption.className = 'dropdown-option';
-            dropdownOption.setAttribute('data-value', option.value);
-            
-            // Create option content with time and tag
-            const timeText = document.createElement('span');
-            timeText.className = 'time-text';
-            timeText.textContent = option.textContent;
-            
-            const tag = document.createElement('span');
-            const status = option.getAttribute('data-status') || 'available';
-            const tagText = option.getAttribute('data-text') || '';
-            tag.className = `new-badge tag-${status}`;
-            tag.textContent = tagText;
-            
-            // Ensure proper contrast for tag text in dark mode
-            if (status === 'limited') {
-                tag.style.fontWeight = '700';
-                tag.style.textShadow = '0px 0px 1px rgba(0,0,0,0.2)';
-            }
-            
-            dropdownOption.appendChild(timeText);
-            dropdownOption.appendChild(tag);
-            
-            optionsContainer.appendChild(dropdownOption);
-        });
-        
-        // Assemble custom dropdown
-        customDropdownContainer.appendChild(selectedDisplay);
-        customDropdownContainer.appendChild(optionsContainer);
-        
-        // Insert custom dropdown after the select element
-        selectElement.style.display = 'none'; // Hide the original select
-        selectContainer.appendChild(customDropdownContainer);
-        
-        // Add event listeners for custom dropdown
-        selectedDisplay.addEventListener('click', function() {
-            // Close all other open dropdowns first
-            document.querySelectorAll('.dropdown-options.show').forEach(dropdown => {
-                if (dropdown !== optionsContainer) {
-                    dropdown.classList.remove('show');
-                }
-            });
-            
-            // Toggle this dropdown
-            optionsContainer.classList.toggle('show');
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!customDropdownContainer.contains(e.target)) {
-                optionsContainer.classList.remove('show');
-            }
-        });
-        
-        // Handle option selection
-        const dropdownOptions = optionsContainer.querySelectorAll('.dropdown-option');
-        dropdownOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                const value = this.getAttribute('data-value');
-                const text = this.querySelector('.time-text')?.textContent || this.textContent;
-                
-                // Update selected display
-                selectedDisplay.textContent = text;
-                selectedDisplay.setAttribute('data-value', value);
-                
-                // Update hidden select for form submission
-                selectElement.value = value;
-                
-                // Trigger change event on select
-                const event = new Event('change', { bubbles: true });
-                selectElement.dispatchEvent(event);
-                
-                // Close dropdown
-                optionsContainer.classList.remove('show');
-            });
-        });
-        
-        return customDropdownContainer;
     }
 
     // Form submission handler
@@ -362,6 +557,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 form.reset();
+                initializeCustomDropdowns();
             } catch (error) {
                 console.error('Error submitting form:', error);
                 
@@ -437,183 +633,4 @@ document.addEventListener('DOMContentLoaded', function() {
             throw error;
         }
     }
-    
-    // Function to create custom dropdowns for all select elements
-    function createCustomDropdown(selectElement) {
-        if (!selectElement) return;
-        
-        // Get the parent container of the select element
-        const selectContainer = selectElement.parentElement;
-        
-        // Skip if already has a custom dropdown
-        if (selectContainer.querySelector('.custom-dropdown-container')) return;
-        
-        // Create custom dropdown container
-        const customDropdownContainer = document.createElement('div');
-        customDropdownContainer.className = 'custom-dropdown-container';
-        
-        // Get the label text from the select element's label
-        const labelText = selectContainer.querySelector('label')?.textContent || '';
-        
-        // Create selected display
-        const selectedDisplay = document.createElement('div');
-        selectedDisplay.className = 'selected-option';
-        
-        // Set initial text - if no selection, use placeholder text instead of label
-        const selectedOption = selectElement.options[selectElement.selectedIndex];
-        if (selectedOption && selectedOption.value) {
-            selectedDisplay.textContent = selectedOption.textContent;
-        } else {
-            // Use placeholder text based on the select element's ID
-            switch(selectElement.id) {
-                case 'grade':
-                    selectedDisplay.textContent = 'اختر الصف';
-                    break;
-                case 'section':
-                    selectedDisplay.textContent = 'اختر الشعبة';
-                    break;
-                case 'group':
-                    selectedDisplay.textContent = 'اختر المجموعة';
-                    break;
-                case 'time':
-                    selectedDisplay.textContent = 'اختر الموعد';
-                    break;
-                default:
-                    selectedDisplay.textContent = 'اختر';
-            }
-        }
-        
-        selectedDisplay.setAttribute('data-value', selectElement.value);
-        
-        // Create dropdown options container
-        const optionsContainer = document.createElement('div');
-        optionsContainer.className = 'dropdown-options';
-        
-        // Add options to custom dropdown (skip the first empty/placeholder option)
-        Array.from(selectElement.options).forEach((option, index) => {
-            // Skip empty placeholder options
-            if (index === 0 && !option.value) return;
-            
-            const dropdownOption = document.createElement('div');
-            dropdownOption.className = 'dropdown-option';
-            dropdownOption.textContent = option.textContent;
-            dropdownOption.setAttribute('data-value', option.value);
-            optionsContainer.appendChild(dropdownOption);
-        });
-        
-        // Assemble custom dropdown
-        customDropdownContainer.appendChild(selectedDisplay);
-        customDropdownContainer.appendChild(optionsContainer);
-        
-        // Insert custom dropdown after the select element
-        selectElement.style.display = 'none'; // Hide the original select
-        selectContainer.appendChild(customDropdownContainer);
-        
-        // Add event listeners for custom dropdown
-        selectedDisplay.addEventListener('click', function() {
-            // Close all other open dropdowns first
-            document.querySelectorAll('.dropdown-options.show').forEach(dropdown => {
-                if (dropdown !== optionsContainer) {
-                    dropdown.classList.remove('show');
-                }
-            });
-            
-            // Toggle this dropdown
-            optionsContainer.classList.toggle('show');
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!customDropdownContainer.contains(e.target)) {
-                optionsContainer.classList.remove('show');
-            }
-        });
-        
-        // Handle option selection
-        const dropdownOptions = optionsContainer.querySelectorAll('.dropdown-option');
-        dropdownOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                const value = this.getAttribute('data-value');
-                const text = this.textContent;
-                
-                // Update selected display
-                selectedDisplay.textContent = text;
-                selectedDisplay.setAttribute('data-value', value);
-                
-                // Update hidden select for form submission
-                selectElement.value = value;
-                
-                // Trigger change event on select
-                const event = new Event('change', { bubbles: true });
-                selectElement.dispatchEvent(event);
-                
-                // Close dropdown
-                optionsContainer.classList.remove('show');
-            });
-        });
-        
-        // Update custom dropdown when select changes programmatically
-        selectElement.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            if (selectedOption && selectedOption.value) {
-                selectedDisplay.textContent = selectedOption.textContent;
-                selectedDisplay.setAttribute('data-value', selectedOption.value);
-            } else {
-                // Reset to placeholder if no selection
-                switch(selectElement.id) {
-                    case 'grade':
-                        selectedDisplay.textContent = 'اختر الصف';
-                        break;
-                    case 'section':
-                        selectedDisplay.textContent = 'اختر الشعبة';
-                        break;
-                    case 'group':
-                        selectedDisplay.textContent = 'اختر المجموعة';
-                        break;
-                    case 'time':
-                        selectedDisplay.textContent = 'اختر الموعد';
-                        break;
-                    default:
-                        selectedDisplay.textContent = 'اختر';
-                }
-            }
-            
-            // Update dropdown options
-            optionsContainer.innerHTML = '';
-            
-            // Add options to dropdown (skip the first empty/placeholder option)
-            Array.from(this.options).forEach((option, index) => {
-                // Skip empty placeholder options
-                if (index === 0 && !option.value) return;
-                
-                const dropdownOption = document.createElement('div');
-                dropdownOption.className = 'dropdown-option';
-                dropdownOption.textContent = option.textContent;
-                dropdownOption.setAttribute('data-value', option.value);
-                optionsContainer.appendChild(dropdownOption);
-                
-                // Re-add click event listener
-                dropdownOption.addEventListener('click', function() {
-                    const value = this.getAttribute('data-value');
-                    const text = this.textContent;
-                    
-                    // Update selected display
-                    selectedDisplay.textContent = text;
-                    selectedDisplay.setAttribute('data-value', value);
-                    
-                    // Update hidden select for form submission
-                    selectElement.value = value;
-                    
-                    // Trigger change event on select
-                    const event = new Event('change', { bubbles: true });
-                    selectElement.dispatchEvent(event);
-                    
-                    // Close dropdown
-                    optionsContainer.classList.remove('show');
-                });
-            });
-        });
-        
-        return customDropdownContainer;
-    }
-}); 
+});

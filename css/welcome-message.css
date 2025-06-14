@@ -1,205 +1,222 @@
-/* Welcome Message Styles */
-.welcome-message-container {
+/* === WELCOME MESSAGE COMPONENT === */
+
+.welcome-message {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 9999;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
-    overflow: hidden;
-}
-
-.welcome-message-container.show {
-    opacity: 1;
-    visibility: visible;
-}
-
-.welcome-message-content {
-    position: relative;
-    width: 90%;
-    max-width: 500px;
+    top: var(--space-lg);
+    right: var(--space-lg);
     background: var(--card-bg);
-    border-radius: 20px;
-    padding: 2.5rem 2rem;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.2);
-    transform: scale(0.9);
-    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: 2px solid var(--primary-light);
-    overflow: hidden;
+    border-radius: var(--radius-xl);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+    z-index: var(--z-popover);
+    max-width: 350px;
+    transform: translateX(400px);
+    opacity: 0;
+    transition: var(--transition-all);
+    backdrop-filter: blur(10px);
 }
 
-.welcome-message-container.show .welcome-message-content {
-    transform: scale(1);
-}
-
-.welcome-close-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: transparent;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: color 0.3s ease;
-    z-index: 2;
-}
-
-.welcome-close-btn:hover {
-    color: var(--accent);
+.welcome-message.show {
+    transform: translateX(0);
+    opacity: 1;
 }
 
 .welcome-header {
-    margin-bottom: 1.5rem;
-    position: relative;
-}
-
-.celebration-icons {
     display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
-    color: var(--accent);
-    font-size: 1.5rem;
-}
-
-.celebration-icons i {
-    animation: bounce 2s infinite alternate;
-}
-
-.celebration-icons i:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.celebration-icons i:nth-child(3) {
-    animation-delay: 0.4s;
-}
-
-.celebration-icons i:nth-child(4) {
-    animation-delay: 0.6s;
-}
-
-.welcome-message-content h3 {
-    color: var(--primary);
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    font-weight: 700;
-}
-
-.welcome-message-content p {
-    color: var(--text-secondary);
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
-}
-
-.discord-button {
-    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    background: linear-gradient(135deg, #5865F2 0%, #4752C4 100%);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 10px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 10px rgba(88, 101, 242, 0.3);
-    position: relative;
-    overflow: hidden;
+    justify-content: space-between;
+    margin-bottom: var(--space-base);
 }
 
-.discord-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(88, 101, 242, 0.4);
-    color: white;
+.welcome-title {
+    color: var(--primary);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
 }
 
-.discord-button i {
-    font-size: 1.2rem;
-}
-
-/* Pulse effect for Discord button */
-.pulse-effect {
+.welcome-title i {
+    font-size: var(--font-size-xl);
     animation: pulse 2s infinite;
 }
 
-@keyframes pulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba(88, 101, 242, 0.7);
-    }
-    70% {
-        box-shadow: 0 0 0 10px rgba(88, 101, 242, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(88, 101, 242, 0);
-    }
+.welcome-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: var(--font-size-lg);
+    cursor: pointer;
+    padding: var(--space-xs);
+    border-radius: var(--radius-sm);
+    transition: var(--transition-colors);
 }
 
-/* Confetti Animation */
-.confetti {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    animation: confetti-fall 5s linear infinite;
-    z-index: 1;
+.welcome-close:hover {
+    color: var(--text-primary);
+    background: rgba(var(--text-secondary), 0.1);
 }
 
-@keyframes confetti-fall {
-    0% {
-        transform: translateY(-100px) rotate(0deg);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(calc(100vh + 100px)) rotate(720deg);
+.welcome-content {
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin-bottom: var(--space-lg);
+}
+
+.welcome-content p {
+    margin: 0 0 var(--space-sm);
+}
+
+.welcome-actions {
+    display: flex;
+    gap: var(--space-sm);
+    justify-content: flex-end;
+}
+
+.welcome-btn {
+    padding: var(--space-sm) var(--space-base);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: var(--transition-all);
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.welcome-btn.primary {
+    background: var(--primary);
+    color: white;
+}
+
+.welcome-btn.primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-primary);
+}
+
+.welcome-btn.secondary {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.welcome-btn.secondary:hover {
+    color: var(--text-primary);
+    background: rgba(var(--text-secondary), 0.05);
+}
+
+/* Welcome Animation */
+@keyframes welcomeSlideIn {
+    from {
+        transform: translateX(400px);
         opacity: 0;
     }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
-@keyframes bounce {
-    0% {
+.welcome-message.animate {
+    animation: welcomeSlideIn 0.5s ease-out;
+}
+
+/* Progress Dots */
+.welcome-progress {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-xs);
+    margin: var(--space-base) 0;
+}
+
+.progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-circle);
+    background: var(--border-color);
+    transition: var(--transition-colors);
+}
+
+.progress-dot.active {
+    background: var(--primary);
+    transform: scale(1.2);
+}
+
+/* Welcome Steps */
+.welcome-step {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.welcome-step.active {
+    display: block;
+}
+
+.welcome-step-counter {
+    color: var(--text-secondary);
+    font-size: var(--font-size-xs);
+    text-align: center;
+    margin-bottom: var(--space-sm);
+}
+
+/* Feature Highlights */
+.feature-highlight {
+    background: rgba(var(--primary-rgb), 0.05);
+    border-radius: var(--radius-sm);
+    padding: var(--space-sm);
+    margin: var(--space-sm) 0;
+    border-left: 3px solid var(--primary);
+}
+
+.feature-highlight-title {
+    font-weight: var(--font-weight-semibold);
+    color: var(--primary);
+    margin-bottom: var(--space-xs);
+    font-size: var(--font-size-sm);
+}
+
+.feature-highlight-text {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .welcome-message {
+        top: var(--space-base);
+        right: var(--space-base);
+        left: var(--space-base);
+        max-width: none;
+        transform: translateY(-100px);
+    }
+
+    .welcome-message.show {
         transform: translateY(0);
     }
-    100% {
-        transform: translateY(-10px);
+
+    .welcome-actions {
+        flex-direction: column;
+    }
+
+    .welcome-btn {
+        width: 100%;
+        justify-content: center;
     }
 }
 
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-    .welcome-message-content {
-        padding: 2rem 1.5rem;
-    }
-    
-    .welcome-message-content h3 {
-        font-size: 1.3rem;
-    }
-    
-    .celebration-icons {
-        font-size: 1.2rem;
-    }
+/* Dark Mode Adjustments */
+[data-theme="dark"] .welcome-message {
+    background: var(--card-bg);
+    border-color: rgba(255, 255, 255, 0.1);
 }
 
-@media (max-width: 480px) {
-    .welcome-message-content {
-        padding: 1.5rem 1rem;
-    }
-    
-    .welcome-message-content h3 {
-        font-size: 1.1rem;
-    }
-    
-    .discord-button {
-        padding: 0.6rem 1.2rem;
-        font-size: 0.9rem;
-    }
+[data-theme="dark"] .feature-highlight {
+    background: rgba(var(--primary-rgb), 0.1);
 }

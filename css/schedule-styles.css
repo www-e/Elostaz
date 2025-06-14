@@ -1,0 +1,275 @@
+/* === SCHEDULE PAGE STYLES === */
+
+.schedule-section {
+    padding: 120px 0 var(--space-5xl);
+    background: var(--gradient-bg-subtle);
+    min-height: 100vh;
+}
+
+.schedule-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-3xl);
+    padding: var(--space-2xl);
+    height: 100%;
+    box-shadow: var(--shadow-xl);
+    border: 1px solid var(--border-color);
+    transition: var(--transition-all);
+    position: relative;
+    overflow: hidden;
+}
+
+.schedule-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-2xl);
+}
+
+.schedule-card.online {
+    border-top: 4px solid #25D366;
+}
+
+.schedule-card.offline {
+    border-top: 4px solid var(--primary);
+}
+
+.card-badge {
+    background: var(--gradient-primary);
+    color: white;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-full);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-xl);
+    font-size: var(--font-size-base);
+}
+
+.schedule-card.online .card-badge {
+    background: #25D366;
+}
+
+.features-list {
+    margin-bottom: var(--space-xl);
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+    color: var(--text-primary);
+}
+
+.feature-item i {
+    color: var(--success);
+    font-size: var(--font-size-sm);
+}
+
+.schedule-times {
+    margin-bottom: var(--space-xl);
+}
+
+.times-title {
+    color: var(--text-primary);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-base);
+}
+
+.time-slots {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.time-slot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) var(--space-base);
+    background: rgba(var(--primary-rgb), 0.05);
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--error);
+}
+
+.time-slot .day {
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.time-slot .time {
+    color: var(--error);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+.schedule-downloads {
+    margin-bottom: var(--space-xl);
+}
+
+.download-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-base);
+    padding: var(--space-base);
+    background: var(--background);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-sm);
+    transition: var(--transition-all);
+    border: 1px solid var(--border-color);
+}
+
+.download-card:hover {
+    background: var(--gradient-bg);
+    transform: translateX(5px);
+}
+
+.download-image {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.download-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.download-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(var(--primary-rgb), 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: var(--transition-base);
+}
+
+.download-card:hover .download-overlay {
+    opacity: 1;
+}
+
+.download-overlay i {
+    color: white;
+    font-size: var(--font-size-lg);
+}
+
+.download-info h4 {
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-xs);
+    font-weight: var(--font-weight-semibold);
+}
+
+.download-btn {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    transition: var(--transition-colors);
+}
+
+.download-btn:hover {
+    color: var(--primary-dark);
+}
+
+.location-info {
+    margin-bottom: var(--space-xl);
+}
+
+.location-title {
+    color: var(--text-primary);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-base);
+}
+
+.location-text {
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin: 0;
+}
+
+.location-text i {
+    color: var(--primary);
+}
+
+.booking-action {
+    text-align: center;
+}
+
+.btn-book {
+    background: var(--gradient-primary);
+    color: white;
+    padding: var(--space-base) var(--space-2xl);
+    border-radius: var(--radius-xl);
+    text-decoration: none;
+    font-weight: var(--font-weight-semibold);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    transition: var(--transition-all);
+    font-size: var(--font-size-base);
+}
+
+.btn-book:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-primary);
+    color: white;
+}
+
+.schedule-card.online .btn-book {
+    background: #25D366;
+}
+
+.schedule-card.online .btn-book:hover {
+    background: #1ea952;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+}
+
+/* Dark Mode Adjustments */
+[data-theme="dark"] .download-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .time-slot {
+    background: rgba(var(--primary-rgb), 0.1);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .schedule-section {
+        padding: 100px 0 var(--space-4xl);
+    }
+    
+    .schedule-card {
+        padding: var(--space-xl);
+    }
+    
+    .download-card {
+        padding: var(--space-sm);
+    }
+    
+    .download-image {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .download-info h4 {
+        font-size: var(--font-size-sm);
+    }
+    
+    .download-btn {
+        font-size: var(--font-size-xs);
+    }
+}

@@ -1,45 +1,46 @@
-/* Navbar */
+/* === FLOATING NAVIGATION === */
+
 .floating-nav {
     position: fixed;
-    top: 20px;
+    top: var(--space-lg);
     left: 50%;
     transform: translateX(-50%);
     width: 90%;
     max-width: 1140px;
     background-color: rgba(var(--card-bg), 0.9);
     backdrop-filter: blur(10px);
-    border-radius: 15px;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    z-index: 1050;
-    padding: 10px 20px;
-    transition: all 0.3s ease;
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-xl);
+    z-index: var(--z-navbar);
+    padding: var(--space-sm) var(--space-lg);
+    transition: var(--transition-all);
     border: 1px solid var(--border-color);
 }
 
 .floating-nav .navbar-brand {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--primary);
 }
 
 .floating-nav .nav-link {
     color: var(--text-primary);
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    border-radius: 25px;
-    transition: all 0.3s ease;
+    font-weight: var(--font-weight-medium);
+    padding: var(--space-sm) var(--space-base);
+    border-radius: var(--radius-full);
+    transition: var(--transition-all);
     position: relative;
 }
 
 .floating-nav .nav-link:hover {
     color: var(--primary);
-    background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.1), rgba(var(--secondary-rgb), 0.1));
+    background: var(--gradient-bg-subtle);
 }
 
 .floating-nav .nav-link.active {
     color: var(--primary);
-    background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.15), rgba(var(--secondary-rgb), 0.15));
+    background: var(--gradient-bg);
     box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.15);
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     animation: activeLink 3s ease-in-out infinite;
     position: relative;
 }
@@ -47,20 +48,17 @@
 .floating-nav .nav-link.active::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 25px;
+    inset: 0;
+    border-radius: var(--radius-full);
     padding: 2px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    background: var(--gradient-primary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     color: transparent;
     display: inline-block;
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-sm);
     pointer-events: none;
 }
 
@@ -72,9 +70,9 @@
     transform: translateX(-50%);
     width: 30px;
     height: 3px;
-    background: linear-gradient(to right, var(--primary), var(--secondary));
-    border-radius: 10px;
-    transition: all 0.3s ease;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-sm);
+    transition: var(--transition-all);
 }
 
 .floating-nav .nav-link.active:hover::after {
@@ -83,28 +81,37 @@
 }
 
 @keyframes activeLink {
-    0% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-2px);
-    }
-    100% {
-        transform: translateY(0);
-    }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
 }
 
-/* Dark mode adjustments */
-[data-theme="dark"] .floating-nav .nav-link.active {
-    background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.25), rgba(var(--secondary-rgb), 0.25));
-    box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3);
+/* Sign In Button */
+.floating-nav .signin-btn {
+    background: var(--gradient-primary);
+    color: white !important;
+    font-weight: var(--font-weight-bold);
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-primary);
+    padding: var(--space-sm) var(--space-lg);
+    margin-right: var(--space-sm);
+    transition: var(--transition-all);
+    border: none;
+    outline: none;
 }
 
-/* Custom Hamburger Icon Styling */
+.floating-nav .signin-btn:hover,
+.floating-nav .signin-btn:focus {
+    background: linear-gradient(90deg, var(--secondary), var(--primary));
+    color: white !important;
+    box-shadow: var(--shadow-primary-lg);
+    text-decoration: none;
+}
+
+/* Hamburger Menu */
 .navbar-toggler {
     border: none;
-    padding: 0.5rem;
-    transition: all 0.3s ease;
+    padding: var(--space-sm);
+    transition: var(--transition-all);
     background: transparent;
 }
 
@@ -113,11 +120,10 @@
     outline: none;
 }
 
-/* Light mode hamburger */
 .navbar-light .navbar-toggler-icon {
     background-image: none;
     position: relative;
-    transition: all 0.3s ease;
+    transition: var(--transition-all);
 }
 
 .navbar-light .navbar-toggler-icon::before,
@@ -126,9 +132,9 @@
     position: absolute;
     width: 24px;
     height: 2px;
-    background: linear-gradient(to right, var(--primary), var(--secondary));
+    background: var(--gradient-primary);
     left: 4px;
-    transition: all 0.3s ease;
+    transition: var(--transition-all);
 }
 
 .navbar-light .navbar-toggler-icon::before {
@@ -139,7 +145,7 @@
     bottom: 8px;
 }
 
-/* Active state for hamburger */
+/* Active hamburger state */
 .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon::before {
     transform: rotate(45deg);
     top: 11px;
@@ -150,28 +156,13 @@
     bottom: 11px;
 }
 
-/* Dark mode adjustments */
+/* Dark Mode Adjustments */
+[data-theme="dark"] .floating-nav .nav-link.active {
+    background: var(--gradient-bg-strong);
+    box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3);
+}
+
 [data-theme="dark"] .navbar-light .navbar-toggler-icon::before,
 [data-theme="dark"] .navbar-light .navbar-toggler-icon::after {
-    background: linear-gradient(to right, var(--primary), var(--secondary));
-}
-
-.floating-nav .signin-btn {
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-    color: var(--card-bg) !important;
-    font-weight: 700;
-    border-radius: 25px;
-    box-shadow: 0 2px 10px rgba(var(--primary-rgb), 0.15);
-    padding: 0.5rem 1.2rem;
-    margin-right: 0.5rem;
-    transition: background 0.2s, box-shadow 0.2s, color 0.2s;
-    border: none;
-    outline: none;
-}
-
-.floating-nav .signin-btn:hover, .floating-nav .signin-btn:focus {
-    background: linear-gradient(90deg, var(--secondary), var(--primary));
-    color: var(--card-bg) !important;
-    box-shadow: 0 4px 18px rgba(var(--primary-rgb), 0.25);
-    text-decoration: none;
+    background: var(--gradient-primary);
 }
