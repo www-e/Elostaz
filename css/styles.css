@@ -2164,11 +2164,52 @@ h1, h2, h3 {
     }
 }
 
+.cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.cta-button i {
+    font-size: 1.2rem;
+}
+
+.cta-button.primary {
+    background: linear-gradient(45deg, #2196F3, #1976D2);
+    color: white;
+}
+
+.cta-button.secondary {
+    background: linear-gradient(45deg, #FF9800, #F57C00);
+    color: white;
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.cta-button.primary:hover {
+    background: linear-gradient(45deg, #1976D2, #1565C0);
+}
+
+.cta-button.secondary:hover {
+    background: linear-gradient(45deg, #F57C00, #EF6C00);
+}
+
 .new-badge {
     position: absolute;
     top: -10px;
     right: -10px;
-    background-color: var(--accent);
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
     color: white;
     padding: 2px 8px;
     border-radius: 12px;
@@ -2176,6 +2217,7 @@ h1, h2, h3 {
     font-weight: bold;
     animation: pulse 2s infinite;
     z-index: 10;
+    box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.3);
 }
 
 @keyframes pulse {
@@ -2190,6 +2232,27 @@ h1, h2, h3 {
     100% {
         transform: scale(1);
         opacity: 1;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .cta-button {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .new-badge {
+        font-size: 0.7rem;
+        padding: 2px 6px;
     }
 }
 
@@ -2350,5 +2413,80 @@ h1, h2, h3 {
 
     .info-section h4 {
         font-size: 1.1rem;
+    }
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.cta-button i {
+    font-size: 1.2rem;
+}
+
+.cta-button.primary {
+    background: linear-gradient(45deg, #2196F3, #1976D2);
+    color: white;
+}
+
+.cta-button.secondary {
+    background: linear-gradient(45deg, #FF9800, #F57C00);
+    color: white;
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.cta-button.primary:hover {
+    background: linear-gradient(45deg, #1976D2, #1565C0);
+}
+
+.cta-button.secondary:hover {
+    background: linear-gradient(45deg, #F57C00, #EF6C00);
+}
+
+@media screen and (max-width: 768px) {
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .cta-button {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .cta-button {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.9rem;
+    }
+
+    .cta-button i {
+        font-size: 1rem;
     }
 }

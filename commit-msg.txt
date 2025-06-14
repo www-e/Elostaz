@@ -1,0 +1,25 @@
+🚀 Major Feature Updates & Fixes
+
+1. fixed the stats registration form. 
+2. Fixed all RLS (Row-Level Security) policies.
+3. Integrated payment system via Vodafone Cash.
+4. Created admin dashboard.
+5. Implemented user sign-in capabilities.
+
+🛠 Bug Fixes & Improvements that needs to be done  
+
+6. Issue where payment proof image didn't appear in: 
+   - Admin dashboard
+   - Student profile
+7.  color styling of the admin dashboard table. 
+
+🔔 Notifications
+
+9. Planned for notification for: 
+   - When a student is accepted
+   - Auto-accepting notification on PWA install (research pending)
+
+📢 Messaging & UX
+
+10. Need to add message for new year registration: 
+    - Students must either pay via Vodafone Cash or attend the center for confirmation.

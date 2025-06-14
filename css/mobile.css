@@ -33,13 +33,25 @@
     }
     .hero-content h1 {
         font-size: 2rem;
+        margin-bottom: 0.8rem; /* Reduced from 1.5rem */
     }
     .hero-content p {
         font-size: 1rem;
+        margin-bottom: 1.2rem; /* Reduced from 2rem */
     }
     .hero-image-container {
         margin-top: 1rem; /* Reduced margin */
-        margin-bottom: 1rem; /* Added bottom margin to bring CTA button up */
+        margin-bottom: 2rem; /* Increased bottom margin */
+    }
+
+    /* CTA Buttons */
+    .cta-buttons {
+        margin-top: 0.8rem; /* Reduced from 2rem */
+        gap: 0.7rem; /* Reduced from 1.5rem */
+    }
+
+    .cta-button {
+        margin-bottom: 0.5rem;
     }
 
     /* Books Section */
@@ -67,20 +79,58 @@
 @media (max-width: 576px) {
     .section-title {
         font-size: 1.75rem;
+        margin-bottom: 1rem;
     }
     .section-subtitle {
         font-size: 0.9rem;
+        margin-bottom: 1.5rem;
     }
     
     /* Improve CTA button visibility */
     .row.min-vh-100.align-items-center {
         min-height: auto !important; /* Override min-vh-100 to reduce empty space */
-        padding-bottom: 1rem;
+        padding-bottom: 2rem;
     }
     
     /* Make the booking button more prominent */
     [href*="حجز"], [href*="2025"] {
         transform: scale(1.05);
         box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
+    }
+
+    /* Adjust text spacing */
+    .hero-content {
+        padding: 1rem;
+    }
+
+    .hero-title {
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-subtitle {
+        margin-bottom: 2rem;
+    }
+
+    .hero-description {
+        margin: 1.5rem 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section {
+        padding-top: 40px !important;
+        padding-bottom: 10px !important;
+    }
+    .hero-content {
+        padding: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    .cta-buttons {
+        margin-top: 0.2rem !important;
+        gap: 0.3rem !important;
+    }
+    .cta-button {
+        font-size: 1rem !important;
+        padding: 0.5rem 0.7rem !important;
     }
 }

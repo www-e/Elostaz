@@ -1,4 +1,5 @@
 let supabaseInstance = null;
+let initializationPromise = null;
 
 async function initializeSupabase() {
     // Wait for the script to be loaded
@@ -20,28 +21,41 @@ async function initializeSupabase() {
     const supabaseUrl = 'https://hzcuypdjxslgifigjofl.supabase.co';
     const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh6Y3V5cGRqeHNsZ2lmaWdqb2ZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc5NDA0NjYsImV4cCI6MjA2MzUxNjQ2Nn0.buO4qGzdvRRIWYoH6ZPgs_UqlrbcLPI0mAcYz1YbozY';
 
-    if (!supabaseInstance) {
-        supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'apikey': supabaseAnonKey,
-                'Authorization': `Bearer ${supabaseAnonKey}`
-            },
-            auth: {
-                persistSession: true,
-                autoRefreshToken: true,
-                detectSessionInUrl: true
+    try {
+        if (!supabaseInstance) {
+            supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
+                auth: {
+                    persistSession: true,
+                    autoRefreshToken: true,
+                    detectSessionInUrl: true
+                }
+            });
+
+            // Test the connection
+            const { error } = await supabaseInstance.auth.getSession();
+            if (error) {
+                console.error('Supabase initialization error:', error);
+                supabaseInstance = null;
+                throw error;
             }
-        });
+        }
+        return supabaseInstance;
+    } catch (error) {
+        console.error('Failed to initialize Supabase client:', error);
+        supabaseInstance = null;
+        throw error;
     }
-    return supabaseInstance;
 }
 
 // Initialize and export the client
 export const supabase = async () => {
-    if (!supabaseInstance) {
-        await initializeSupabase();
+    try {
+        if (!initializationPromise) {
+            initializationPromise = initializeSupabase();
+        }
+        return await initializationPromise;
+    } catch (error) {
+        initializationPromise = null; // Reset on error
+        throw error;
     }
-    return supabaseInstance;
 }; 

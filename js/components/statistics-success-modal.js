@@ -200,22 +200,23 @@ export class StatisticsSuccessModal {
 
     shareViaWhatsApp(data) {
         const message = `
-تم تسجيلك بنجاح في مراجعة الإحصائيات 🎉
+*تم تسجيلك بنجاح في منصة الأستاذ*
 
-👤 اسم الطالب: ${data.studentName}
-📱 رقم الطالب: ${data.studentPhone}
-👨‍👦 رقم ولي الأمر: ${data.parentPhone}
-🏫 نوع الثانوية: ${data.schoolType}
-📍 نوع الحضور: ${data.attendanceType}
+*بيانات التسجيل:*
+الاسم: ${data.studentName}
+رقم الطالب: ${data.studentPhone}
+رقم ولي الأمر: ${data.parentPhone}
+نوع الثانوية: ${data.schoolType}
+نوع الحضور: ${data.attendanceType}
 
-بيانات الدخول:
-👤 اسم المستخدم: ${data.username}
-🔑 كلمة المرور: ${data.password}
+*بيانات الدخول:*
+اسم المستخدم: ${data.username}
+كلمة المرور: ${data.password}
 
 يرجى الاحتفاظ ببيانات الدخول في مكان آمن 🔒
-`.trim();
+        `.trim();
 
-        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+        const whatsappUrl = `https://wa.me/${data.studentPhone}?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, '_blank');
     }
 } 

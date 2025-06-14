@@ -43,3 +43,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+export function initializeMobileDrawer() {
+    const drawer = document.createElement('div');
+    drawer.className = 'mobile-drawer';
+    drawer.innerHTML = `
+        <div class="drawer-content">
+            <button class="close-drawer">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="drawer-links">
+                <a href="/" class="drawer-link">الرئيسية</a>
+                <a href="/pages/about.html" class="drawer-link">عن المركز</a>
+                <a href="/pages/schedule.html" class="drawer-link">المواعيد</a>
+                <a href="/pages/registration.html" class="drawer-link">حجز 2025/2026</a>
+                <a href="/pages/statistics.html" class="drawer-link">مراجعة الإحصائيات</a>
+                <a href="/pages/signin.html" class="drawer-link signin-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    تسجيل الدخول
+                </a>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(drawer);
+
+    // ... rest of the code ...
+}
