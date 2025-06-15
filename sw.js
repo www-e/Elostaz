@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v2025-4';
+const CACHE_VERSION = 'v2025-5';
 const CACHE_NAME = `elostaz-cache-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `elostaz-dynamic-${CACHE_VERSION}`;
 
@@ -19,6 +19,9 @@ const ASSETS = [
     `${BASE_PATH}/pages/grades/grade1.html`,
     `${BASE_PATH}/pages/grades/grade2.html`,
     `${BASE_PATH}/pages/grades/grade3.html`,
+     `${BASE_PATH}/pages/admin.html`,
+    `${BASE_PATH}/pages/profile.html`,
+    `${BASE_PATH}/pages/signin.html`,
     
     // CSS files
     `${BASE_PATH}/css/styles.css`,
@@ -31,6 +34,9 @@ const ASSETS = [
     `${BASE_PATH}/css/welcome-message.css`,
     `${BASE_PATH}/css/dropdown-fix.css`,
     `${BASE_PATH}/css/modal.css`,
+    `${BASE_PATH}/css/admin.css`,
+    `${BASE_PATH}/css/profile.css`,
+    `${BASE_PATH}/css/auth.css`,
     
     // JavaScript files
     `${BASE_PATH}/js/main.js`,
@@ -53,6 +59,9 @@ const ASSETS = [
     `${BASE_PATH}/js/welcome-message.js`,
     `${BASE_PATH}/js/pwa-updater.js`,
     `${BASE_PATH}/js/mobile-drawer.js`,
+    `${BASE_PATH}/js/admin/admin.js`,
+    `${BASE_PATH}/js/profile/profile.js`,
+    `${BASE_PATH}/js/auth/signin.js`
     
     // Component files
     `${BASE_PATH}/js/components/success-modal.js`,
