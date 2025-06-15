@@ -135,28 +135,67 @@
     background: var(--primary-dark);
 }
 
-/* Responsive Design */
+/* === Responsive Design (UPDATED) === */
 @media (max-width: 768px) {
     .install-prompt {
-        bottom: var(--space-lg);
-        width: calc(100% - var(--space-lg));
+        /* Make it sit closer to the edge */
+        bottom: var(--space-md); 
+        left: var(--space-md);
+        right: var(--space-md);
+        
+        /* Let the browser calculate the width automatically */
+        width: auto; 
         max-width: none;
-        margin: 0 var(--space-lg);
-        left: 0;
         transform: none;
-        right: 0;
+
+        /* Reduce padding to make it less bulky */
+        padding: var(--space-md); 
+    }
+    
+    /* Reduce font size and spacing inside the prompt */
+    .install-prompt-header {
+        font-size: var(--font-size-lg); /* Was xl */
+        margin-bottom: var(--space-md); /* Was lg */
     }
 
+    .install-prompt-content {
+        margin-bottom: var(--space-lg); /* Was xl */
+        font-size: var(--font-size-sm); /* Added for better readability */
+    }
+    
+    .install-prompt-buttons {
+        gap: var(--space-md); /* Was lg */
+    }
+
+    /* Make buttons slightly smaller */
+    .install-button,
+    .close-button {
+        padding: var(--space-sm) var(--space-md);
+    }
+
+    /* Adjust the instructions modal */
     .install-instructions-modal .modal-content {
         margin: var(--space-lg);
         max-height: calc(100vh - var(--space-2xl));
         overflow-y: auto;
+        
+        /* Reduce padding significantly on mobile */
+        padding: var(--space-lg); /* Was 3xl */
+    }
+
+    .install-instructions-modal .modal-header {
+        font-size: var(--font-size-xl); /* Was 2xl */
+    }
+
+    .install-instructions-modal .modal-close {
+        padding: var(--space-md); /* Was xl */
+        font-size: var(--font-size-base); /* Was lg */
     }
 }
 
 /* Safari iOS Support */
 @supports (-webkit-touch-callout: none) {
     .install-prompt {
-        padding-bottom: calc(var(--space-lg) + env(safe-area-inset-bottom));
+        padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
     }
 }

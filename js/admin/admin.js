@@ -3,7 +3,8 @@ import { supabase } from '../supabase-client.js';
 // Initialize payment proof modal function
 function showPaymentProof(url) {
     const modal = new bootstrap.Modal(document.getElementById('paymentProofModal'));
-    document.getElementById('proofImage').src = url;
+    // Add a cache-busting parameter to the URL to bypass browser cache and ensure the latest image is shown.
+    document.getElementById('proofImage').src = url + '?t=' + new Date().getTime();
     modal.show();
 }
 
@@ -37,7 +38,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
         ],
         language: {
-            url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/ar.json'
+            // FIX: Changed protocol from relative '//' to explicit 'https://' to resolve CORS error
+            url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/ar.json'
         },
         order: [[5, 'asc']], // Sort by payment status
         pageLength: 25,
@@ -192,7 +194,7 @@ function showError(message) {
     errorElement.className = 'alert alert-danger alert-dismissible fade show';
     errorElement.innerHTML = `
         ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <button type-button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
     document.querySelector('.admin-content').insertBefore(errorElement, document.querySelector('.table-container'));
     setTimeout(() => errorElement.remove(), 5000);
@@ -212,4 +214,4 @@ function getAttendanceTypeText(type) {
         'offline': 'حضوري'
     };
     return types[type] || type;
-} 
+}

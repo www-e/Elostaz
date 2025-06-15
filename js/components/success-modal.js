@@ -1,6 +1,7 @@
 export class SuccessModal {
     constructor() {
         this.createModal();
+        this.addCustomStyles(); // Add styles for the new section
         this.attachEventListeners();
     }
 
@@ -36,6 +37,18 @@ export class SuccessModal {
                             <p class="group-info" style="display: none"><strong>المجموعة:</strong> <span class="group-name"></span></p>
                             <p class="time-info" style="display: none"><strong>الموعد:</strong> <span class="time-name"></span></p>
                             <p class="timestamp"></p>
+                            
+                            <!-- NEW: Confirmation Details Section -->
+                            <div class="confirmation-details">
+                                <h4 class="confirmation-title"><i class="fas fa-exclamation-circle"></i> خطوة هامة لتأكيد الحجز</h4>
+                                <p>لإتمام عملية التسجيل، يرجى تأكيد الحجز بالحضور إلى السنتر (شخصيًا أو بواسطة ولي الأمر).</p>
+                                <p><strong>الموعد:</strong> يوم السبت 7/12، من الساعة 4:00 عصرًا حتى 6:00 مساءً.</p>
+                                <p><strong>المطلوب:</strong> سداد رسوم تأكيد الحجز بقيمة 150 جنيهًا.</p>
+                                <a href="https://www.google.com/maps/search/?api=1&query=30.468833,31.184222" target="_blank" class="receipt-btn location-btn">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    عرض موقع السنتر
+                                </a>
+                            </div>
                         </div>
                         <button class="receipt-btn prev-btn">
                             <i class="fas fa-arrow-right"></i>
@@ -54,6 +67,44 @@ export class SuccessModal {
 
         document.body.appendChild(modal);
         this.modal = modal;
+    }
+
+    addCustomStyles() {
+        const style = document.createElement('style');
+        style.textContent = `
+            .confirmation-details {
+                margin-top: 1.5rem;
+                padding-top: 1rem;
+                border-top: 1px solid var(--border-color);
+                text-align: right;
+            }
+            .confirmation-title {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: var(--primary);
+                margin-bottom: 0.75rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            .confirmation-details p {
+                font-size: 0.95rem;
+                margin-bottom: 0.5rem;
+                line-height: 1.6;
+            }
+            .location-btn {
+                display: inline-flex !important;
+                align-items: center;
+                gap: 0.5rem;
+                margin-top: 1rem;
+                background: var(--accent) !important;
+                border-color: var(--accent-dark) !important;
+            }
+            .location-btn:hover {
+                 background: var(--accent-dark) !important;
+            }
+        `;
+        document.head.appendChild(style);
     }
 
     attachEventListeners() {
@@ -182,4 +233,4 @@ export class SuccessModal {
     hide() {
         this.modal.style.display = 'none';
     }
-} 
+}

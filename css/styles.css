@@ -1253,10 +1253,7 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .theme-toggle {
-        top: 90px;
-        right: var(--space-base);
-    }
+
 }
 
 @media (max-width: 480px) {

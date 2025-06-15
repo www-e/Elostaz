@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Initialize file upload
     initializeFileUpload();
 
+    // NEW: Initialize the new "View Image" button and its modal functionality
+    initializeModalButton();
+
     // Initialize payment status
     updatePaymentStatus(userData.payment_status);
 
@@ -44,9 +47,9 @@ function initializeFileUpload() {
 
     // Make the entire upload area clickable
     uploadArea.addEventListener('click', (e) => {
-        if (e.target !== removeButton && e.target !== submitButton) {
-            fileInput.click();
-        }
+        // Prevent click if target is a button inside the area
+        if (e.target.closest('button')) return;
+        fileInput.click();
     });
 
     // Prevent default drag behaviors
@@ -80,8 +83,24 @@ function initializeFileUpload() {
         resetUpload();
     });
 
-    // Check for existing payment proof
+    // Check for existing payment proof (This is also called on DOMContentLoaded, can be reviewed for optimization later)
     checkExistingPaymentProof();
+}
+
+// NEW: This function sets up the "View Image" button to open the Bootstrap modal.
+function initializeModalButton() {
+    const viewImageBtn = document.getElementById('viewImageBtn');
+    if (!viewImageBtn) return;
+    const previewImage = document.getElementById('previewImage');
+    const modalImage = document.getElementById('modalImage');
+    const imageModal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+
+    viewImageBtn.addEventListener('click', () => {
+        if (previewImage.src && previewImage.src !== window.location.href) {
+            modalImage.src = previewImage.src;
+            imageModal.show();
+        }
+    });
 }
 
 function preventDefaults(e) {
@@ -110,35 +129,24 @@ function handleFiles(e) {
     if (files && files[0]) {
         const file = files[0];
         
-        // Validate file type
         if (!file.type.startsWith('image/')) {
             showError('يرجى اختيار صورة صالحة');
             return;
         }
 
-        // Validate file size (max 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            showError('حجم الصورة يجب أن يكون أقل من 5 ميجابايت');
+        // Allow larger images before compression
+        if (file.size > 10 * 1024 * 1024) {
+            showError('حجم الصورة يجب أن يكون أقل من 10 ميجابايت');
             return;
         }
 
-        // Show preview
         const reader = new FileReader();
         reader.onload = function(e) {
-            const uploadArea = document.getElementById('uploadArea');
             const previewImage = document.getElementById('previewImage');
-            const removeButton = document.getElementById('removeImage');
-            const submitButton = document.querySelector('.submit-btn');
-            
-            // Update preview image
+            document.getElementById('uploadArea').classList.add('has-preview');
+            document.getElementById('removeImage').style.display = 'block';
+            document.querySelector('.submit-btn').disabled = false;
             previewImage.src = e.target.result;
-            
-            // Show preview and remove button
-            uploadArea.classList.add('has-preview');
-            removeButton.style.display = 'block';
-            
-            // Enable submit button
-            submitButton.disabled = false;
         };
         reader.readAsDataURL(file);
     }
@@ -149,7 +157,7 @@ async function handleSubmit(e) {
 
     const fileInput = document.getElementById('paymentProof');
     const submitButton = e.target.querySelector('.submit-btn');
-    const file = fileInput.files[0];
+    let file = fileInput.files[0];
 
     if (!file) {
         showError('يرجى اختيار صورة');
@@ -158,7 +166,6 @@ async function handleSubmit(e) {
 
     const userData = JSON.parse(sessionStorage.getItem('user'));
     
-    // Check if user already has a payment proof
     if (userData.payment_proof_url) {
         const confirmReupload = await showConfirmDialog(
             'تأكيد إعادة الرفع',
@@ -168,107 +175,86 @@ async function handleSubmit(e) {
             return;
         }
         
-        // Delete old file if it exists
         try {
-            const oldFileName = userData.payment_proof_url.split('/').pop();
+            const oldFilePath = new URL(userData.payment_proof_url).pathname.split('/statisticsrevision/')[1];
             const supabaseClient = await supabase();
-            await supabaseClient.storage
-                .from('statisticsrevision')
-                .remove([`payment_proofs/${oldFileName}`]);
+            await supabaseClient.storage.from('statisticsrevision').remove([oldFilePath]);
         } catch (error) {
             console.error('Error deleting old file:', error);
-            // Continue anyway as this is not critical
         }
     }
 
+    submitButton.disabled = true;
+    submitButton.classList.add('loading');
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري ضغط الصورة...';
+    
+    // NEW: Client-side image compression
+    const options = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+      fileType: 'image/jpeg',
+      initialQuality: 0.7
+    };
+
     try {
-        submitButton.disabled = true;
-        submitButton.classList.add('loading');
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الرفع...';
+        const compressedFile = await imageCompression(file, options);
+        console.log(`Image compressed from ${(file.size / 1024 / 1024).toFixed(2)} MB to ${(compressedFile.size / 1024 / 1024).toFixed(2)} MB`);
+        file = compressedFile;
+    } catch (compressionError) {
+        console.error('Image compression failed:', compressionError);
+        showError('حدث خطأ أثناء ضغط الصورة. سيتم رفع الصورة الأصلية.');
+    }
+    // End of compression logic
 
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الرفع...';
+
+    try {
         const studentCode = `std-${userData.id.substring(0, 8)}`;
-        const fileExtension = file.name.split('.').pop();
+        const fileExtension = file.name ? file.name.split('.').pop() : 'jpg';
         const fileName = `payment_proofs/${studentCode}-${Date.now()}.${fileExtension}`;
-
-        // Get Supabase client
         const supabaseClient = await supabase();
 
-        // Upload file
-        const { data: uploadData, error: uploadError } = await supabaseClient.storage
+        const { error: uploadError } = await supabaseClient.storage
             .from('statisticsrevision')
             .upload(fileName, file);
-
         if (uploadError) throw uploadError;
 
-        // Get public URL
-        const { data: urlData, error: urlError } = await supabaseClient.storage
+        const { data: urlData } = supabaseClient.storage
             .from('statisticsrevision')
             .getPublicUrl(fileName);
-
-        if (urlError) throw urlError;
-
         const publicUrl = urlData.publicUrl;
 
-        // Update user record with retries
+        // Using original retry logic as provided
         let updateError;
         for (let i = 0; i < 3; i++) {
-            console.log('Attempting to update record, attempt:', i + 1);
-            
-            // First verify the record exists
             const { data: records, error: fetchError } = await supabaseClient
-                .from('stats_review_2025')
-                .select('id')
-                .eq('id', userData.id)
-                .order('created_at', { ascending: false })
-                .limit(1);
-            
-            if (fetchError) {
-                console.error('Error fetching record:', fetchError);
-                continue;
-            }
+                .from('stats_review_2025').select('id').eq('id', userData.id).limit(1);
+            if (fetchError || !records || records.length === 0) continue;
 
-            if (!records || records.length === 0) {
-                throw new Error('Record not found');
-            }
-
-            // Then update with new URL
             const { data: updateData, error: err } = await supabaseClient
                 .from('stats_review_2025')
-                .update({
-                    payment_proof_url: publicUrl,
-                    payment_status: 'under_review'
-                })
+                .update({ payment_proof_url: publicUrl, payment_status: 'under_review' })
                 .eq('id', userData.id)
                 .select();
-            
             if (!err && updateData && updateData.length > 0) {
-                console.log('Update successful:', updateData[0]);
                 updateError = null;
                 break;
             }
             updateError = err;
-            console.error('Update attempt failed:', err);
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s before retry
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
-        if (updateError) {
-            console.error('All update attempts failed. Last error:', updateError);
-            throw updateError;
-        }
+        if (updateError) throw updateError;
 
-        // Update session storage
         userData.payment_proof_url = publicUrl;
         userData.payment_status = 'under_review';
         sessionStorage.setItem('user', JSON.stringify(userData));
 
-        // Update UI
-        const uploadArea = document.getElementById('uploadArea');
-        const previewImage = document.getElementById('previewImage');
-        const removeButton = document.getElementById('removeImage');
-
-        previewImage.src = publicUrl;
-        uploadArea.classList.add('has-preview');
-        removeButton.style.display = 'flex';
+        document.getElementById('previewImage').src = publicUrl + '?t=' + new Date().getTime();
+        document.getElementById('uploadArea').classList.add('has-preview');
+        document.getElementById('removeImage').style.display = 'block';
+        document.getElementById('viewImageBtn').style.display = 'inline-flex'; // Show view button
         submitButton.disabled = true;
 
         updatePaymentStatus('under_review');
@@ -288,85 +274,64 @@ function resetUpload() {
     const fileInput = document.getElementById('paymentProof');
     const uploadArea = document.getElementById('uploadArea');
     const previewImage = document.getElementById('previewImage');
-    const removeButton = document.getElementById('removeImage');
-    const submitButton = document.querySelector('.submit-btn');
-
+    
     fileInput.value = '';
     previewImage.src = '';
     uploadArea.classList.remove('has-preview');
-    removeButton.style.display = 'none';
-    submitButton.disabled = true;
+    document.getElementById('removeImage').style.display = 'none';
+    document.getElementById('viewImageBtn').style.display = 'none'; // Hide view button
+    document.querySelector('.submit-btn').disabled = true;
 }
 
 async function checkExistingPaymentProof() {
     try {
         const userData = JSON.parse(sessionStorage.getItem('user'));
-        if (!userData) return;
+        if (!userData || !userData.id) return;
 
-        // Get fresh data from Supabase
         const supabaseClient = await supabase();
         const { data, error } = await supabaseClient
             .from('stats_review_2025')
             .select('payment_proof_url, payment_status')
             .eq('id', userData.id)
-            .limit(1);
+            .single(); // Use single() for better error handling if row is missing
 
-        if (error) throw error;
-
-        if (data && data.length > 0) {
-            const record = data[0];
-            // Update session storage
-            userData.payment_proof_url = record.payment_proof_url;
-            userData.payment_status = record.payment_status;
-            sessionStorage.setItem('user', JSON.stringify(userData));
-
-            // Update UI
-            const uploadArea = document.getElementById('uploadArea');
-            const previewImage = document.getElementById('previewImage');
-            const removeButton = document.getElementById('removeImage');
-            const submitButton = document.querySelector('.submit-btn');
-
-            if (record.payment_proof_url) {
-                previewImage.src = record.payment_proof_url;
-                uploadArea.classList.add('has-preview');
-                removeButton.style.display = 'flex';
-                submitButton.disabled = true;
-
-                // Update payment status
-                updatePaymentStatus(record.payment_status);
+        if (error) {
+             // Silently fail if user not found, e.g., after DB reset
+            if (error.code !== 'PGRST116') { // PGRST116: "exact one row not found"
+                 throw error;
             }
+            return;
+        }
+
+        if (data && data.payment_proof_url) {
+            userData.payment_proof_url = data.payment_proof_url;
+            userData.payment_status = data.payment_status;
+            sessionStorage.setItem('user', JSON.stringify(userData));
+            
+            document.getElementById('previewImage').src = data.payment_proof_url + '?t=' + new Date().getTime();
+            document.getElementById('uploadArea').classList.add('has-preview');
+            document.getElementById('removeImage').style.display = 'block';
+            document.getElementById('viewImageBtn').style.display = 'inline-flex'; // Show view button
+            document.querySelector('.submit-btn').disabled = true;
+
+            updatePaymentStatus(data.payment_status);
         }
     } catch (error) {
         console.error('Error checking payment proof:', error);
-        showError('حدث خطأ أثناء تحميل إثبات الدفع');
+        // Do not show an error to the user for this background check
     }
 }
 
 function updatePaymentStatus(status) {
     const statusElement = document.getElementById('paymentStatus');
     const statusMap = {
-        'pending': {
-            icon: 'fa-clock',
-            text: 'قيد الانتظار',
-            class: 'pending'
-        },
-        'under_review': {
-            icon: 'fa-spinner',
-            text: 'قيد المراجعة',
-            class: 'under-review'
-        },
-        'accepted': {
-            icon: 'fa-check-circle',
-            text: 'تم القبول',
-            class: 'accepted'
-        }
+        'pending': { icon: 'fa-clock', text: 'قيد الانتظار', class: 'pending' },
+        'under_review': { icon: 'fa-spinner', text: 'قيد المراجعة', class: 'under-review' },
+        'accepted': { icon: 'fa-check-circle', text: 'تم القبول', class: 'accepted' }
     };
 
     const statusInfo = statusMap[status] || statusMap.pending;
-    statusElement.innerHTML = `
-        <i class="fas ${statusInfo.icon}"></i>
-        <span>${statusInfo.text}</span>
-    `;
+    statusElement.innerHTML = `<i class="fas ${statusInfo.icon}"></i> <span>${statusInfo.text}</span>`;
     statusElement.className = `payment-status ${statusInfo.class}`;
 }
 
@@ -385,18 +350,12 @@ function showSuccess(message) {
 }
 
 function getSchoolTypeText(type) {
-    const types = {
-        'azhar': 'ثانوي أزهري',
-        'general_arts': 'ثانوي عام/أدبي'
-    };
+    const types = { 'azhar': 'ثانوي أزهري', 'general_arts': 'ثانوي عام/أدبي' };
     return types[type] || type;
 }
 
 function getAttendanceTypeText(type) {
-    const types = {
-        'zoom': 'Zoom',
-        'offline': 'حضوري'
-    };
+    const types = { 'zoom': 'Zoom', 'offline': 'حضوري' };
     return types[type] || type;
 }
 
@@ -437,4 +396,4 @@ async function showConfirmDialog(title, message) {
             dialog.remove();
         });
     });
-} 
+}

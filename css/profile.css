@@ -1,6 +1,7 @@
 /* === PROFILE PAGE STYLES === */
 
 .profile-container {
+    margin-top: 50px;
     padding: var(--space-2xl);
     min-height: calc(100vh - 80px);
     background: var(--gradient-bg-subtle);

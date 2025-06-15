@@ -394,8 +394,7 @@
 /* Responsive Design */
 @media (max-width: 768px) {
     .admin-container {
-        padding: var(--space-base);
-    }
+        padding: 90px var(--space-xl) var(--space-xl);    }
 
     .admin-header h1 {
         font-size: var(--font-size-2xl);
