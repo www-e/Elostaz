@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Check if user is admin
     const userData = JSON.parse(sessionStorage.getItem('user'));
     if (!userData || userData.id !== '4dba45ee-33a6-41cd-b0da-af7c1f7d9870') {
-        window.location.href = '/pages/signin.html';
+        window.location.href = '../pages/signin.html';
         return;
     }
 
@@ -171,7 +171,7 @@ function initializeLogout() {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
             sessionStorage.removeItem('user');
-            window.location.href = '/pages/signin.html';
+            window.location.href = '../pages/signin.html';
         });
     }
 }
