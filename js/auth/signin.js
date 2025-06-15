@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }));
 
                 // Redirect to student profile page
-                window.location.href = '/pages/profile.html';
+                window.location.href = '../pages/profile.html';
                 return;
             }
 
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }));
 
                 // Redirect to admin dashboard
-                window.location.href = '/pages/admin.html';
+                window.location.href = '../pages/admin.html';
                 return;
             }
 

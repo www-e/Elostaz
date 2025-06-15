@@ -19,7 +19,7 @@ const ASSETS = [
     `${BASE_PATH}/pages/grades/grade1.html`,
     `${BASE_PATH}/pages/grades/grade2.html`,
     `${BASE_PATH}/pages/grades/grade3.html`,
-     `${BASE_PATH}/pages/admin.html`,
+    `${BASE_PATH}/pages/admin.html`,
     `${BASE_PATH}/pages/profile.html`,
     `${BASE_PATH}/pages/signin.html`,
     
