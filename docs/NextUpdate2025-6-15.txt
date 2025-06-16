@@ -1,0 +1,9 @@
+1- adding the sign in button to the hero sections
+3- add notification when the users status are changed
+4-add another method for the users sign in credintials saving as when they close the the modal it is not saved somwhere easy accesible for the user and they have to contact me to get it , which is super weird ofcourse
+5-fix علمي - ادبي in الصف الثالث الثانوي
+6- remove the prefix of اختار الثانوي and so on on the drop down boxes
+7- fix the tags in the the drop down boxes
+8- a notification for me as a an admin whenever a studnet is newely added or adds a proof of payment
+9-make sure the users signs in , when he goes to the home dashboard he has to sign in back which is weird , make sure he is rememberd and a profile icon is in the drawer and the nav bar ofcourse
+10-add a qucik accept button for the admin in the notification for the phones and pc also 

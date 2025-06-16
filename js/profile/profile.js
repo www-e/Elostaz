@@ -363,7 +363,7 @@ function initializeLogout() {
     const logoutBtn = document.getElementById('logoutBtn');
     logoutBtn.addEventListener('click', () => {
         sessionStorage.removeItem('user');
-        window.location.href = '/pages/signin.html';
+        window.location.href = '../pages/signin.html';
     });
 }
 
