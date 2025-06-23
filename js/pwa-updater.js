@@ -94,7 +94,6 @@ const filesToCache = [
     '/css/mobile.css',
     '/css/registration.css',
     '/css/tags.css',
-    '/css/welcome-message.css',
     '/css/about-styles.css',
     '/css/grade-styles.css',
     '/css/dropdown-fix.css',
@@ -115,7 +114,6 @@ const filesToCache = [
     '/js/booking-form.js',
     '/js/contact-form.js',
     '/js/modal-handler.js',
-    '/js/welcome-message.js',
     '/js/pwa-updater.js',
     '/js/supabase-client.js',
     

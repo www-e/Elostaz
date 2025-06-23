@@ -2,7 +2,6 @@ import { initializeContactForm } from './contact-form.js';
 import { initializeMultiStepForm } from './booking-form.js';
 import { initializeModalHandlers } from './modal-handler.js';
 // Import welcome message but don't initialize it here
-import './welcome-message.js';
 
 // Initialize all components when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
