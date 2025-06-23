@@ -140,13 +140,15 @@
 }
 
 .dropdown-option .new-badge {
+    position: static; /* Prevents absolute positioning from styles.css */
+    flex-shrink: 0;   /* Stops the tag from shrinking if the text is long */
     font-size: var(--font-size-xs);
     padding: var(--space-xs) var(--space-sm);
     border-radius: var(--radius-full);
     font-weight: var(--font-weight-bold);
     margin-left: var(--space-sm);
     white-space: nowrap;
-    display: flex;
+    display: inline-flex; /* More appropriate for a badge */
     align-items: center;
     justify-content: center;
     min-height: 20px;

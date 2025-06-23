@@ -1,12 +1,14 @@
+// /sw.js
+
 const CACHE_VERSION = 'v2025-5';
 const CACHE_NAME = `elostaz-cache-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `elostaz-dynamic-${CACHE_VERSION}`;
 
-// Detect if we're on GitHub Pages and set the base path accordingly
+// Define BASE_PATH as a constant string based on the environment.
 const isGitHubPages = self.location.hostname === 'www-e.github.io';
 const BASE_PATH = isGitHubPages ? '/Elostaz' : '';
 
-// Add BASE_PATH to all assets
+// List of assets to cache during installation.
 const ASSETS = [
     `${BASE_PATH}/`,
     `${BASE_PATH}/index.html`,
@@ -22,8 +24,6 @@ const ASSETS = [
     `${BASE_PATH}/pages/admin.html`,
     `${BASE_PATH}/pages/profile.html`,
     `${BASE_PATH}/pages/signin.html`,
-    
-    // CSS files
     `${BASE_PATH}/css/styles.css`,
     `${BASE_PATH}/css/mobile.css`,
     `${BASE_PATH}/css/about-styles.css`,
@@ -37,8 +37,6 @@ const ASSETS = [
     `${BASE_PATH}/css/admin.css`,
     `${BASE_PATH}/css/profile.css`,
     `${BASE_PATH}/css/auth.css`,
-    
-    // JavaScript files
     `${BASE_PATH}/js/main.js`,
     `${BASE_PATH}/js/path-handler.js`,
     `${BASE_PATH}/js/registration.js`,
@@ -61,20 +59,15 @@ const ASSETS = [
     `${BASE_PATH}/js/mobile-drawer.js`,
     `${BASE_PATH}/js/admin/admin.js`,
     `${BASE_PATH}/js/profile/profile.js`,
-    `${BASE_PATH}/js/auth/signin.js`
-    
-    // Component files
+    `${BASE_PATH}/js/auth/signin.js`,
     `${BASE_PATH}/js/components/success-modal.js`,
     `${BASE_PATH}/js/components/statistics-success-modal.js`,
     `${BASE_PATH}/js/components/duplicate-registration-modal.js`,
     `${BASE_PATH}/js/components/restricted-groups-modal.js`,
     `${BASE_PATH}/js/components/third-grade-modal.js`,
-    
-    // Assets
     `${BASE_PATH}/assets/icons/edu.ico`,
     `${BASE_PATH}/components/install-prompt/install-prompt.css`,
     `${BASE_PATH}/components/install-prompt/install-prompt.js`,
-    // External resources
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css',
     'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap',
@@ -90,18 +83,12 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
-                console.log('Caching assets...');
-                return Promise.allSettled(
-                    ASSETS.map(asset =>
-                        cache.add(asset).catch(error => {
-                            console.error(`Failed to cache asset ${asset}:`, error);
-                            return Promise.resolve(); // Continue with other assets
-                        })
-                    )
-                );
+                console.log('Caching core assets...');
+                return cache.addAll(ASSETS).catch(error => {
+                    console.error('Failed to cache core assets:', error);
+                });
             })
     );
-    // Force activation of the new service worker
     self.skipWaiting();
 });
 
@@ -109,116 +96,31 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
     console.log(`[Service Worker] Activating new version ${CACHE_VERSION}`);
     event.waitUntil(
-        Promise.all([
-            // Delete old caches
-            caches.keys().then(keys => {
-                return Promise.all(
-                    keys.filter(key => {
-                        return key.startsWith('elostaz-') && ![CACHE_NAME, DYNAMIC_CACHE].includes(key);
-                    }).map(key => {
+        caches.keys().then(keys => {
+            return Promise.all(
+                keys.filter(key => key.startsWith('elostaz-') && key !== CACHE_NAME && key !== DYNAMIC_CACHE)
+                    .map(key => {
                         console.log('[Service Worker] Removing old cache:', key);
                         return caches.delete(key);
                     })
-                );
-            }),
-            // Take control of all clients immediately
-            clients.claim().then(() => {
-                // Notify all clients about the update
-                clients.matchAll().then(clients => {
-                    clients.forEach(client => {
-                        client.postMessage({
-                            type: 'CACHE_UPDATED',
-                            version: CACHE_VERSION,
-                            reloadRequired: true
-                        });
-                    });
-                });
-            })
-        ])
+            );
+        }).then(() => {
+            return clients.claim();
+        })
     );
 });
 
-// Helper function to normalize URLs
-function normalizeUrl(url) {
-    const urlObj = new URL(url, location.href);
-    if (isGitHubPages) {
-        // Remove /Elostaz from the beginning of the path if it exists
-        urlObj.pathname = urlObj.pathname.replace(/^\/Elostaz/, '');
-    }
-    return urlObj.toString();
-}
-
-// Helper function to determine if a request should be cached
-function shouldCache(url) {
-    const fileExtensions = ['.html', '.css', '.js', '.json', '.ico', '.png', '.jpg', '.jpeg', '.gif', '.svg'];
-    return fileExtensions.some(ext => url.toLowerCase().endsWith(ext));
-}
-
-// Fetch event - network first with cache fallback
+// Fetch event - Network first, then cache
 self.addEventListener('fetch', event => {
-    // Skip non-GET requests
-    if (event.request.method !== 'GET') return;
-
-    // Skip Chrome extensions and other non-http(s) requests
-    if (!event.request.url.startsWith('http')) return;
-
-    const normalizedUrl = normalizeUrl(event.request.url);
-    
-    // Check if this is a navigation request (HTML page)
-    const isNavigationRequest = event.request.mode === 'navigate';
-
-    // Special handling for manifest.json and icons
-    if (event.request.url.includes('manifest.json') || 
-        event.request.url.includes('/assets/icons/')) {
-        event.respondWith(
-            fetch(event.request)
-                .then(response => {
-                    const clonedResponse = response.clone();
-                    caches.open(CACHE_NAME).then(cache => {
-                        cache.put(event.request, clonedResponse);
-                    });
-                    return response;
-                })
-                .catch(() => caches.match(event.request))
-        );
+    if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) {
         return;
     }
 
-    // For navigation requests (like back button), prioritize network and don't show loading indicator
-    if (isNavigationRequest) {
-        event.respondWith(
-            fetch(event.request)
-                .then(response => {
-                    // Cache successful responses
-                    if (response.ok && shouldCache(normalizedUrl)) {
-                        const clonedResponse = response.clone();
-                        caches.open(DYNAMIC_CACHE).then(cache => {
-                            cache.put(event.request, clonedResponse);
-                        });
-                    }
-                    return response;
-                })
-                .catch(() => {
-                    // Fallback to cache if network fails
-                    return caches.match(event.request)
-                        .then(cachedResponse => {
-                            if (cachedResponse) {
-                                return cachedResponse;
-                            }
-                            // If no cached response, return the index page
-                            return caches.match(`${BASE_PATH}/index.html`);
-                        });
-                })
-        );
-        return;
-    }
-
-    // For non-navigation requests, use the original strategy
     event.respondWith(
         fetch(event.request)
             .then(response => {
-                // Cache successful responses
-                if (response.ok && shouldCache(normalizedUrl)) {
+                // If the request is successful, cache it and return it
+                if (response.ok) {
                     const clonedResponse = response.clone();
                     caches.open(DYNAMIC_CACHE).then(cache => {
                         cache.put(event.request, clonedResponse);
@@ -227,17 +129,21 @@ self.addEventListener('fetch', event => {
                 return response;
             })
             .catch(() => {
-                // Fallback to cache if network fails
+                // If the network fails, try to get the response from the cache
                 return caches.match(event.request)
                     .then(cachedResponse => {
                         if (cachedResponse) {
                             return cachedResponse;
                         }
-                        // If the request is for an HTML page, return the offline page
+                        // If the request is for an HTML page and it's not in cache, return the offline fallback page
                         if (event.request.headers.get('accept').includes('text/html')) {
                             return caches.match(`${BASE_PATH}/index.html`);
                         }
-                        return new Response('Offline content not available');
+                        // For other assets, if not in cache, the request will fail (which is expected)
+                        return new Response('Offline content not available.', {
+                            status: 404,
+                            statusText: 'Offline content not available.'
+                        });
                     });
             })
     );
@@ -245,7 +151,7 @@ self.addEventListener('fetch', event => {
 
 // Handle service worker updates
 self.addEventListener('message', event => {
-    if (event.data === 'skipWaiting') {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
         self.skipWaiting();
     }
 });

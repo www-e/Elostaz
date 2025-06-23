@@ -355,6 +355,18 @@ body {
     color: white;
     transform: translateY(-3px);
 }
+.cta-button.tertiary {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 2px solid var(--border-color);
+}
+
+.cta-button.tertiary:hover {
+    background: var(--card-bg);
+    color: var(--text-primary);
+    border-color: var(--text-secondary);
+    transform: translateY(-3px);
+}
 
 .new-badge {
     position: absolute;

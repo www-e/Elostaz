@@ -44,6 +44,7 @@ export class SuccessModal {
                                 <p>لإتمام عملية التسجيل، يرجى تأكيد الحجز بالحضور إلى السنتر (شخصيًا أو بواسطة ولي الأمر).</p>
                                 <p><strong>الموعد:</strong> يوم السبت 7/12، من الساعة 4:00 عصرًا حتى 6:00 مساءً.</p>
                                 <p><strong>المطلوب:</strong> سداد رسوم تأكيد الحجز بقيمة 150 جنيهًا.</p>
+                                <p><strong>العنوان:</strong> الاهرام ش الاستاد الشارع المقابل لسيتي كلوب امام مدرسة الثانويه بنات</p>
                                 <a href="https://www.google.com/maps/search/?api=1&query=30.468833,31.184222" target="_blank" class="receipt-btn location-btn">
                                     <i class="fas fa-map-marker-alt"></i>
                                     عرض موقع السنتر

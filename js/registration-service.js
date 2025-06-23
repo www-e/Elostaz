@@ -113,16 +113,24 @@ export async function registerStudent(studentData) {
     }
 }
 
-export async function checkExistingRegistration(studentPhone) {
+export async function checkExistingRegistration(studentPhone, grade, section) {
     const supabaseClient = await supabase();
     try {
-        const { data, error } = await supabaseClient
+        let query = supabaseClient
             .from('registrations_2025_2026')
-            .select('*')
-            .eq('student_phone', studentPhone);
+            .select('id', { count: 'exact' })
+            .eq('student_phone', studentPhone)
+            .eq('grade', grade);
+
+        // For third grade, the section is also part of the unique key
+        if (grade === 'third' && section) {
+            query = query.eq('section', section);
+        }
+
+        const { error, count } = await query;
 
         if (error) throw error;
-        return { exists: data.length > 0, error: null };
+        return { exists: count > 0, error: null };
     } catch (error) {
         console.error('Error checking registration:', error);
         return { exists: false, error };
@@ -242,8 +250,7 @@ export async function submitRegistration(formData) {
         }
 
         // Check for existing registration
-        const { exists, error: checkError } = await checkExistingRegistration(registrationData.student_phone);
-        if (checkError) throw checkError;
+        const { exists, error: checkError } = await checkExistingRegistration(registrationData.student_phone, registrationData.grade, registrationData.section);        if (checkError) throw checkError;
         if (exists) {
             return { 
                 success: false, 
