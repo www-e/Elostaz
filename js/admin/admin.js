@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     // 2. Initialize UI Components
+    const filteredCountCard = document.getElementById('filteredCountCard');
     initializeLogout();
     await updateStatCards();
 
@@ -40,6 +41,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                 tab.pane.innerHTML = `<div class="alert alert-danger">فشل تحميل محتوى هذا القسم.</div>`;
             }
         }
+        // Toggle filtered count card visibility
+        filteredCountCard.style.display = tabKey === 'registrations' ? 'flex' : 'none';
     }
 
     // Load the default active tab
@@ -49,7 +52,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     Object.keys(tabs).forEach(key => {
         const tabElement = tabs[key].element;
         if (tabElement) {
-            tabElement.addEventListener('show.bs.tab', () => loadTab(key));
+            tabElement.addEventListener('shown.bs.tab', () => loadTab(key));
         }
     });
 });
@@ -66,7 +69,6 @@ async function updateStatCards() {
         if (statsError) throw statsError;
 
         const statsCounts = {
-            pending: statsData.filter(s => s.payment_status === 'pending').length,
             under_review: statsData.filter(s => s.payment_status === 'under_review').length,
             accepted: statsData.filter(s => s.payment_status === 'accepted').length,
             total: statsData.length
@@ -81,13 +83,11 @@ async function updateStatCards() {
 
         // Update card values
         document.getElementById('totalStudents').textContent = (statsCounts.total || 0) + (registrationsCount || 0);
-        document.getElementById('pendingPayments').textContent = statsCounts.pending || 0;
         document.getElementById('underReview').textContent = statsCounts.under_review || 0;
         document.getElementById('acceptedPayments').textContent = statsCounts.accepted || 0;
 
     } catch (error) {
         console.error('Error fetching statistics:', error);
-        // Optionally show an error message to the user
     }
 }
 
@@ -96,12 +96,12 @@ function initializeLogout() {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
             sessionStorage.removeItem('user');
+            supabase().then(client => client.auth.signOut()); // Also sign out from Supabase
             window.location.href = '../pages/signin.html';
         });
     }
 }
 
-// Global utility to show alerts, accessible by tab modules
 window.showAlert = function (message, type = 'success') {
     const alertContainer = document.querySelector('.admin-content');
     const alertElement = document.createElement('div');
@@ -112,7 +112,6 @@ window.showAlert = function (message, type = 'success') {
     `;
     alertContainer.insertBefore(alertElement, alertContainer.firstChild);
     setTimeout(() => {
-        // Use Bootstrap's method to gracefully close the alert
         const bsAlert = new bootstrap.Alert(alertElement);
         bsAlert.close();
     }, 5000);

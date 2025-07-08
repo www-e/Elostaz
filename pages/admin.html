@@ -18,7 +18,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="../js/path-handler.js"></script>
-    <script src="../js/pwa-updater.js"></script>
+    <!-- Print specific styles -->
+    <style>
+        @media print {
+            body {
+                direction: rtl !important;
+            }
+            .table th, .table td {
+                text-align: right !important; /* Force RTL text alignment */
+            }
+            .action-btn, #registrationsTable th:last-child, #registrationsTable td:last-child {
+                display: none !important; /* Hide action buttons and last column */
+            }
+             #studentsTable th:last-child, #studentsTable td:last-child {
+                display: none !important;
+            }
+             #studentsTable th:nth-last-child(2), #studentsTable td:nth-last-child(2) {
+                display: none !important;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Navbar -->
@@ -59,10 +78,10 @@
                     </div>
                 </div>
                 <div class="stat-card">
-                    <i class="fas fa-clock"></i>
-                    <div class="stat-info">
-                        <span class="stat-value" id="pendingPayments">...</span>
-                        <span class="stat-label">قيد الانتظار</span>
+                    <i class="fas fa-filter"></i>
+                    <div class="stat-info" id="filteredCountCard" style="display: none;">
+                        <span class="stat-value" id="filteredCount">0</span>
+                        <span class="stat-label">نتائج البحث</span>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -217,9 +236,10 @@
                                 <option value="third">الصف الثالث</option>
                             </select>
                         </div>
-                        <div class="mb-3" id="editSectionContainer">
+                        <div class="mb-3" id="editSectionContainer" style="display: none;">
                             <label for="editSection" class="form-label">الشعبة</label>
                             <select class="form-select" id="editSection" disabled>
+                                <option value="">اختر الشعبة</option>
                                 <option value="general">علمي رياضة</option>
                                 <option value="statistics">إحصاء (أدبي)</option>
                                 <option value="science">علمي</option>

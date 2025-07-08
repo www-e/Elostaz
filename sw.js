@@ -54,7 +54,6 @@ const ASSETS = [
     `${BASE_PATH}/js/booking-form.js`,
     `${BASE_PATH}/js/contact-form.js`,
     `${BASE_PATH}/js/modal-handler.js`,
-    `${BASE_PATH}/js/pwa-updater.js`,
     `${BASE_PATH}/js/mobile-drawer.js`,
     `${BASE_PATH}/js/admin/admin.js`,
     `${BASE_PATH}/js/admin/stats-tab.js`,

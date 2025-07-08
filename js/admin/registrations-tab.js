@@ -3,11 +3,25 @@ import { supabase } from '../supabase-client.js';
 let registrationsDataTable;
 let gradeFilter, groupFilter, searchInput;
 let editModal, editForm, editStudentIdInput, editStudentNameInput, editStudentPhoneInput, editParentPhoneInput, editGradeInput, editSectionInput, editSectionContainer;
+let searchTimeout;
 
 // --- Helper Functions ---
 const gradeMap = { first: 'الصف الأول', second: 'الصف الثاني', third: 'الصف الثالث' };
-const sectionMap = { general: 'علمي رياضة', statistics: 'إحصاء (أدبي)', science: 'علمي', arts: 'أدبي', null: 'N/A' };
+const sectionMap = { general: 'علمي رياضة', statistics: 'إحصاء (أدبي)', science: 'علمي', arts: 'أدبي' };
 const groupMap = { sat_tue: 'سبت وثلاثاء', sun_wed: 'أحد وأربعاء', mon_thu: 'اثنين وخميس', sat_tue_thu: 'سبت وثلاثاء وخميس', sun_wed_fri: 'أحد وأربعاء وجمعة' };
+
+// Function to format time to 12-hour Arabic format
+function formatTime12HourArabic(timeString) {
+    if (!timeString) return '';
+    const [hours, minutes] = timeString.split(':');
+    let H = parseInt(hours, 10);
+    const M = minutes;
+    const period = H >= 12 ? 'م' : 'ص';
+    H = H % 12 || 12;
+    const arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+    const formatNumber = n => n.toString().split('').map(digit => arabicNumbers[digit]).join('');
+    return `${formatNumber(H)}:${formatNumber(M)} ${period}`;
+}
 
 function showLoader() {
     document.getElementById('registrations-loader').style.display = 'block';
@@ -45,8 +59,9 @@ async function fetchRegistrations() {
         const formattedData = data.map(student => ({
             ...student,
             grade_formatted: gradeMap[student.grade] || student.grade,
-            section_formatted: sectionMap[student.section] || 'لا يوجد',
+            section_formatted: student.section ? (sectionMap[student.section] || student.section) : '—', // Handle null section
             group_formatted: groupMap[student.days_group] || student.days_group,
+            time_slot_formatted: formatTime12HourArabic(student.time_slot), // Format time
             action_button: `<button class="btn btn-sm action-btn edit" data-id="${student.id}"><i class="fas fa-edit"></i> تعديل</button>`
         }));
         
@@ -70,7 +85,7 @@ function openEditModal(studentData) {
     // Show/hide section based on grade
     if (studentData.grade === 'second' || studentData.grade === 'third') {
         editSectionContainer.style.display = 'block';
-        editSectionInput.value = studentData.section;
+        editSectionInput.value = studentData.section || "";
     } else {
         editSectionContainer.style.display = 'none';
         editSectionInput.value = '';
@@ -81,7 +96,7 @@ function openEditModal(studentData) {
 
 async function handleSaveChanges(e) {
     e.preventDefault();
-    const saveButton = e.target.querySelector('#saveStudentChangesBtn');
+    const saveButton = document.getElementById('saveStudentChangesBtn');
     saveButton.disabled = true;
     saveButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> جار الحفظ...';
 
@@ -114,9 +129,13 @@ async function handleSaveChanges(e) {
     }
 }
 
+function updateFilteredCount() {
+    const count = registrationsDataTable.rows({ search: 'applied' }).count();
+    document.getElementById('filteredCount').textContent = count;
+}
+
 // Main initialization function for this tab
 export function init() {
-    // Initialize DOM elements
     gradeFilter = document.getElementById('gradeFilter');
     groupFilter = document.getElementById('groupFilter');
     searchInput = document.getElementById('registrationSearch');
@@ -131,7 +150,6 @@ export function init() {
     editSectionInput = document.getElementById('editSection');
     editSectionContainer = document.getElementById('editSectionContainer');
 
-    // Initialize DataTable
     registrationsDataTable = $('#registrationsTable').DataTable({
         data: [],
         columns: [
@@ -141,26 +159,46 @@ export function init() {
             { data: 'grade_formatted' },
             { data: 'section_formatted' },
             { data: 'group_formatted' },
-            { data: 'time_slot' },
-            { data: 'action_button', orderable: false }
+            { data: 'time_slot_formatted' },
+            { data: 'action_button', orderable: false, className: 'no-print' }
         ],
         dom: 'Bfrtip',
         buttons: [
-             { extend: 'excel', text: '<i class="fas fa-file-excel me-1"></i>Excel', className: 'btn-success' },
-             { extend: 'print', text: '<i class="fas fa-print me-1"></i>طباعة', className: 'btn-primary' }
+             { 
+                 extend: 'excel', 
+                 text: '<i class="fas fa-file-excel me-1"></i>Excel', 
+                 className: 'btn-success',
+                 exportOptions: { columns: ':visible:not(.no-print)' }
+             },
+             { 
+                 extend: 'print', 
+                 text: '<i class="fas fa-print me-1"></i>طباعة', 
+                 className: 'btn-primary',
+                 exportOptions: { columns: ':visible:not(.no-print)' }
+             }
         ],
         language: { url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/ar.json' },
         pageLength: 25,
         responsive: true,
-        searching: false, // We use a custom search input
+        searching: false,
+        pagingType: 'simple_numbers', // Added for 1, 2, 3 pagination
         columnDefs: [ { targets: '_all', className: 'align-middle text-center' } ]
     });
 
-    // Add event listeners
-    [gradeFilter, groupFilter, searchInput].forEach(el => el.addEventListener('input', fetchRegistrations));
+    // Debounced search input
+    searchInput.addEventListener('keyup', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            fetchRegistrations();
+        }, 300); // 300ms delay
+    });
+    
+    [gradeFilter, groupFilter].forEach(el => el.addEventListener('change', fetchRegistrations));
     editForm.addEventListener('submit', handleSaveChanges);
 
-    // Delegated event listener for edit buttons
+    // Update filtered count on table draw
+    registrationsDataTable.on('draw.dt', updateFilteredCount);
+
     $('#registrationsTable tbody').on('click', '.edit-btn', function () {
         const studentId = $(this).data('id');
         const studentData = registrationsDataTable.rows().data().toArray().find(s => s.id === studentId);
@@ -169,6 +207,5 @@ export function init() {
         }
     });
 
-    // Initial data load
     fetchRegistrations();
 }

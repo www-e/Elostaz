@@ -29,7 +29,7 @@ JavaScript is organized into modules with specific responsibilities:
 - **Core Functionality**: main.js, DOMloader.js
 - **Feature-specific Modules**: navbar.js, registration.js, form-validation.js
 - **Component Handlers**: modal-handler.js, mobile-drawer.js
-- **PWA Support**: pwa-updater.js, service worker (sw.js)
+- **PWA Support**: service worker (sw.js)
 
 ## PWA Implementation
 
