@@ -54,28 +54,28 @@
                 <div class="stat-card">
                     <i class="fas fa-users"></i>
                     <div class="stat-info">
-                        <span class="stat-value" id="totalStudents">0</span>
+                        <span class="stat-value" id="totalStudents">...</span>
                         <span class="stat-label">إجمالي الطلاب</span>
                     </div>
                 </div>
                 <div class="stat-card">
                     <i class="fas fa-clock"></i>
                     <div class="stat-info">
-                        <span class="stat-value" id="pendingPayments">0</span>
+                        <span class="stat-value" id="pendingPayments">...</span>
                         <span class="stat-label">قيد الانتظار</span>
                     </div>
                 </div>
                 <div class="stat-card">
                     <i class="fas fa-spinner"></i>
                     <div class="stat-info">
-                        <span class="stat-value" id="underReview">0</span>
+                        <span class="stat-value" id="underReview">...</span>
                         <span class="stat-label">قيد المراجعة</span>
                     </div>
                 </div>
                 <div class="stat-card">
                     <i class="fas fa-check-circle"></i>
                     <div class="stat-info">
-                        <span class="stat-value" id="acceptedPayments">0</span>
+                        <span class="stat-value" id="acceptedPayments">...</span>
                         <span class="stat-label">تم القبول</span>
                     </div>
                 </div>
@@ -83,22 +83,90 @@
         </div>
 
         <div class="admin-content">
-            <div class="table-container">
-                <table id="studentsTable" class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>اسم الطالب</th>
-                            <th>رقم الطالب</th>
-                            <th>رقم ولي الأمر</th>
-                            <th>نوع الثانوية</th>
-                            <th>نوع الحضور</th>
-                            <th>حالة الدفع</th>
-                            <th>إثبات الدفع</th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats-tab-pane" type="button" role="tab" aria-controls="stats-tab-pane" aria-selected="true">
+                        <i class="fas fa-chart-bar me-2"></i>مراجعة الإحصائيات
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="registrations-tab" data-bs-toggle="tab" data-bs-target="#registrations-tab-pane" type="button" role="tab" aria-controls="registrations-tab-pane" aria-selected="false">
+                        <i class="fas fa-user-plus me-2"></i>تسجيلات العام الجديد
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tabs Content -->
+            <div class="tab-content" id="adminTabsContent">
+                <!-- Statistics Tab Pane -->
+                <div class="tab-pane fade show active" id="stats-tab-pane" role="tabpanel" aria-labelledby="stats-tab" tabindex="0">
+                    <div class="table-container mt-3">
+                        <div id="stats-loader" class="text-center p-5" style="display: none;"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>
+                        <table id="studentsTable" class="table table-striped" style="width:100%; display:none;">
+                            <thead>
+                                <tr>
+                                    <th>اسم الطالب</th>
+                                    <th>رقم الطالب</th>
+                                    <th>رقم ولي الأمر</th>
+                                    <th>نوع الثانوية</th>
+                                    <th>نوع الحضور</th>
+                                    <th>حالة الدفع</th>
+                                    <th>إثبات الدفع</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- General Registrations Tab Pane -->
+                <div class="tab-pane fade" id="registrations-tab-pane" role="tabpanel" aria-labelledby="registrations-tab" tabindex="0">
+                    <div class="filters-container my-3">
+                        <div class="row g-2">
+                            <div class="col-md-5">
+                                <input type="search" id="registrationSearch" class="form-control" placeholder="ابحث بالاسم أو رقم الهاتف...">
+                            </div>
+                            <div class="col-md-3">
+                                <select id="gradeFilter" class="form-select">
+                                    <option value="">كل الصفوف</option>
+                                    <option value="first">الصف الأول</option>
+                                    <option value="second">الصف الثاني</option>
+                                    <option value="third">الصف الثالث</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select id="groupFilter" class="form-select">
+                                    <option value="">كل المجموعات</option>
+                                    <option value="sat_tue">السبت والثلاثاء</option>
+                                    <option value="sun_wed">الأحد والأربعاء</option>
+                                    <option value="mon_thu">الاثنين والخميس</option>
+                                    <option value="sat_tue_thu">سبت وثلاثاء وخميس</option>
+                                    <option value="sun_wed_fri">أحد وأربعاء وجمعة</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                         <div id="registrations-loader" class="text-center p-5" style="display: none;"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>
+                        <table id="registrationsTable" class="table table-striped" style="width:100%; display:none;">
+                            <thead>
+                                <tr>
+                                    <th>اسم الطالب</th>
+                                    <th>رقم الطالب</th>
+                                    <th>ولي الأمر</th>
+                                    <th>الصف</th>
+                                    <th>الشعبة</th>
+                                    <th>المجموعة</th>
+                                    <th>الموعد</th>
+                                    <th>إجراء</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -113,6 +181,56 @@
                 </div>
                 <div class="modal-body text-center">
                     <img id="proofImage" src="" alt="Payment Proof" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Student Modal -->
+    <div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editStudentModalLabel">تعديل بيانات الطالب</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editStudentForm">
+                        <input type="hidden" id="editStudentId">
+                        <div class="mb-3">
+                            <label for="editStudentName" class="form-label">اسم الطالب</label>
+                            <input type="text" class="form-control" id="editStudentName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editStudentPhone" class="form-label">رقم الطالب</label>
+                            <input type="tel" class="form-control" id="editStudentPhone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editParentPhone" class="form-label">رقم ولي الأمر</label>
+                            <input type="tel" class="form-control" id="editParentPhone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editGrade" class="form-label">الصف</label>
+                            <select class="form-select" id="editGrade" disabled>
+                                <option value="first">الصف الأول</option>
+                                <option value="second">الصف الثاني</option>
+                                <option value="third">الصف الثالث</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" id="editSectionContainer">
+                            <label for="editSection" class="form-label">الشعبة</label>
+                            <select class="form-select" id="editSection" disabled>
+                                <option value="general">علمي رياضة</option>
+                                <option value="statistics">إحصاء (أدبي)</option>
+                                <option value="science">علمي</option>
+                                <option value="arts">أدبي</option>
+                            </select>
+                        </div>
+                         <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                            <button type="submit" class="btn btn-primary" id="saveStudentChangesBtn">حفظ التغييرات</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -135,4 +253,4 @@
     <script src="../js/admin/admin.js" type="module"></script>
     <script src="../js/auth/auth-guard.js" type="module"></script>
 </body>
-</html> 
+</html>

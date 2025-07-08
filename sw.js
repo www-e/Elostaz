@@ -1,6 +1,6 @@
 // /sw.js
 
-const CACHE_VERSION = 'v2025-5';
+const CACHE_VERSION = 'v2025-6'; // <-- Incremented version to trigger update
 const CACHE_NAME = `elostaz-cache-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `elostaz-dynamic-${CACHE_VERSION}`;
 
@@ -57,6 +57,8 @@ const ASSETS = [
     `${BASE_PATH}/js/pwa-updater.js`,
     `${BASE_PATH}/js/mobile-drawer.js`,
     `${BASE_PATH}/js/admin/admin.js`,
+    `${BASE_PATH}/js/admin/stats-tab.js`,
+    `${BASE_PATH}/js/admin/registrations-tab.js`,
     `${BASE_PATH}/js/profile/profile.js`,
     `${BASE_PATH}/js/auth/signin.js`,
     `${BASE_PATH}/js/components/success-modal.js`,
@@ -76,80 +78,64 @@ const ASSETS = [
     'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'
 ];
 
-// Install event - cache initial assets
-self.addEventListener('install', event => {
-    console.log(`[Service Worker] Installing new version ${CACHE_VERSION}`);
+self.addEventListener('install', (event) => {
+    console.log(`[SW] Installing v${CACHE_VERSION}`);
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then(cache => {
-                console.log('Caching core assets...');
-                return cache.addAll(ASSETS).catch(error => {
-                    console.error('Failed to cache core assets:', error);
-                });
-            })
+        .then((cache) => cache.addAll(ASSETS))
+        .then(() => self.skipWaiting()) // Force the new service worker to activate immediately
+        .catch(err => console.error('[SW] Cache addAll failed:', err))
     );
-    self.skipWaiting();
 });
 
-// Activate event - clean up old caches
-self.addEventListener('activate', event => {
-    console.log(`[Service Worker] Activating new version ${CACHE_VERSION}`);
+self.addEventListener('activate', (event) => {
+    console.log(`[SW] Activating v${CACHE_VERSION}`);
     event.waitUntil(
-        caches.keys().then(keys => {
+        caches.keys().then((cacheNames) => {
             return Promise.all(
-                keys.filter(key => key.startsWith('elostaz-') && key !== CACHE_NAME && key !== DYNAMIC_CACHE)
-                    .map(key => {
-                        console.log('[Service Worker] Removing old cache:', key);
-                        return caches.delete(key);
-                    })
+                cacheNames.map((cacheName) => {
+                    if (cacheName !== CACHE_NAME && cacheName !== DYNAMIC_CACHE) {
+                        console.log(`[SW] Deleting old cache: ${cacheName}`);
+                        return caches.delete(cacheName);
+                    }
+                })
             );
         }).then(() => {
-            return clients.claim();
+            console.log('[SW] Claiming clients');
+            return self.clients.claim(); // Take control of all open clients
         })
     );
 });
 
-// Fetch event - Network first, then cache
-self.addEventListener('fetch', event => {
+self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) {
         return;
     }
-
+    
+    // Strategy: Network First, then Cache
     event.respondWith(
         fetch(event.request)
-            .then(response => {
+            .then((networkResponse) => {
                 // If the request is successful, cache it and return it
-                if (response.ok) {
-                    const clonedResponse = response.clone();
-                    caches.open(DYNAMIC_CACHE).then(cache => {
-                        cache.put(event.request, clonedResponse);
-                    });
-                }
-                return response;
+                return caches.open(DYNAMIC_CACHE).then((cache) => {
+                    cache.put(event.request, networkResponse.clone());
+                    return networkResponse;
+                });
             })
             .catch(() => {
                 // If the network fails, try to get the response from the cache
-                return caches.match(event.request)
-                    .then(cachedResponse => {
-                        if (cachedResponse) {
-                            return cachedResponse;
-                        }
-                        // If the request is for an HTML page and it's not in cache, return the offline fallback page
-                        if (event.request.headers.get('accept').includes('text/html')) {
-                            return caches.match(`${BASE_PATH}/index.html`);
-                        }
-                        // For other assets, if not in cache, the request will fail (which is expected)
-                        return new Response('Offline content not available.', {
-                            status: 404,
-                            statusText: 'Offline content not available.'
-                        });
+                return caches.match(event.request).then((cachedResponse) => {
+                    return cachedResponse || new Response('Offline content not available.', {
+                        status: 404,
+                        statusText: 'Offline content not available.'
                     });
+                });
             })
     );
 });
 
-// Handle service worker updates
-self.addEventListener('message', event => {
+// Listen for a message from the client to skip waiting.
+self.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
         self.skipWaiting();
     }

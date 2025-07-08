@@ -1,170 +1,93 @@
 import { supabase } from '../supabase-client.js';
 
-// Initialize payment proof modal function
-function showPaymentProof(url) {
-    const modal = new bootstrap.Modal(document.getElementById('paymentProofModal'));
-    // Add a cache-busting parameter to the URL to bypass browser cache and ensure the latest image is shown.
-    document.getElementById('proofImage').src = url + '?t=' + new Date().getTime();
-    modal.show();
-}
-
-document.addEventListener('DOMContentLoaded', async function() {
-    // Check if user is admin
+document.addEventListener('DOMContentLoaded', async function () {
+    // 1. Authenticate and Guard
     const userData = JSON.parse(sessionStorage.getItem('user'));
     if (!userData || userData.id !== '4dba45ee-33a6-41cd-b0da-af7c1f7d9870') {
         window.location.href = '../pages/signin.html';
         return;
     }
 
-    // Initialize DataTable
-    const table = $('#studentsTable').DataTable({
-        dom: 'Bfrtip',
-        buttons: [
-            {
-                extend: 'excel',
-                text: '<i class="fas fa-file-excel ms-2"></i>تصدير Excel',
-                className: 'btn btn-success',
-                exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5]
-                }
-            },
-            {
-                extend: 'print',
-                text: '<i class="fas fa-print ms-2"></i>طباعة',
-                className: 'btn btn-primary',
-                exportOptions: {
-                    columns: [0, 1, 2, 3, 4, 5]
-                }
-            }
-        ],
-        language: {
-            // FIX: Changed protocol from relative '//' to explicit 'https://' to resolve CORS error
-            url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/ar.json'
-        },
-        order: [[5, 'asc']], // Sort by payment status
-        pageLength: 25,
-        responsive: true,
-        columnDefs: [
-            {
-                targets: '_all',
-                className: 'align-middle text-center'
-            },
-            {
-                targets: [6, 7], // Payment proof and actions columns
-                orderable: false
-            }
-        ]
-    });
-
-    // Initialize Supabase client
-    const supabaseClient = await supabase();
-
-    // Make functions available globally
-    window.showPaymentProof = showPaymentProof;
-    window.acceptPayment = acceptPayment;
-
-    // Load data
-    loadStudents(supabaseClient);
-
-    // Initialize logout handler
+    // 2. Initialize UI Components
     initializeLogout();
+    await updateStatCards();
+
+    // 3. Tab Management
+    const tabs = {
+        stats: {
+            element: document.querySelector('#stats-tab'),
+            pane: document.querySelector('#stats-tab-pane'),
+            module: './stats-tab.js',
+            loaded: false
+        },
+        registrations: {
+            element: document.querySelector('#registrations-tab'),
+            pane: document.querySelector('#registrations-tab-pane'),
+            module: './registrations-tab.js',
+            loaded: false
+        }
+    };
+
+    async function loadTab(tabKey) {
+        const tab = tabs[tabKey];
+        if (tab && !tab.loaded) {
+            try {
+                const { init } = await import(tab.module);
+                await init();
+                tab.loaded = true;
+            } catch (error) {
+                console.error(`Failed to load module for ${tabKey}:`, error);
+                tab.pane.innerHTML = `<div class="alert alert-danger">فشل تحميل محتوى هذا القسم.</div>`;
+            }
+        }
+    }
+
+    // Load the default active tab
+    await loadTab('stats');
+
+    // Add event listeners for tab clicks
+    Object.keys(tabs).forEach(key => {
+        const tabElement = tabs[key].element;
+        if (tabElement) {
+            tabElement.addEventListener('show.bs.tab', () => loadTab(key));
+        }
+    });
 });
 
-async function loadStudents(supabaseClient) {
-    try {
-        const { data: students, error } = await supabaseClient
-            .from('stats_review_2025')
-            .select('*')
-            .order('payment_status', { ascending: false });
-
-        if (error) throw error;
-
-        const table = $('#studentsTable').DataTable();
-        table.clear();
-
-        students.forEach(student => {
-            table.row.add([
-                student.student_name,
-                student.student_phone,
-                student.parent_phone,
-                getSchoolTypeText(student.school_type),
-                getAttendanceTypeText(student.attendance_type),
-                getPaymentStatusText(student.payment_status),
-                createPaymentProofCell(student),
-                createActionButtons(student)
-            ]);
-        });
-
-        table.draw();
-    } catch (error) {
-        console.error('Error loading students:', error);
-        showError('حدث خطأ أثناء تحميل بيانات الطلاب');
-    }
-}
-
-function createPaymentProofCell(student) {
-    if (student.payment_proof_url) {
-        return `
-            <button class="btn btn-info btn-sm" onclick="showPaymentProof('${student.payment_proof_url}')">
-                <i class="fas fa-image"></i>
-                عرض الإثبات
-            </button>
-        `;
-    }
-    return 'لا يوجد';
-}
-
-function getPaymentStatusText(status) {
-    const statusMap = {
-        'pending': '<span class="badge bg-warning">في انتظار الدفع</span>',
-        'under_review': '<span class="badge bg-info">قيد المراجعة</span>',
-        'accepted': '<span class="badge bg-success">تم القبول</span>'
-    };
-    return statusMap[status] || statusMap.pending;
-}
-
-function createActionButtons(student) {
-    if (student.payment_status === 'under_review') {
-        return `
-            <button class="action-btn accept" onclick="acceptPayment('${student.id}')">
-                <i class="fas fa-check"></i>
-                قبول الدفع
-            </button>
-        `;
-    }
-    return 'لا يوجد';
-}
-
-async function acceptPayment(studentId) {
+async function updateStatCards() {
     try {
         const supabaseClient = await supabase();
-        
-        // Get student data first
-        const { data: student, error: fetchError } = await supabaseClient
+
+        // Fetch counts from stats_review_2025
+        const { data: statsData, error: statsError } = await supabaseClient
             .from('stats_review_2025')
-            .select('*')
-            .eq('id', studentId)
-            .single();
+            .select('payment_status', { count: 'exact' });
 
-        if (fetchError) throw fetchError;
+        if (statsError) throw statsError;
 
-        // Update payment status
-        const { error: updateError } = await supabaseClient
-            .from('stats_review_2025')
-            .update({ 
-                payment_status: 'accepted'
-            })
-            .eq('id', studentId);
+        const statsCounts = {
+            pending: statsData.filter(s => s.payment_status === 'pending').length,
+            under_review: statsData.filter(s => s.payment_status === 'under_review').length,
+            accepted: statsData.filter(s => s.payment_status === 'accepted').length,
+            total: statsData.length
+        };
 
-        if (updateError) throw updateError;
+        // Fetch count from registrations_2025_2026
+        const { count: registrationsCount, error: regsError } = await supabaseClient
+            .from('registrations_2025_2026')
+            .select('*', { count: 'exact', head: true });
 
-        // Reload data
-        loadStudents(supabaseClient);
-        showSuccess('تم قبول الدفع بنجاح');
+        if (regsError) throw regsError;
+
+        // Update card values
+        document.getElementById('totalStudents').textContent = (statsCounts.total || 0) + (registrationsCount || 0);
+        document.getElementById('pendingPayments').textContent = statsCounts.pending || 0;
+        document.getElementById('underReview').textContent = statsCounts.under_review || 0;
+        document.getElementById('acceptedPayments').textContent = statsCounts.accepted || 0;
 
     } catch (error) {
-        console.error('Error accepting payment:', error);
-        showError('حدث خطأ أثناء قبول الدفع');
+        console.error('Error fetching statistics:', error);
+        // Optionally show an error message to the user
     }
 }
 
@@ -178,40 +101,19 @@ function initializeLogout() {
     }
 }
 
-function showSuccess(message) {
-    const successElement = document.createElement('div');
-    successElement.className = 'alert alert-success alert-dismissible fade show';
-    successElement.innerHTML = `
+// Global utility to show alerts, accessible by tab modules
+window.showAlert = function (message, type = 'success') {
+    const alertContainer = document.querySelector('.admin-content');
+    const alertElement = document.createElement('div');
+    alertElement.className = `alert alert-${type} alert-dismissible fade show`;
+    alertElement.innerHTML = `
         ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
-    document.querySelector('.admin-content').insertBefore(successElement, document.querySelector('.table-container'));
-    setTimeout(() => successElement.remove(), 5000);
-}
-
-function showError(message) {
-    const errorElement = document.createElement('div');
-    errorElement.className = 'alert alert-danger alert-dismissible fade show';
-    errorElement.innerHTML = `
-        ${message}
-        <button type-button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    `;
-    document.querySelector('.admin-content').insertBefore(errorElement, document.querySelector('.table-container'));
-    setTimeout(() => errorElement.remove(), 5000);
-}
-
-function getSchoolTypeText(type) {
-    const types = {
-        'azhar': 'ثانوي أزهري',
-        'general_arts': 'ثانوي عام/أدبي'
-    };
-    return types[type] || type;
-}
-
-function getAttendanceTypeText(type) {
-    const types = {
-        'zoom': 'Zoom',
-        'offline': 'حضوري'
-    };
-    return types[type] || type;
+    alertContainer.insertBefore(alertElement, alertContainer.firstChild);
+    setTimeout(() => {
+        // Use Bootstrap's method to gracefully close the alert
+        const bsAlert = new bootstrap.Alert(alertElement);
+        bsAlert.close();
+    }, 5000);
 }
