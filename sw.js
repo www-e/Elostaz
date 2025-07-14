@@ -1,6 +1,6 @@
 // /sw.js
 
-const CACHE_VERSION = 'v2025-6'; // <-- Incremented version to trigger update
+const CACHE_VERSION = 'v2025-7'; // <-- Incremented version to trigger update
 const CACHE_NAME = `elostaz-cache-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `elostaz-dynamic-${CACHE_VERSION}`;
 
