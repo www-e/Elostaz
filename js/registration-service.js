@@ -78,14 +78,9 @@ function getAvailabilityStatus(grade, section, group, time) {
         };
     }
 
-    // Generate random status for other groups
+    // UPDATED: Only show "limited" or "available" for other groups
     const rand = Math.random();
-    if (rand < 0.2) {
-        return {
-            status: 'full',
-            text: 'مكتملة'
-        };
-    } else if (rand < 0.5) {
+    if (rand < 0.6) { // 60% chance of being "limited"
         return {
             status: 'limited',
             text: 'عدد محدود'

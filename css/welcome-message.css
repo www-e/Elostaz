@@ -2,18 +2,18 @@
 
 .welcome-message {
     position: fixed;
-    top: var(--space-lg);
+    top: 90px; /* IMPORTANT: Position it below the floating navbar */
     right: var(--space-lg);
     background: var(--card-bg);
     border-radius: var(--radius-xl);
-    padding: var(--space-lg);
-    box-shadow: var(--shadow-lg);
+    padding: var(--space-base); /* Reduced padding */
+    box-shadow: var(--shadow-xl); /* Increased shadow for better visibility */
     border: 1px solid var(--border-color);
-    z-index: var(--z-popover);
-    max-width: 350px;
-    transform: translateX(400px);
+    z-index: 1040; /* Lower than navbar's 1050, but high enough for content */
+    max-width: 320px; /* More compact width */
+    transform: translateX(calc(100% + var(--space-lg))); /* Start off-screen */
     opacity: 0;
-    transition: var(--transition-all);
+    transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1); /* Smoother transition */
     backdrop-filter: blur(10px);
 }
 
@@ -31,7 +31,7 @@
 
 .welcome-title {
     color: var(--primary);
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-base); /* Was lg */
     font-weight: var(--font-weight-semibold);
     margin: 0;
     display: flex;
@@ -62,8 +62,9 @@
 
 .welcome-content {
     color: var(--text-primary);
-    line-height: 1.6;
-    margin-bottom: var(--space-lg);
+    line-height: 1.5; /* Tighter line-height */
+    margin-bottom: var(--space-base); /* Reduced margin */
+    font-size: var(--font-size-sm); /* Added for smaller text */
 }
 
 .welcome-content p {
@@ -190,11 +191,14 @@
 /* Responsive Design */
 @media (max-width: 768px) {
     .welcome-message {
-        top: var(--space-base);
+        top: auto; /* Unset the desktop top value */
+        bottom: calc(var(--space-lg) + 60px); /* Position from bottom, above PWA prompt */
         right: var(--space-base);
         left: var(--space-base);
         max-width: none;
-        transform: translateY(-100px);
+        width: auto;
+        transform: translateY(200px); /* Animate from bottom on mobile */
+        z-index: var(--z-popover); /* Ensure it's on top */
     }
 
     .welcome-message.show {

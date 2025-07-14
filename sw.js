@@ -65,6 +65,7 @@ const ASSETS = [
     `${BASE_PATH}/js/components/duplicate-registration-modal.js`,
     `${BASE_PATH}/js/components/restricted-groups-modal.js`,
     `${BASE_PATH}/js/components/third-grade-modal.js`,
+    `${BASE_PATH}/js/welcome-message.js`,
     `${BASE_PATH}/assets/icons/edu.ico`,
     `${BASE_PATH}/components/install-prompt/install-prompt.css`,
     `${BASE_PATH}/components/install-prompt/install-prompt.js`,

@@ -9,7 +9,7 @@ export class SuccessModal {
         const modal = document.createElement('div');
         modal.className = 'success-message';
         modal.style.display = 'none';
-        
+
         modal.innerHTML = `
             <div class="success-content">
                 <button class="close-btn">
@@ -32,35 +32,36 @@ export class SuccessModal {
                         </button>
                     </div>
                     <div class="receipt-step step-2">
-                        <div class="receipt-info-group">
-                            <p class="section-info" style="display: none"><strong>الشعبة:</strong> <span class="section-name"></span></p>
-                            <p class="group-info" style="display: none"><strong>المجموعة:</strong> <span class="group-name"></span></p>
-                            <p class="time-info" style="display: none"><strong>الموعد:</strong> <span class="time-name"></span></p>
-                            <p class="timestamp"></p>
-                            
-                            <!-- NEW: Confirmation Details Section -->
-                            <div class="confirmation-details">
-                                <h4 class="confirmation-title"><i class="fas fa-exclamation-circle"></i> خطوة هامة لتأكيد الحجز</h4>
-                                <p>لإتمام عملية التسجيل، يرجى تأكيد الحجز بالحضور إلى السنتر (شخصيًا أو بواسطة ولي الأمر).</p>
-                                <p><strong>الموعد:</strong> يوم السبت 7/12، من الساعة 4:00 عصرًا حتى 6:00 مساءً.</p>
-                                <p><strong>المطلوب:</strong> سداد رسوم تأكيد الحجز بقيمة 150 جنيهًا.</p>
-                                <p><strong>العنوان:</strong> الاهرام ش الاستاد الشارع المقابل لسيتي كلوب امام مدرسة الثانويه بنات</p>
-                                <a href="https://www.google.com/maps/search/?api=1&query=30.468833,31.184222" target="_blank" class="receipt-btn location-btn">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    عرض موقع السنتر
-                                </a>
+                        <!-- NEW Compact Summary -->
+                        <div class="compact-summary">
+                            <div class="summary-item" id="section-info-compact" style="display: none;">
+                                <i class="fas fa-book-open"></i> <span class="section-name"></span>
+                            </div>
+                            <div class="summary-item" id="group-info-compact" style="display: none;">
+                                <i class="fas fa-users"></i> <span class="group-name"></span>
+                            </div>
+                            <div class="summary-item" id="time-info-compact" style="display: none;">
+                                <i class="fas fa-clock"></i> <span class="time-name"></span>
                             </div>
                         </div>
+
+                        <!-- Confirmation Details (Main Focus) -->
+                        <div class="confirmation-details">
+                            <h4 class="confirmation-title"><i class="fas fa-exclamation-circle"></i> خطوة هامة لتأكيد الحجز</h4>
+                            <p>لإتمام عملية التسجيل، يرجى تأكيد الحجز بالحضور إلى السنتر.</p>
+                            <p><strong>الموعد:</strong> من السبت 7/12 حتى السبت 7/22، من الساعة 4:00 عصرًا حتى 8:00 مساءً.</p>
+                            <p><strong>المبلغ المطلوب:</strong> <span id="confirmation-fee" class="fee-highlight"></span></p>
+                            <p><strong>العنوان:</strong> الاهرام ش الاستاد الشارع المقابل لسيتي كلوب امام مدرسة الثانويه بنات</p>
+                            <a href="https://www.google.com/maps/search/?api=1&query=30.468833,31.184222" target="_blank" class="receipt-btn location-btn">
+                                <i class="fas fa-map-marker-alt"></i>
+                                عرض موقع السنتر
+                            </a>
+                        </div>
+                        
                         <button class="receipt-btn prev-btn">
                             <i class="fas fa-arrow-right"></i>
                             <span>السابق</span>
                         </button>
-                        <div class="receipt-actions">
-                            <button class="receipt-btn whatsapp-btn">
-                                <i class="fab fa-whatsapp"></i>
-                                إرسال عبر واتساب
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -73,6 +74,30 @@ export class SuccessModal {
     addCustomStyles() {
         const style = document.createElement('style');
         style.textContent = `
+            .compact-summary {
+                display: flex;
+                flex-wrap: wrap;
+                gap: var(--space-sm);
+                background-color: rgba(var(--primary-rgb), 0.05);
+                padding: var(--space-sm);
+                border-radius: var(--radius-lg);
+                margin-bottom: var(--space-base);
+                justify-content: center;
+            }
+            .summary-item {
+                display: flex;
+                align-items: center;
+                gap: var(--space-xs);
+                font-size: var(--font-size-xs);
+                color: var(--text-secondary);
+                padding: var(--space-xs) var(--space-sm);
+                background-color: var(--card-bg);
+                border-radius: var(--radius-full);
+                border: 1px solid var(--border-color);
+            }
+            .summary-item i {
+                color: var(--primary);
+            }
             .confirmation-details {
                 margin-top: 1.5rem;
                 padding-top: 1rem;
@@ -104,6 +129,13 @@ export class SuccessModal {
             .location-btn:hover {
                  background: var(--accent-dark) !important;
             }
+            .fee-highlight {
+                font-weight: 700;
+                color: var(--success-color);
+                background-color: var(--success-bg);
+                padding: 2px 8px;
+                border-radius: var(--radius-sm);
+            }
         `;
         document.head.appendChild(style);
     }
@@ -112,12 +144,10 @@ export class SuccessModal {
         const closeBtn = this.modal.querySelector('.close-btn');
         const nextBtn = this.modal.querySelector('.next-btn');
         const prevBtn = this.modal.querySelector('.prev-btn');
-        const whatsappBtn = this.modal.querySelector('.whatsapp-btn');
 
         closeBtn.addEventListener('click', () => this.hide());
         nextBtn.addEventListener('click', () => this.showStep(2));
         prevBtn.addEventListener('click', () => this.showStep(1));
-        whatsappBtn.addEventListener('click', () => this.shareReceipt());
     }
 
     showStep(step) {
@@ -125,63 +155,6 @@ export class SuccessModal {
         this.modal.querySelector('.step-2').classList.remove('active');
         this.modal.querySelector('.step-' + step).classList.add('active');
     }
-
-    async shareReceipt() {
-        try {
-            const successContent = this.modal.querySelector('.success-content');
-            const blob = await this.captureReceipt(successContent);
-            const file = new File([blob], 'receipt.png', { type: 'image/png' });
-            
-            if (navigator.share && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    files: [file],
-                    title: 'تأكيد التسجيل',
-                    text: 'إيصال التسجيل في مركز أ/ أشرف حسن للرياضيات'
-                });
-            } else {
-                // Fallback for browsers that don't support sharing
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'receipt.png';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }
-        } catch (error) {
-            console.error('Error sharing:', error);
-            alert('حدث خطأ أثناء مشاركة الإيصال. يرجى المحاولة مرة أخرى.');
-        }
-    }
-
-    async captureReceipt(element) {
-        try {
-            const canvas = await html2canvas(element, {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                allowTaint: true,
-                backgroundColor: null,
-                width: element.offsetWidth * 2,
-                height: element.offsetHeight * 2
-            });
-
-            return new Promise((resolve, reject) => {
-                canvas.toBlob((blob) => {
-                    if (blob) {
-                        resolve(blob);
-                    } else {
-                        reject(new Error('Failed to create blob'));
-                    }
-                }, 'image/png', 1.0);
-            });
-        } catch (error) {
-            console.error('Error capturing receipt:', error);
-            throw error;
-        }
-    }
-
     show(registrationData) {
         // Update modal content with registration data
         this.modal.querySelector('.student-name').textContent = registrationData.studentName;
@@ -189,28 +162,28 @@ export class SuccessModal {
         this.modal.querySelector('.student-phone').textContent = registrationData.studentPhone;
         this.modal.querySelector('.parent-phone').textContent = registrationData.parentPhone;
 
-        const sectionInfo = this.modal.querySelector('.section-info');
+        const sectionInfoCompact = this.modal.querySelector('#section-info-compact');
         if (registrationData.sectionName) {
-            sectionInfo.style.display = 'block';
+            sectionInfoCompact.style.display = 'flex';
             this.modal.querySelector('.section-name').textContent = registrationData.sectionName;
         } else {
-            sectionInfo.style.display = 'none';
+            sectionInfoCompact.style.display = 'none';
         }
 
-        const groupInfo = this.modal.querySelector('.group-info');
+        const groupInfoCompact = this.modal.querySelector('#group-info-compact');
         if (registrationData.groupName) {
-            groupInfo.style.display = 'block';
+            groupInfoCompact.style.display = 'flex';
             this.modal.querySelector('.group-name').textContent = registrationData.groupName;
         } else {
-            groupInfo.style.display = 'none';
+            groupInfoCompact.style.display = 'none';
         }
 
-        const timeInfo = this.modal.querySelector('.time-info');
+        const timeInfoCompact = this.modal.querySelector('#time-info-compact');
         if (registrationData.timeSlot) {
-            timeInfo.style.display = 'block';
+            timeInfoCompact.style.display = 'flex';
             this.modal.querySelector('.time-name').textContent = registrationData.timeSlot;
         } else {
-            timeInfo.style.display = 'none';
+            timeInfoCompact.style.display = 'none';
         }
 
         // Set timestamp
@@ -226,7 +199,30 @@ export class SuccessModal {
         this.modal.querySelectorAll('.timestamp').forEach(el => {
             el.textContent = `تاريخ التسجيل: ${timestamp}`;
         });
+        // --- Dynamic Confirmation Fee Logic ---
+        const feeElement = this.modal.querySelector('#confirmation-fee');
+        let fee = '';
 
+        if (registrationData.grade === 'first') {
+            fee = '115 جنيهًا';
+        } else if (registrationData.grade === 'second') {
+            fee = '140 جنيهًا';
+        } else if (registrationData.grade === 'third') {
+            if (registrationData.section === 'general') {
+                fee = '400 جنيهًا';
+            } else if (registrationData.section === 'statistics') {
+                fee = '150 جنيهًا';
+            }
+        }
+
+        if (fee) {
+            feeElement.textContent = fee;
+            feeElement.parentElement.style.display = 'block';
+        } else {
+            // Hide the fee line if no fee is applicable
+            feeElement.parentElement.style.display = 'none';
+        }
+        // --- End of Dynamic Logic ---
         this.modal.style.display = 'flex';
         this.showStep(1);
     }

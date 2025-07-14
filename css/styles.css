@@ -278,6 +278,26 @@ body {
     z-index: 1;
     animation: fadeInUp 1s ease-out;
 }
+/* Hero section desktop text alignment for Arabic */
+@media (min-width: 992px) {
+    .hero-content {
+        text-align: right; /* Right-align for Arabic */
+        direction: rtl;
+    }
+    
+    .hero-content h1,
+    .hero-content p {
+        text-align: right;
+    }
+}
+
+/* Keep centered on mobile */
+@media (max-width: 991px) {
+    .hero-content {
+        text-align: center;
+    }
+}
+
 
 .hero-title {
     font-size: var(--font-size-5xl);
@@ -546,8 +566,10 @@ body {
 }
 
 .smart-card {
-    width: 350px;
-    height: 220px;
+    width: 100%; /* Make it responsive */
+    max-width: 350px; /* Set the maximum width */
+    height: auto; /* Allow height to adjust */
+    aspect-ratio: 350 / 220; /* Maintain the aspect ratio */
     margin: 0 auto;
     position: relative;
 }
@@ -684,7 +706,13 @@ body {
     box-shadow: var(--shadow-lg);
     transition: var(--transition-all);
     cursor: pointer;
-    height: 450px; /* Give the container a fixed height */
+    height: auto;
+    min-height: 500px; 
+}
+.book-container img {
+    width: 100%;
+    height: auto; /* Ensure full image display */
+    object-fit: contain; /* Changed from cover to contain */
 }
 
 .book-container:hover {
@@ -1267,7 +1295,10 @@ body {
     .attendance-stats {
         grid-template-columns: 1fr;
     }
-
+    .smart-card-container {
+        margin-left: auto;
+        margin-right: auto;
+    }
 
 }
 

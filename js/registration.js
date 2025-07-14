@@ -553,7 +553,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     parentPhone: formData.get('parent_phone'),
                     sectionName: sectionNames[formData.get('section')] || null,
                     groupName: groupNames[formData.get('days_group')] || null,
-                    timeSlot: formData.get('time_slot')
+                    timeSlot: formData.get('time_slot'),
+                    grade: formData.get('grade'),
+                    section: formData.get('section')
                 });
 
                 form.reset();
