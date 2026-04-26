@@ -2,10 +2,21 @@
    About Page Enhanced Styles
    ============================================ */
 
+/* Ensure no horizontal scroll on any device */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+* {
+  max-width: 100%;
+}
+
 /* Timeline Section */
 .timeline-section {
-  padding: 4rem 0;
+  padding: 3rem 0;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  overflow-x: hidden;
 }
 
 .section-title {
@@ -107,9 +118,10 @@
 
 /* Statistics Section */
 .statistics-section {
-  padding: 4rem 0;
+  padding: 3rem 0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
+  overflow-x: hidden;
 }
 
 .statistics-section .section-title {
@@ -159,8 +171,9 @@
 
 /* Collaborations Section */
 .collaborations-section {
-  padding: 4rem 0;
+  padding: 3rem 0;
   background: #f8f9fa;
+  overflow-x: hidden;
 }
 
 .collaborations-grid {
@@ -244,8 +257,9 @@
 
 /* Curriculum Section */
 .curriculum-section {
-  padding: 4rem 0;
+  padding: 3rem 0;
   background: white;
+  overflow-x: hidden;
 }
 
 .curriculum-grid {
@@ -285,8 +299,9 @@
 
 /* Methodology Section */
 .methodology-section {
-  padding: 4rem 0;
+  padding: 3rem 0;
   background: #f8f9fa;
+  overflow-x: hidden;
 }
 
 .methodology-grid {
@@ -341,9 +356,10 @@
 
 /* Contact Section */
 .contact-section {
-  padding: 4rem 0;
+  padding: 3rem 0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
+  overflow-x: hidden;
 }
 
 .contact-section .section-title {
@@ -401,19 +417,51 @@
 /* Large phones (576px+) */
 @media (min-width: 576px) {
   .section-title {
-    font-size: 3rem;
+    font-size: 2.25rem;
   }
 
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  /* Ensure proper spacing for collaboration cards */
+  .collaborations-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Ensure buttons meet 44x44px minimum */
+  .filter-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .contact-item {
+    min-height: 48px;
+  }
 }
 
 /* Tablets (768px+) */
 @media (min-width: 768px) {
-  .timeline-item::before {
-    /* Add timeline line */
-    content: '';
+  /* Timeline line appears on tablet and up */
+  .timeline::before {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  .timeline-item::after {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  .timeline-item:nth-child(odd) .timeline-content,
+  .timeline-item:nth-child(even) .timeline-content {
+    width: calc(50% - 2rem);
+  }
+
+  .section-title {
+    font-size: 2.75rem;
   }
 }
 
@@ -424,95 +472,207 @@
   }
 
   .collaborations-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .section-title {
+    font-size: 3rem;
   }
 }
 
 /* Large desktops (1200px+) */
 @media (min-width: 1200px) {
+  .collaborations-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
   .timeline-item:nth-child(odd) .timeline-content,
   .timeline-item:nth-child(even) .timeline-content {
-    /* Keep alternating layout */
+    width: calc(50% - 2rem);
+  }
+}
+
+/* Extra large desktops (1400px+) */
+@media (min-width: 1400px) {
+  .section-title {
+    font-size: 3.5rem;
   }
 }
 
 /* Mobile devices (<768px) */
 @media (max-width: 767px) {
-  .section-title {
-    font-size: 2rem;
+  /* Reduce section padding on mobile */
+  .timeline-section,
+  .statistics-section,
+  .collaborations-section,
+  .curriculum-section,
+  .methodology-section,
+  .contact-section {
+    padding: 2rem 0;
   }
 
-  /* Timeline mobile */
+  /* Ensure containers don't overflow */
+  .container {
+    max-width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .section-title {
+    font-size: 1.75rem;
+    margin-bottom: 2rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Timeline mobile - fixed for RTL support */
   .timeline::before {
     left: 1rem;
+    right: auto;
   }
 
   .timeline-item {
     padding-left: 3rem;
+    padding-right: 0;
+    margin-bottom: 2rem;
   }
 
   .timeline-item::after {
     left: 1rem;
+    right: auto;
   }
 
   .timeline-item:nth-child(odd) .timeline-content,
   .timeline-item:nth-child(even) .timeline-content {
     width: 100%;
     margin: 0 !important;
-    text-align: left !important;
-    direction: ltr !important;
+    text-align: right !important;
+    direction: rtl !important;
+    padding: 1rem;
   }
 
   /* Stats mobile */
   .stats-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   .stat-number {
     font-size: 2.5rem;
   }
 
+  .stat-card {
+    padding: 1.5rem;
+  }
+
   /* Collaborations mobile */
   .collaborations-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   /* Curriculum mobile */
   .curriculum-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   /* Methodology mobile */
   .methodology-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   /* Contact mobile */
   .contact-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
-  /* Filter buttons mobile */
+  /* Filter buttons mobile - ensure 44px minimum tap targets */
   .filter-controls {
-    gap: 0.3rem;
+    gap: 0.5rem;
+    padding: 0 0.5rem;
   }
 
   .filter-btn {
-    padding: 0.4rem 1rem;
-    font-size: 0.9rem;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.85rem;
+    min-height: 44px;
+    min-width: 44px;
+    white-space: nowrap;
+  }
+
+  /* Ensure cards have proper spacing on mobile */
+  .collaboration-card,
+  .curriculum-card,
+  .methodology-card {
+    padding: 1.5rem;
+  }
+
+  /* Fix contact card tap targets */
+  .contact-item {
+    min-height: 48px;
+    padding: 1rem;
+  }
+
+  /* Prevent text overflow */
+  h3, h4, p {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
 }
 
-/* RTL Support */
+/* RTL Support - Fixed for proper Arabic display */
 [dir="rtl"] .timeline::before {
-  /* Timeline stays on left for RTL */
+  left: 1rem;
+  right: auto;
+}
+
+[dir="rtl"] .timeline-item {
+  padding-left: 3rem;
+  padding-right: 0;
+}
+
+[dir="rtl"] .timeline-item::after {
+  left: 1rem;
+  right: auto;
 }
 
 [dir="rtl"] .timeline-item:nth-child(odd) .timeline-content,
 [dir="rtl"] .timeline-item:nth-child(even) .timeline-content {
-  /* Adjust for RTL */
   text-align: right;
   direction: rtl;
+}
+
+/* Desktop RTL fixes */
+@media (min-width: 768px) {
+  [dir="rtl"] .timeline::before {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  [dir="rtl"] .timeline-item::after {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  [dir="rtl"] .timeline-item:nth-child(odd) .timeline-content {
+    margin-left: 0;
+    margin-right: auto;
+    text-align: right;
+    direction: rtl;
+  }
+
+  [dir="rtl"] .timeline-item:nth-child(even) .timeline-content {
+    margin-right: 0;
+    margin-left: auto;
+    text-align: left;
+    direction: ltr;
+  }
 }
 
 /* Accessibility - Reduced Motion */
