@@ -526,9 +526,9 @@ fetch('../components/banner/closed-banner.html')
         </div>
     </section>
 
-    <!-- Booking Modal -->
+    <!-- Registration Closed Modal -->
     <div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="false">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="bookingModalLabel">
@@ -537,191 +537,22 @@ fetch('../components/banner/closed-banner.html')
                     </h5>
                     <button type="button" class="btn-close modal-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
                 </div>
-                <div class="modal-body">
-                    <form id="bookingForm" class="booking-form">
-                        <!-- Progress Steps -->
-                        <div class="form-progress mb-4">
-                            <div class="progress-step active" data-step="1">
-                                <span class="step-number">1</span>
-                                <span class="step-text">المعلومات الشخصية</span>
-                            </div>
-                            <div class="progress-step" data-step="2">
-                                <span class="step-number">2</span>
-                                <span class="step-text">معلومات الحصة</span>
-                            </div>
-                            <div class="progress-step" data-step="3">
-                                <span class="step-number">3</span>
-                                <span class="step-text">التأكيد</span>
-                            </div>
-                        </div>
-
-                        <!-- Step 1: Personal Information -->
-                        <div class="form-step active" data-step="1">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group floating-label">
-                                        <input type="text" class="form-control" id="studentName" required>
-                                        <label for="studentName">اسم الطالب</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group floating-label">
-                                        <input type="tel" class="form-control" id="studentPhone" required>
-                                        <label for="studentPhone">رقم هاتف الطالب</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mt-3">
-                                <div class="col-md-6">
-                                    <div class="form-group floating-label">
-                                        <input type="tel" class="form-control" id="parentPhone" required>
-                                        <label for="parentPhone">رقم هاتف ولي الأمر</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="country">الدولة</label>
-                                        <select class="form-select" id="country" required>
-                                            <option value="">اختر الدولة</option>
-                                            <option value="EG">مصر</option>
-                                            <option value="SA">المملكة العربية السعودية</option>
-                                            <option value="AE">الإمارات العربية المتحدة</option>
-                                            <option value="KW">الكويت</option>
-                                            <option value="QA">قطر</option>
-                                            <option value="BH">البحرين</option>
-                                            <option value="OM">عمان</option>
-                                            <option value="OTHER">دول أخرى</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Step 2: Session Information -->
-                        <div class="form-step" data-step="2">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="studentGrade">الصف الدراسي</label>
-                                        <select class="form-select" id="studentGrade" required>
-                                            <option value="">اختر الصف</option>
-                                            <option value="1">الصف الأول الثانوي</option>
-                                            <option value="2">الصف الثاني الثانوي</option>
-                                            <option value="3">الصف الثالث الثانوي</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="sessionType">نوع الحصة</label>
-                                        <select class="form-select" id="sessionType" required>
-                                            <option value="">اختر نوع الحصة</option>
-                                            <option value="private">حصة خاصة</option>
-                                            <option value="group">حصة جماعية</option>
-                                            <option value="online">حصة أونلاين</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mt-3">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="sessionDate">التاريخ المفضل</label>
-                                        <input type="date" class="form-control date-picker" id="sessionDate" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="sessionTime">الوقت المفضل</label>
-                                        <select class="form-select" id="sessionTime" required>
-                                            <option value="">اختر الوقت</option>
-                                            <option value="09:00">09:00 صباحاً</option>
-                                            <option value="10:00">10:00 صباحاً</option>
-                                            <option value="11:00">11:00 صباحاً</option>
-                                            <option value="12:00">12:00 ظهراً</option>
-                                            <option value="13:00">01:00 مساءً</option>
-                                            <option value="14:00">02:00 مساءً</option>
-                                            <option value="15:00">03:00 مساءً</option>
-                                            <option value="16:00">04:00 مساءً</option>
-                                            <option value="17:00">05:00 مساءً</option>
-                                            <option value="18:00">06:00 مساءً</option>
-                                            <option value="19:00">07:00 مساءً</option>
-                                            <option value="20:00">08:00 مساءً</option>
-                                            <option value="21:00">09:00 مساءً</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group mt-3">
-                                <label for="notes">ملاحظات إضافية</label>
-                                <textarea class="form-control" id="notes" rows="3" placeholder="اكتب أي ملاحظات إضافية هنا..."></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Step 3: Confirmation -->
-                        <div class="form-step" data-step="3">
-                            <div class="confirmation-summary">
-                                <h6 class="mb-3">مراجعة البيانات</h6>
-                                <div class="summary-item">
-                                    <span class="summary-label">اسم الطالب:</span>
-                                    <span class="summary-value" id="summary-name"></span>
-                                </div>
-                                <div class="summary-item">
-                                    <span class="summary-label">رقم الهاتف:</span>
-                                    <span class="summary-value" id="summary-phone"></span>
-                                </div>
-                                <div class="summary-item">
-                                    <span class="summary-label">الصف الدراسي:</span>
-                                    <span class="summary-value" id="summary-grade"></span>
-                                </div>
-                                <div class="summary-item">
-                                    <span class="summary-label">موعد الحصة:</span>
-                                    <span class="summary-value" id="summary-datetime"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Navigation Buttons -->
-                        <div class="form-navigation mt-4">
-                            <button type="button" class="btn btn-secondary btn-prev" style="display: none;">
-                                <i class="fas fa-arrow-right ml-2"></i>
-                                السابق
-                            </button>
-                            <button type="button" class="btn btn-primary btn-next">
-                                التالي
-                                <i class="fas fa-arrow-left mr-2"></i>
-                            </button>
-                            <button type="submit" class="btn btn-submit" style="display: none;">
-                                <i class="fas fa-paper-plane ml-2"></i>
-                                تأكيد الحجز
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Success Modal -->
-    <div class="modal" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-modal="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
                 <div class="modal-body text-center py-4">
-                    <div class="success-checkmark">
-                        <div class="check-icon">
-                            <span class="icon-line line-tip"></span>
-                            <span class="icon-line line-long"></span>
-                            <div class="icon-circle"></div>
-                            <div class="icon-fix"></div>
-                        </div>
+                    <div class="registration-closed-icon mb-3">
+                        <i class="fas fa-calendar-times fa-4x text-warning"></i>
                     </div>
-                    <h4 id="successModalLabel" class="mb-3">تم تأكيد الحجز بنجاح!</h4>
-                    <p class="text-muted">سيتم التواصل معك قريباً لتأكيد موعد الحصة</p>
-                    <button type="button" class="btn btn-primary mt-3" data-bs-dismiss="modal" autofocus>حسناً</button>
+                    <h4 class="mb-3">التسجيل مغلق للعام الحالي</h4>
+                    <p class="text-muted">نأسف لعدم قبول حجوزات جديدة في الوقت الحالي. يرجى التحقق مرة أخرى العام القادم.</p>
+                    <p class="text-info">يمكنك التواصل معنا مباشرة عبر واتساب للاستفسار</p>
+                    <a href="https://wa.me/+201227278084" class="btn btn-success mt-3" target="_blank">
+                        <i class="fab fa-whatsapp ms-2"></i>
+                        تواصل عبر واتساب
+                    </a>
                 </div>
             </div>
         </div>
     </div>
+
 
     <button class="theme-toggle" aria-label="Toggle Theme">
         <i class="fas fa-moon"></i>
@@ -847,10 +678,8 @@ fetch('../components/banner/closed-banner.html')
     <script src="../js/theme.js" type="module"></script>
     <script src="../js/ActiveState.js" type="module"></script>
     <script src="../js/form-validation.js" type="module"></script>
-    <script src="../js/google-sheets.js" type="module"></script>
     <script src="../js/navbar.js" type="module"></script>
     <script src="../js/Private_form.js" type="module"></script>
-    <script src="../js/booking-form.js" type="module"></script>
     <script src="../js/about-page.js"></script>
 </body>
 </html>
