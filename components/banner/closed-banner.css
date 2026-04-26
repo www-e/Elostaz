@@ -1,0 +1,71 @@
+.registration-closed-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  z-index: 1050;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-100%);
+  opacity: 0;
+  direction: rtl;
+}
+
+.registration-closed-banner.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.banner-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.banner-text-arabic {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.banner-text-english {
+  display: block;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.banner-icon {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+  .registration-closed-banner {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .banner-text-arabic {
+    font-size: 1rem;
+  }
+
+  .banner-text-english {
+    font-size: 0.85rem;
+  }
+}
+
+/* Push content down when banner is shown */
+body.has-banner {
+  padding-top: 80px;
+}
+
+@media (max-width: 768px) {
+  body.has-banner {
+    padding-top: 100px;
+  }
+}
