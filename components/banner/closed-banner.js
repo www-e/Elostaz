@@ -17,7 +17,7 @@ function initRegistrationBanner() {
   });
 
   // Subtle pulse effect on text
-  gsap.to('.banner-text-arabic', {
+  gsap.to('.banner-text', {
     scale: 1.02,
     duration: 2,
     repeat: -1,

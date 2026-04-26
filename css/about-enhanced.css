@@ -1,11 +1,17 @@
 /* ============================================
-   About Page Enhanced Styles
+   About Page Enhanced Styles - RTL/Arabic Support
    ============================================ */
+
+/* Arabic-friendly font stack */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@400;500;700&display=swap');
 
 /* Ensure no horizontal scroll on any device */
 html, body {
   overflow-x: hidden;
   max-width: 100%;
+  direction: rtl;
+  text-align: right;
+  font-family: 'Cairo', 'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 * {
@@ -17,6 +23,7 @@ html, body {
   padding: 3rem 0;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   overflow-x: hidden;
+  direction: rtl;
 }
 
 .section-title {
@@ -25,6 +32,7 @@ html, body {
   margin-bottom: 3rem;
   color: #2c3e50;
   font-weight: 700;
+  direction: rtl;
 }
 
 .timeline {
@@ -33,16 +41,16 @@ html, body {
   margin: 0 auto;
 }
 
-/* Timeline vertical line */
+/* Timeline vertical line - RTL centered */
 .timeline::before {
   content: '';
   position: absolute;
-  left: 50%;
+  right: 50%;
   top: 0;
   bottom: 0;
   width: 3px;
   background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-  transform: translateX(-50%);
+  transform: translateX(50%);
 }
 
 .timeline-item {
@@ -53,15 +61,15 @@ html, body {
 }
 
 .timeline-item:nth-child(odd) .timeline-content {
-  margin-left: auto;
-  margin-right: 0;
-  text-align: left;
-  direction: ltr;
+  margin-right: auto;
+  margin-left: 0;
+  text-align: right;
+  direction: rtl;
 }
 
 .timeline-item:nth-child(even) .timeline-content {
-  margin-right: auto;
-  margin-left: 0;
+  margin-left: auto;
+  margin-right: 0;
   text-align: right;
   direction: rtl;
 }
@@ -74,6 +82,8 @@ html, body {
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: right;
+  direction: rtl;
 }
 
 .timeline-content:hover {
@@ -96,24 +106,24 @@ html, body {
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 
-/* Timeline dots */
+/* Timeline dots - RTL centered */
 .timeline-item::after {
   content: '';
   position: absolute;
-  left: 50%;
+  right: 50%;
   top: 1.5rem;
   width: 20px;
   height: 20px;
   background: #667eea;
   border: 4px solid white;
   border-radius: 50%;
-  transform: translateX(-50%);
+  transform: translateX(50%);
   z-index: 1;
   transition: transform 0.3s ease;
 }
 
 .timeline-item:hover::after {
-  transform: translateX(-50%) scale(1.3);
+  transform: translateX(50%) scale(1.3);
 }
 
 /* Statistics Section */
@@ -122,6 +132,7 @@ html, body {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   overflow-x: hidden;
+  direction: rtl;
 }
 
 .statistics-section .section-title {
@@ -145,6 +156,7 @@ html, body {
   transition: transform 0.3s ease, background 0.3s ease;
   opacity: 0;
   transform: scale(0.8);
+  direction: rtl;
 }
 
 .stat-card:hover {
@@ -174,6 +186,7 @@ html, body {
   padding: 3rem 0;
   background: #f8f9fa;
   overflow-x: hidden;
+  direction: rtl;
 }
 
 .collaborations-grid {
@@ -191,6 +204,8 @@ html, body {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   opacity: 0;
   transform: translateY(30px);
+  text-align: right;
+  direction: rtl;
 }
 
 .collaboration-card:hover {
@@ -228,13 +243,14 @@ html, body {
   font-size: 0.85rem;
 }
 
-/* Filter Controls */
+/* Filter Controls - RTL optimized */
 .filter-controls {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 2rem;
+  direction: rtl;
 }
 
 .filter-btn {
@@ -246,6 +262,8 @@ html, body {
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 600;
+  font-family: 'Cairo', 'Tajawal', sans-serif;
+  direction: rtl;
 }
 
 .filter-btn:hover,
@@ -260,6 +278,7 @@ html, body {
   padding: 3rem 0;
   background: white;
   overflow-x: hidden;
+  direction: rtl;
 }
 
 .curriculum-grid {
@@ -275,6 +294,8 @@ html, body {
   transition: transform 0.3s ease;
   opacity: 0;
   transform: translateX(-30px);
+  text-align: right;
+  direction: rtl;
 }
 
 .curriculum-card:hover {
@@ -302,6 +323,7 @@ html, body {
   padding: 3rem 0;
   background: #f8f9fa;
   overflow-x: hidden;
+  direction: rtl;
 }
 
 .methodology-grid {
@@ -318,6 +340,8 @@ html, body {
   transition: transform 0.3s ease;
   opacity: 0;
   transform: scale(0.9);
+  text-align: right;
+  direction: rtl;
 }
 
 .methodology-card:hover {
@@ -342,14 +366,16 @@ html, body {
 
 .methodology-features li {
   padding: 0.5rem 0;
-  padding-left: 1.5rem;
+  padding-right: 1.5rem;
   position: relative;
+  text-align: right;
+  direction: rtl;
 }
 
 .methodology-features li::before {
   content: '✓';
   position: absolute;
-  left: 0;
+  right: 0;
   color: #667eea;
   font-weight: bold;
 }
@@ -360,6 +386,7 @@ html, body {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   overflow-x: hidden;
+  direction: rtl;
 }
 
 .contact-section .section-title {
@@ -373,6 +400,7 @@ html, body {
   backdrop-filter: blur(10px);
   border-radius: 15px;
   margin-bottom: 3rem;
+  direction: rtl;
 }
 
 .registration-reminder h3 {
@@ -395,6 +423,7 @@ html, body {
   backdrop-filter: blur(10px);
   border-radius: 15px;
   transition: transform 0.3s ease;
+  direction: rtl;
 }
 
 .contact-card:hover {
@@ -442,17 +471,17 @@ html, body {
 
 /* Tablets (768px+) */
 @media (min-width: 768px) {
-  /* Timeline line appears on tablet and up */
+  /* Timeline line appears on tablet and up - RTL centered */
   .timeline::before {
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
+    right: 50%;
+    left: auto;
+    transform: translateX(50%);
   }
 
   .timeline-item::after {
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
+    right: 50%;
+    left: auto;
+    transform: translateX(50%);
   }
 
   .timeline-item:nth-child(odd) .timeline-content,
@@ -525,21 +554,21 @@ html, body {
     overflow-wrap: break-word;
   }
 
-  /* Timeline mobile - fixed for RTL support */
+  /* Timeline mobile - RTL support */
   .timeline::before {
-    left: 1rem;
-    right: auto;
+    right: 1rem;
+    left: auto;
   }
 
   .timeline-item {
-    padding-left: 3rem;
-    padding-right: 0;
+    padding-right: 3rem;
+    padding-left: 0;
     margin-bottom: 2rem;
   }
 
   .timeline-item::after {
-    left: 1rem;
-    right: auto;
+    right: 1rem;
+    left: auto;
   }
 
   .timeline-item:nth-child(odd) .timeline-content,
@@ -624,20 +653,20 @@ html, body {
   }
 }
 
-/* RTL Support - Fixed for proper Arabic display */
+/* RTL Support - Fully optimized for Arabic */
 [dir="rtl"] .timeline::before {
-  left: 1rem;
-  right: auto;
+  right: 1rem;
+  left: auto;
 }
 
 [dir="rtl"] .timeline-item {
-  padding-left: 3rem;
-  padding-right: 0;
+  padding-right: 3rem;
+  padding-left: 0;
 }
 
 [dir="rtl"] .timeline-item::after {
-  left: 1rem;
-  right: auto;
+  right: 1rem;
+  left: auto;
 }
 
 [dir="rtl"] .timeline-item:nth-child(odd) .timeline-content,
@@ -649,29 +678,29 @@ html, body {
 /* Desktop RTL fixes */
 @media (min-width: 768px) {
   [dir="rtl"] .timeline::before {
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
+    right: 50%;
+    left: auto;
+    transform: translateX(50%);
   }
 
   [dir="rtl"] .timeline-item::after {
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
+    right: 50%;
+    left: auto;
+    transform: translateX(50%);
   }
 
   [dir="rtl"] .timeline-item:nth-child(odd) .timeline-content {
-    margin-left: 0;
-    margin-right: auto;
+    margin-right: 0;
+    margin-left: auto;
     text-align: right;
     direction: rtl;
   }
 
   [dir="rtl"] .timeline-item:nth-child(even) .timeline-content {
-    margin-right: 0;
-    margin-left: auto;
-    text-align: left;
-    direction: ltr;
+    margin-left: 0;
+    margin-right: auto;
+    text-align: right;
+    direction: rtl;
   }
 }
 
