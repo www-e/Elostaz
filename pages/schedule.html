@@ -18,10 +18,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../components/banner/closed-banner.css">
     <script src="../js/path-handler.js"></script>
     <script src="../js/pwa-updater.js"></script>
 </head>
 <body>
+    <!-- Registration Closed Banner -->
+    <div id="registration-banner-container"></div>
+    <script>
+// Load banner component
+fetch('../components/banner/closed-banner.html')
+  .then(response => response.text())
+  .then(html => {
+    document.getElementById('registration-banner-container').innerHTML = html;
+    return import('../components/banner/closed-banner.js');
+  })
+  .catch(error => console.error('Error loading banner:', error));
+</script>
     <!-- Loader -->
     <div class="loader-wrapper">
         <div class="loader">
@@ -267,6 +280,7 @@
         </div>
     </div>
 </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/DOMloader.js" type="module"></script>
     <script src="../js/main.js" type="module"></script>
