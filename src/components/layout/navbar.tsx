@@ -146,9 +146,12 @@ export function Navbar() {
           <ThemeToggle />
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger>
-              <Button variant="ghost" size="icon" aria-label="فتح القائمة">
+              <div
+                className="inline-flex items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground h-10 w-10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+                aria-label="فتح القائمة"
+              >
                 <Menu className="size-5" />
-              </Button>
+              </div>
             </SheetTrigger>
             <SheetContent side="right" className="w-72">
               <SheetHeader>
