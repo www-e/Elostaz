@@ -16,7 +16,7 @@ const testimonials = [
     name: "عمر محمد",
     achievement: "أوائل الثانوية العامة 2020",
   },
-  {
+ {
     quote:
       "الشرح منظم وسهل الفهم، والواجبات المنزلية مفيدة جداً",
     name: "ابانوب جرجس",
@@ -33,6 +33,36 @@ const testimonials = [
       "السبورة الإلكترونية والشرح المباشر غيروا فهمي للرياضيات تماماً",
     name: "سارة أحمد",
     achievement: "الأولى على المدرسة 2022",
+  },
+  {
+    quote:
+      "شرحه ممتاز وبيشرح كل حاجة بالتفصيل، ربنا يبارك فيه",
+    name: "فاطمة الزهراء",
+    achievement: "الثانوية العامة 2023",
+  },
+  {
+    quote:
+      "مفيش أحسن من مستر أشرف في شرح الرياضيات، فهمت معاه كل حاجة",
+    name: "يوسف محمود",
+    achievement: "الأول على المدرسة 2024",
+  },
+  {
+    quote:
+      "أسلوبه في الشرح رائع وبيفهمنا بطريقة سهلة وبسيطة",
+    name: "نوران حسن",
+    achievement: "الثانوية العامة 2022",
+  },
+  {
+    quote:
+      "الحصص مع مستر أشرف كانت سبب نجاحي، شرح منظم وممتع",
+    name: "عبدالله خالد",
+    achievement: "أوائل الثانوية العامة 2023",
+  },
+  {
+    quote:
+      "مستر أشرف غير نظرتي للرياضيات خالص، بقيت أحب المادة وافهمها كويس",
+    name: "مريم سعيد",
+    achievement: "الثانوية العامة 2024",
   },
 ];
 
@@ -63,8 +93,15 @@ function TestimonialCard({
 }
 
 export function TestimonialsMarquee() {
-  // Duplicate items for seamless infinite scroll
-  const items = [...testimonials, ...testimonials];
+  // Duplicate items multiple times so the total width always exceeds any viewport,
+  // guaranteeing no empty space is visible during the marquee animation.
+  const items = [
+    ...testimonials,
+    ...testimonials,
+    ...testimonials,
+    ...testimonials,
+    ...testimonials,
+  ];
 
   return (
     <section className="py-20 overflow-hidden">
@@ -90,11 +127,13 @@ export function TestimonialsMarquee() {
             transform: translateX(0);
           }
           100% {
-            transform: translateX(-50%);
+            /* 5 copies total → shift by exactly 1/5 of the full width (one set) */
+            transform: translateX(calc(-100% / 5));
           }
         }
         .animate-marquee-rtl {
-          animation: marquee-rtl 30s linear infinite;
+          /* 50s keeps the speed comfortable with the larger content set */
+          animation: marquee-rtl 50s linear infinite;
           width: max-content;
         }
         .animate-marquee-rtl:hover {

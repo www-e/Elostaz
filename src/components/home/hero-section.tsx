@@ -144,7 +144,7 @@ export function HeroSection() {
             ))}
           </div>
 
-          <div className="mt-8 flex flex-wrap gap-4 justify-end">
+          <div className="mt-8 flex flex-wrap gap-4 justify-start">
             <Link
               href="/#contact"
               className={cn(

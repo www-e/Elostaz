@@ -40,7 +40,7 @@ const timeline = [
 const stats = [
   { target: 6, suffix: "+", label: "سنوات التدريس عبر الإنترنت" },
   { target: 1000, suffix: "+", label: "طالب تم تدريسهم" },
-  { target: 50, suffix: "+", label: "مركز عبر مصر" },
+  { target: 2, suffix: "", label: "مراكز التعاون" },
   { target: 10, suffix: "+", label: "تعاون في المناهج" },
 ];
 
@@ -139,7 +139,7 @@ export default function AboutPage() {
             <p className="mt-4 text-xl text-muted-foreground">
               مدرس رياضيات للمرحلة الثانوية بخبرة أكثر من ٣٠ عاماً
             </p>
-            <div className="mt-8 flex flex-wrap gap-4 justify-end">
+            <div className="mt-8 flex flex-wrap gap-4 justify-start">
               <RegistrationDialog buttonText="احجز حصة خاصة" />
               <a
                 href="https://wa.me/201234567890"
@@ -184,24 +184,24 @@ export default function AboutPage() {
                   <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-4">
                     {index % 2 === 0 ? (
                       <>
-                        <div className="text-right md:pr-8 order-1">
+                        <div className="text-right md:text-left md:pl-8 md:col-start-1 order-1 md:order-none">
                           <span className="text-primary font-bold text-xl block">
                             {item.year}
                           </span>
                           <p className="font-semibold">{item.title}</p>
                         </div>
-                        <div className="relative flex justify-center order-first md:order-none my-2 md:my-0">
+                        <div className="relative flex justify-center md:col-start-2 order-first md:order-none my-2 md:my-0">
                           <div className="w-3 h-3 bg-primary rounded-full ring-4 ring-background" />
                         </div>
-                        <div className="hidden md:block" />
+                        <div className="hidden md:block md:col-start-3" />
                       </>
                     ) : (
                       <>
-                        <div className="hidden md:block" />
-                        <div className="relative flex justify-center order-first md:order-none my-2 md:my-0">
+                        <div className="hidden md:block md:col-start-1" />
+                        <div className="relative flex justify-center md:col-start-2 order-first md:order-none my-2 md:my-0">
                           <div className="w-3 h-3 bg-primary rounded-full ring-4 ring-background" />
                         </div>
-                        <div className="text-right md:text-left md:pl-8 order-1">
+                        <div className="text-right md:pr-8 md:col-start-3 order-1 md:order-none">
                           <span className="text-primary font-bold text-xl block">
                             {item.year}
                           </span>
@@ -281,7 +281,7 @@ export default function AboutPage() {
                       {item.features.map((feature) => (
                         <li
                           key={feature}
-                          className="flex items-center gap-2 text-sm justify-end"
+                          className="flex items-center gap-2 text-sm"
                         >
                           <span>{feature}</span>
                           <CheckCircle className="size-4 text-primary shrink-0" />

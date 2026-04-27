@@ -2,13 +2,19 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   TrendingUp,
-  CheckCircle,
   Calendar,
   ClipboardCheck,
   QrCode,
   Contact,
   Users,
   MessageCircle,
+  Calculator,
+  BookOpen,
+  GraduationCap,
+  Star,
+  Clock,
+  Award,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -52,36 +58,119 @@ const books = [
 const courses = [
   {
     title: "الصف الأول الثانوي",
+    subtitle: "أساسيات الرياضيات والجبر والهندسة",
     link: "/grades/grade1/",
     lessons: 12,
     hours: 36,
     tests: 24,
+    students: 340,
     progress: 75,
-    topics: ["الجبر والمعادلات", "الهندسة التحليلية", "حساب المثلثات"],
+    rating: 4.8,
+    difficulty: "متوسط",
+    color: "blue",
+    icon: Calculator,
+    topics: [
+      "الجبر والمعادلات",
+      "الهندسة التحليلية",
+      "حساب المثلثات",
+      "الدوال والرسوم البيانية",
+      "الإحصاء والاحتمالات",
+      "التفاضل المبدئي",
+      "التكامل المبدئي",
+      "الهندسة الوصفية",
+    ],
   },
   {
     title: "الصف الثاني الثانوي",
+    subtitle: "تفاضل، تكامل، إحصاء وهندسة فراغية",
     link: "/grades/grade2/",
     lessons: 14,
     hours: 42,
     tests: 28,
+    students: 280,
     progress: 85,
-    topics: ["التفاضل والتكامل", "الاحتمالات والإحصاء", "الهندسة الفراغية"],
+    rating: 4.9,
+    difficulty: "صعب",
+    color: "purple",
+    icon: BookOpen,
+    topics: [
+      "التفاضل والتكامل",
+      "الاحتمالات والإحصاء",
+      "الهندسة الفراغية",
+      "المتتاليات والمتسلسلات",
+      "الدوال الأسية واللوغاريتمية",
+      "الهندسة التحليلية المتقدمة",
+      "المعادلات التفاضلية",
+      "الإحصاء التطبيقي",
+    ],
   },
   {
     title: "الصف الثالث الثانوي",
+    subtitle: "رياضيات متقدمة للثانوية العامة",
     link: "/grades/grade3/",
     lessons: 16,
     hours: 48,
     tests: 32,
+    students: 420,
     progress: 90,
+    rating: 5.0,
+    difficulty: "متقدم",
+    color: "emerald",
+    icon: GraduationCap,
     topics: [
       "التفاضل والتكامل المتقدم",
       "المصفوفات والمحددات",
       "التحليل الرياضي",
+      "الهندسة التفاضلية",
+      "الإحصاء الرياضي",
+      "الدوال المعقدة",
+      "الرياضيات المالية",
+      "النمذجة الرياضية",
     ],
   },
 ];
+
+const gradeStyles = {
+  blue: {
+    border: "border-t-blue-500",
+    iconBg: "bg-blue-50",
+    iconText: "text-blue-600",
+    gradient: "bg-gradient-to-l from-blue-500 to-cyan-400",
+    badgeBg: "bg-blue-50",
+    badgeText: "text-blue-700",
+    badgeRing: "ring-blue-200",
+    btn: "bg-blue-600 hover:bg-blue-700",
+    progressText: "text-blue-600",
+    lightBg: "bg-blue-50",
+    topBar: "bg-blue-500",
+  },
+  purple: {
+    border: "border-t-purple-500",
+    iconBg: "bg-purple-50",
+    iconText: "text-purple-600",
+    gradient: "bg-gradient-to-l from-purple-500 to-fuchsia-400",
+    badgeBg: "bg-purple-50",
+    badgeText: "text-purple-700",
+    badgeRing: "ring-purple-200",
+    btn: "bg-purple-600 hover:bg-purple-700",
+    progressText: "text-purple-600",
+    lightBg: "bg-purple-50",
+    topBar: "bg-purple-500",
+  },
+  emerald: {
+    border: "border-t-emerald-500",
+    iconBg: "bg-emerald-50",
+    iconText: "text-emerald-600",
+    gradient: "bg-gradient-to-l from-emerald-500 to-teal-400",
+    badgeBg: "bg-emerald-50",
+    badgeText: "text-emerald-700",
+    badgeRing: "ring-emerald-200",
+    btn: "bg-emerald-600 hover:bg-emerald-700",
+    progressText: "text-emerald-600",
+    lightBg: "bg-emerald-50",
+    topBar: "bg-emerald-500",
+  },
+};
 
 export default function HomePage() {
   return (
@@ -107,19 +196,19 @@ export default function HomePage() {
                 وفعالية.
               </p>
               <ul className="space-y-3">
-                <li className="flex items-center gap-3 justify-end">
+                <li className="flex items-center gap-3">
                   <span>بطاقة هوية رقمية للطالب</span>
                   <Contact className="size-5 text-primary shrink-0" />
                 </li>
-                <li className="flex items-center gap-3 justify-end">
+                <li className="flex items-center gap-3">
                   <span>رمز QR للوصول السريع للبيانات</span>
                   <QrCode className="size-5 text-primary shrink-0" />
                 </li>
-                <li className="flex items-center gap-3 justify-end">
+                <li className="flex items-center gap-3">
                   <span>تتبع الحضور والغياب تلقائياً</span>
                   <Calendar className="size-5 text-primary shrink-0" />
                 </li>
-                <li className="flex items-center gap-3 justify-end">
+                <li className="flex items-center gap-3">
                   <span>متابعة التقدم الدراسي والدرجات</span>
                   <TrendingUp className="size-5 text-primary shrink-0" />
                 </li>
@@ -155,19 +244,19 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <div className="bg-[#dcf8c6] dark:bg-green-900/30 p-3 rounded-lg rounded-tr-none max-w-[85%] mr-auto ml-0">
+                  <div className="bg-[#dcf8c6] dark:bg-green-900/30 p-3 rounded-lg rounded-tr-none max-w-[85%] ml-auto">
                     <p className="text-sm">
                       أهلاً بك! تم تسجيل حضورك اليوم بنجاح ✅
                     </p>
-                    <span className="text-[10px] text-muted-foreground mt-1 block text-left">
+                    <span className="text-[10px] text-muted-foreground mt-1 block">
                       10:30 ص
                     </span>
                   </div>
-                  <div className="bg-[#dcf8c6] dark:bg-green-900/30 p-3 rounded-lg rounded-tr-none max-w-[85%] mr-auto ml-0">
+                  <div className="bg-[#dcf8c6] dark:bg-green-900/30 p-3 rounded-lg rounded-tr-none max-w-[85%] ml-auto">
                     <p className="text-sm">
                       تذكر: غداً اختبار على الوحدة الثانية 📚
                     </p>
-                    <span className="text-[10px] text-muted-foreground mt-1 block text-left">
+                    <span className="text-[10px] text-muted-foreground mt-1 block">
                       10:31 ص
                     </span>
                   </div>
@@ -244,59 +333,183 @@ export default function HomePage() {
       </section>
 
       {/* 6. Courses Section */}
-      <section id="courses" className="py-20 px-4">
-        <div className="max-w-6xl mx-auto">
+      <section id="courses" className="py-24 px-4">
+        <div className="max-w-7xl mx-auto">
           <SectionHeader title="الصفوف الدراسية" />
-          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.map((course) => (
-              <StaggerItem key={course.title}>
-                <Card className="h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
-                  <CardHeader>
-                    <CardTitle>{course.title}</CardTitle>
-                    <CardDescription>
-                      {course.lessons} درس | {course.hours} ساعة |{" "}
-                      {course.tests} اختبار
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-sm">
-                        <span>التقدم</span>
-                        <span className="font-bold text-primary">
-                          {course.progress}%
-                        </span>
-                      </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-primary transition-all"
-                          style={{ width: `${course.progress}%` }}
-                        />
-                      </div>
-                    </div>
-                    <ul className="space-y-2">
-                      {course.topics.map((topic) => (
-                        <li
-                          key={topic}
-                          className="flex items-center gap-2 text-sm justify-end"
-                        >
-                          <span>{topic}</span>
-                          <CheckCircle className="size-4 text-primary shrink-0" />
-                        </li>
-                      ))}
-                    </ul>
-                    <Link
-                      href={course.link}
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {courses.map((course) => {
+              const styles =
+                gradeStyles[course.color as keyof typeof gradeStyles];
+              const Icon = course.icon;
+              return (
+                <StaggerItem key={course.title}>
+                  <Card
+                    className={cn(
+                      "group h-full flex flex-col overflow-hidden border-t-4 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl",
+                      styles.border
+                    )}
+                  >
+                    {/* Icon Header */}
+                    <div
                       className={cn(
-                        buttonVariants({ variant: "default" }),
-                        "w-full mt-2"
+                        "relative h-28 flex items-center justify-center",
+                        styles.iconBg
                       )}
                     >
-                      استكشف المنهج
-                    </Link>
-                  </CardContent>
-                </Card>
-              </StaggerItem>
-            ))}
+                      <Icon
+                        className={cn(
+                          "size-14 transition-transform duration-300 group-hover:scale-110",
+                          styles.iconText
+                        )}
+                      />
+                      <div
+                        className={cn(
+                          "absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm",
+                          styles.topBar
+                        )}
+                      >
+                        {course.difficulty}
+                      </div>
+                    </div>
+
+                    <CardHeader className="pb-2 pt-5">
+                      <CardTitle className="text-2xl font-bold text-right">
+                        {course.title}
+                      </CardTitle>
+                      <CardDescription className="text-right text-base leading-relaxed">
+                        {course.subtitle}
+                      </CardDescription>
+                    </CardHeader>
+
+                    <CardContent className="flex-1 flex flex-col gap-5">
+                      {/* Stats Grid */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="flex items-center gap-2 text-sm p-2 rounded-lg bg-muted/40">
+                          <div className="text-right">
+                            <p className="font-bold text-lg leading-none">
+                              {course.lessons}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground">
+                              درس
+                            </p>
+                          </div>
+                          <BookOpen
+                            className={cn("size-5", styles.iconText)}
+                          />
+                        </div>
+                        <div className="flex items-center gap-2 text-sm p-2 rounded-lg bg-muted/40">
+                          <div className="text-right">
+                            <p className="font-bold text-lg leading-none">
+                              {course.hours}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground">
+                              ساعة
+                            </p>
+                          </div>
+                          <Clock
+                            className={cn("size-5", styles.iconText)}
+                          />
+                        </div>
+                        <div className="flex items-center gap-2 text-sm p-2 rounded-lg bg-muted/40">
+                          <div className="text-right">
+                            <p className="font-bold text-lg leading-none">
+                              {course.tests}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground">
+                              اختبار
+                            </p>
+                          </div>
+                          <ClipboardCheck
+                            className={cn("size-5", styles.iconText)}
+                          />
+                        </div>
+                        <div className="flex items-center gap-2 text-sm p-2 rounded-lg bg-muted/40">
+                          <div className="text-right">
+                            <p className="font-bold text-lg leading-none">
+                              {course.students}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground">
+                              طالب
+                            </p>
+                          </div>
+                          <Users
+                            className={cn("size-5", styles.iconText)}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Progress */}
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm items-center">
+                          <span className="text-muted-foreground">التقدم</span>
+                          <span
+                            className={cn("font-bold", styles.progressText)}
+                          >
+                            {course.progress}%
+                          </span>
+                        </div>
+                        <div className="h-3 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className={cn(
+                              "h-full rounded-full transition-all duration-1000",
+                              styles.gradient
+                            )}
+                            style={{ width: `${course.progress}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Topics as badges */}
+                      <div className="flex flex-wrap gap-2">
+                        {course.topics.map((topic) => (
+                          <span
+                            key={topic}
+                            className={cn(
+                              "inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ring-1 ring-inset",
+                              styles.badgeBg,
+                              styles.badgeText,
+                              styles.badgeRing
+                            )}
+                          >
+                            {topic}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Rating & Difficulty */}
+                      <div className="flex items-center justify-between pt-2 border-t border-border">
+                        <div className="flex items-center gap-1">
+                          <Star className="size-4 fill-amber-400 text-amber-400" />
+                          <span className="text-sm font-bold">
+                            {course.rating}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <Award
+                            className={cn("size-4", styles.iconText)}
+                          />
+                          <span>{course.difficulty}</span>
+                        </div>
+                      </div>
+
+                      <div className="mt-auto pt-2">
+                        <Link
+                          href={course.link}
+                          className={cn(
+                            buttonVariants({ variant: "default" }),
+                            "w-full gap-2 group/btn",
+                            styles.btn
+                          )}
+                        >
+                          استكشف المنهج
+                          <ChevronRight className="size-4 transition-transform group-hover/btn:translate-x-1" />
+                        </Link>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </StaggerItem>
+              );
+            })}
           </StaggerContainer>
         </div>
       </section>

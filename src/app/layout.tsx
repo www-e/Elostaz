@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Cairo } from "next/font/google"
+import { Tajawal } from "next/font/google"
 import "./globals.css"
 
 import { ThemeProvider } from "@/components/providers/theme-provider"
@@ -9,10 +9,11 @@ import { LoadingScreen } from "@/components/layout/loading-screen"
 import { ScrollProgress } from "@/components/layout/scroll-progress"
 import { ScrollToTop } from "@/components/layout/scroll-to-top"
 
-const cairo = Cairo({
-  variable: "--font-cairo",
+const tajawal = Tajawal({
+  variable: "--font-tajawal",
   subsets: ["arabic", "latin"],
   display: "swap",
+  weight: ["200", "300", "400", "500", "700", "800", "900"],
 })
 
 export const metadata: Metadata = {
@@ -83,7 +84,7 @@ export default function RootLayout({
           />
         )}
       </head>
-      <body className="min-h-full bg-background text-foreground" suppressHydrationWarning>
+      <body className={`${tajawal.variable} min-h-full bg-background text-foreground`} suppressHydrationWarning>
         <LoadingScreen />
         <ScrollProgress />
         <ThemeProvider>

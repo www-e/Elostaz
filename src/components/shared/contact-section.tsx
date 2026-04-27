@@ -60,18 +60,24 @@ const socialContacts = [
 const directContacts = [
   {
     icon: Phone,
-    label: "+20 1227278084",
+    title: "هاتف",
+    label: "01227278084",
     href: "tel:+201227278084",
+    color: "hover:bg-blue-500/10 hover:text-blue-600 hover:border-blue-500/30",
   },
   {
     icon: Phone,
-    label: "+20 1062739292",
+    title: "هاتف آخر",
+    label: "01062739292",
     href: "tel:+201062739292",
+    color: "hover:bg-emerald-500/10 hover:text-emerald-600 hover:border-emerald-500/30",
   },
   {
     icon: Mail,
+    title: "البريد الإلكتروني",
     label: "ah8370521@gmail.com",
     href: "mailto:ah8370521@gmail.com",
+    color: "hover:bg-orange-500/10 hover:text-orange-600 hover:border-orange-500/30",
   },
 ];
 
@@ -108,20 +114,25 @@ export function ContactSection() {
           ))}
         </div>
 
-        <FadeIn>
-          <div className="flex flex-wrap items-center justify-center gap-6 py-6 rounded-2xl bg-muted/50">
-            {directContacts.map((contact) => (
-              <a
-                key={contact.label}
-                href={contact.href}
-                className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-              >
-                <contact.icon className="size-4" />
-                <span className="text-sm font-medium">{contact.label}</span>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+          {directContacts.map((contact, index) => (
+            <FadeIn key={contact.label} delay={index * 0.1}>
+              <a href={contact.href} className="block h-full">
+                <Card className={`h-full transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${contact.color}`}>
+                  <CardContent className="flex flex-col items-center gap-2 pt-6 text-center">
+                    <div className="flex items-center justify-center size-12 rounded-full bg-primary/10">
+                      <contact.icon className="size-6 text-primary" />
+                    </div>
+                    <h3 className="font-bold text-base">{contact.title}</h3>
+                    <p className="text-muted-foreground text-sm font-medium" dir="ltr">
+                      {contact.label}
+                    </p>
+                  </CardContent>
+                </Card>
               </a>
-            ))}
-          </div>
-        </FadeIn>
+            </FadeIn>
+          ))}
+        </div>
       </div>
     </section>
   );
