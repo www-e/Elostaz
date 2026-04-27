@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Sitemap: https://www.alostaz.com/sitemap.xml
+
+# Optimize crawling
+Crawl-delay: 10
+
+# Prevent caching of service worker
+Disallow: /sw.js

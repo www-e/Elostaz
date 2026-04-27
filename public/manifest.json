@@ -1,0 +1,24 @@
+{
+  "name": "مركز أ/ أشرف حسن للرياضيات",
+  "short_name": "أ/ أشرف حسن",
+  "description": "مركز أ/ أشرف حسن للرياضيات - دروس خصوصية في الرياضيات",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#2e1269",
+  "theme_color": "#2e1269",
+  "orientation": "any",
+  "dir": "rtl",
+  "lang": "ar",
+  "icons": [
+    {
+      "src": "./assets/icons/edu.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false,
+  "display_override": ["window-controls-overlay"]
+}
