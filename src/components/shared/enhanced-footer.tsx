@@ -77,8 +77,8 @@ const gradeLinks = [
 
 const contactInfo = [
   {
-    label: "الهاتف: 01009596930",
-    href: "tel:+201009596930",
+    label: "الهاتف: 01227278084",
+    href: "tel:+201227278084",
     icon: Phone,
   },
   {
@@ -87,8 +87,8 @@ const contactInfo = [
     icon: Phone,
   },
   {
-    label: "واتساب",
-    href: "https://wa.me/+201009596930",
+    label: "واتساب: 01227278084",
+    href: "https://wa.me/+201227278084",
     icon: MessageCircle,
     external: true,
   },
@@ -101,8 +101,8 @@ const contactInfo = [
 
 const socialLinks = [
   {
-    label: "واتساب",
-    href: "https://wa.me/+201009596930",
+    label: "واتساب: 01227278084",
+    href: "https://wa.me/+201227278084",
     icon: WhatsAppIcon,
     hoverColor: "hover:text-green-500",
   },
@@ -238,7 +238,7 @@ export function EnhancedFooter({ className }: EnhancedFooterProps) {
             <p className="text-sm text-muted-foreground">
               تم التطوير بواسطة{" "}
               <a
-                href="https://wa.me/+201154688628"
+                href="https://wa.me/+201227278084"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 font-medium text-primary hover:underline transition-colors"

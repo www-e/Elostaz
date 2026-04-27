@@ -133,41 +133,59 @@ const courses = [
 const gradeStyles = {
   blue: {
     border: "border-t-blue-500",
-    iconBg: "bg-blue-50",
-    iconText: "text-blue-600",
-    gradient: "bg-gradient-to-l from-blue-500 to-cyan-400",
-    badgeBg: "bg-blue-50",
-    badgeText: "text-blue-700",
-    badgeRing: "ring-blue-200",
+    iconBg:
+      "bg-blue-50 dark:bg-blue-950/40",
+    iconText:
+      "text-blue-600 dark:text-blue-400",
+    gradient:
+      "bg-gradient-to-l from-blue-500 to-cyan-400 dark:from-blue-400 dark:to-cyan-300",
+    badgeBg:
+      "bg-blue-50 dark:bg-blue-950/40",
+    badgeText:
+      "text-blue-700 dark:text-blue-300",
+    badgeRing:
+      "ring-blue-200 dark:ring-blue-800",
     btn: "bg-blue-600 hover:bg-blue-700",
-    progressText: "text-blue-600",
-    lightBg: "bg-blue-50",
+    progressText:
+      "text-blue-600 dark:text-blue-400",
     topBar: "bg-blue-500",
   },
   purple: {
     border: "border-t-purple-500",
-    iconBg: "bg-purple-50",
-    iconText: "text-purple-600",
-    gradient: "bg-gradient-to-l from-purple-500 to-fuchsia-400",
-    badgeBg: "bg-purple-50",
-    badgeText: "text-purple-700",
-    badgeRing: "ring-purple-200",
+    iconBg:
+      "bg-purple-50 dark:bg-purple-950/40",
+    iconText:
+      "text-purple-600 dark:text-purple-400",
+    gradient:
+      "bg-gradient-to-l from-purple-500 to-fuchsia-400 dark:from-purple-400 dark:to-fuchsia-300",
+    badgeBg:
+      "bg-purple-50 dark:bg-purple-950/40",
+    badgeText:
+      "text-purple-700 dark:text-purple-300",
+    badgeRing:
+      "ring-purple-200 dark:ring-purple-800",
     btn: "bg-purple-600 hover:bg-purple-700",
-    progressText: "text-purple-600",
-    lightBg: "bg-purple-50",
+    progressText:
+      "text-purple-600 dark:text-purple-400",
     topBar: "bg-purple-500",
   },
   emerald: {
     border: "border-t-emerald-500",
-    iconBg: "bg-emerald-50",
-    iconText: "text-emerald-600",
-    gradient: "bg-gradient-to-l from-emerald-500 to-teal-400",
-    badgeBg: "bg-emerald-50",
-    badgeText: "text-emerald-700",
-    badgeRing: "ring-emerald-200",
+    iconBg:
+      "bg-emerald-50 dark:bg-emerald-950/40",
+    iconText:
+      "text-emerald-600 dark:text-emerald-400",
+    gradient:
+      "bg-gradient-to-l from-emerald-500 to-teal-400 dark:from-emerald-400 dark:to-teal-300",
+    badgeBg:
+      "bg-emerald-50 dark:bg-emerald-950/40",
+    badgeText:
+      "text-emerald-700 dark:text-emerald-300",
+    badgeRing:
+      "ring-emerald-200 dark:ring-emerald-800",
     btn: "bg-emerald-600 hover:bg-emerald-700",
-    progressText: "text-emerald-600",
-    lightBg: "bg-emerald-50",
+    progressText:
+      "text-emerald-600 dark:text-emerald-400",
     topBar: "bg-emerald-500",
   },
 };

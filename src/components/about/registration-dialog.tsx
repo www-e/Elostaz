@@ -42,7 +42,7 @@ export function RegistrationDialog({
           </DialogHeader>
           <div className="mt-4 flex justify-center">
             <a
-              href="https://wa.me/201234567890"
+              href="https://wa.me/+201227278084"
               target="_blank"
               rel="noopener noreferrer"
               className={cn(buttonVariants({ variant: "default" }))}
