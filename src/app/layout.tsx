@@ -28,64 +28,70 @@ export const metadata: Metadata = {
     "دروس خصوصية",
     "رياضيات ثانوية",
   ],
-  authors: [{ name: "أ/ أشرف حسن" }],
-  openGraph: {
-    title: "أ/ أشرف حسن - مدرس رياضيات متميز للمرحلة الثانوية",
-    description:
-      "مركز تعليمي متخصص في تدريس الرياضيات للمرحلة الثانوية. خبرة 30 عاماً، نتائج متميزة، ومذكرات شرح حصرية.",
-    type: "website",
-    locale: "ar_EG",
-    siteName: "مركز أ/ أشرف حسن للرياضيات",
-    images: [{
-      url: "/assets/images-optimized/logo.webp",
-      width: 1200,
-      height: 630,
-    }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "أ/ أشرف حسن - مدرس رياضيات متميز للمرحلة الثانوية",
-    description:
-      "مركز تعليمي متخصص في تدريس الرياضيات للمرحلة الثانوية. خبرة 30 عاماً، نتائج متميزة، ومذكرات شرح حصرية.",
-    images: ["/assets/images-optimized/logo.webp"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-  icons: {
-    icon: "/assets/icons/edu.ico",
-    shortcut: "/assets/icons/edu.ico",
-    apple: "/assets/icons/edu.ico",
+  authors: [{ name: "أشرف حسن" }],
+  creator: "مركز أ/ أشرف حسن",
+  publisher: "مركز أ/ أشرف حسن",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
   },
   manifest: "/manifest.json",
   other: {
-    "theme-color": "#2e1269",
+    "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "default",
+    "apple-mobile-web-app-title": "أشرف حسن",
+  },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+  },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
+  // Only register service worker on GitHub Pages, not on Vercel/production
+  const isGitHubPages = process.env.NEXT_PUBLIC_DEPLOY_PLATFORM === "github-pages"
+
   return (
-    <html
-      lang="ar"
-      dir="rtl"
-      className={`${cairo.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
-      <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
+    <html lang="ar" dir="rtl" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/favicon.ico" />
+        {isGitHubPages && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                if ('serviceWorker' in navigator) {
+                  window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js')
+                      .then(reg => console.log('Service Worker registered'))
+                      .catch(err => console.log('Service Worker registration failed:', err));
+                  });
+                }
+              `,
+            }}
+          />
+        )}
+      </head>
+      <body className="min-h-full bg-background text-foreground" suppressHydrationWarning>
         <LoadingScreen />
-        <div className="noise-overlay" />
         <ScrollProgress />
         <ThemeProvider>
-          <Navbar />
-          <main className="flex-1 pt-24">{children}</main>
-          <Footer />
+          <div className="relative flex min-h-screen flex-col font-sans">
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
           <ScrollToTop />
         </ThemeProvider>
       </body>
