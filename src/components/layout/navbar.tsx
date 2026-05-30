@@ -44,6 +44,7 @@ const navLinks: NavLink[] = [
     ],
   },
   { name: "المواعيد", href: "/schedule/" },
+  { name: "حجز السنة الجديدة", href: "/reserve/" },
   { name: "تواصل معي", href: "/#contact" },
 ]
 

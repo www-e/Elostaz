@@ -21,9 +21,18 @@ import { ContactSection } from "@/components/shared/contact-section";
 import { DownloadCard } from "@/components/shared/download-card";
 
 export const metadata: Metadata = {
-  title: "حجز المواعيد - أ/ أشرف حسن",
+  title: "حجز المواعيد",
   description:
-    "احجز موعدك للدروس الخصوصية أونلاين أو في المركز مع أ/ أشرف حسن",
+    "احجز موعدك للدروس الخصوصية أونلاين أو في المركز مع أ/ أشرف حسن. دروس رياضيات للمرحلة الثانوية في بنها والقليوبية.",
+  alternates: {
+    canonical: "https://www.alostaz.com/schedule",
+  },
+  openGraph: {
+    title: "حجز المواعيد | أ/ أشرف حسن",
+    description:
+      "احجز موعدك للدروس الخصوصية أونلاين أو في المركز مع أ/ أشرف حسن.",
+    url: "https://www.alostaz.com/schedule",
+  },
 };
 
 const onlineFeatures = [

@@ -1,24 +1,37 @@
 {
   "name": "مركز أ/ أشرف حسن للرياضيات",
   "short_name": "أ/ أشرف حسن",
-  "description": "مركز أ/ أشرف حسن للرياضيات - دروس خصوصية في الرياضيات",
-  "id": "./",
-  "start_url": "./",
-  "scope": "./",
+  "description": "مركز أ/ أشرف حسن للرياضيات - دروس خصوصية في الرياضيات للمرحلة الثانوية",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#2e1269",
   "theme_color": "#2e1269",
   "orientation": "any",
   "dir": "rtl",
   "lang": "ar",
+  "categories": ["education", "math"],
   "icons": [
     {
-      "src": "./assets/icons/edu.ico",
+      "src": "/favicon.ico",
       "sizes": "32x32",
       "type": "image/x-icon"
+    },
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
   "screenshots": [],
   "prefer_related_applications": false,
-  "display_override": ["window-controls-overlay"]
+  "display_override": ["window-controls-overlay", "minimal-ui"]
 }

@@ -5,8 +5,18 @@ import { SectionHeader } from "@/components/shared/section-header";
 import { SubjectCard } from "@/components/shared/subject-card";
 
 export const metadata: Metadata = {
-  title: "الصف الأول الثانوي - أ/ أشرف حسن",
-  description: "دروس الصف الأول الثانوي في الرياضيات مع أ/ أشرف حسن",
+  title: "الصف الأول الثانوي",
+  description:
+    "دروس الصف الأول الثانوي في الرياضيات مع أ/ أشرف حسن. شرح الجبر والهندسة وحساب المثلثات والإحصاء - ثانوية عامة مصر.",
+  alternates: {
+    canonical: "https://www.alostaz.com/grades/grade1",
+  },
+  openGraph: {
+    title: "الصف الأول الثانوي - الرياضيات",
+    description:
+      "دروس الصف الأول الثانوي في الرياضيات مع أ/ أشرف حسن.",
+    url: "https://www.alostaz.com/grades/grade1",
+  },
 };
 
 const subjects = [

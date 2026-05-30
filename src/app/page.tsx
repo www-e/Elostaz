@@ -1,3 +1,7 @@
+"use client";
+
+import { useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -28,13 +32,64 @@ import {
 import { FadeIn } from "@/components/motion/fade-in";
 import { StaggerContainer, StaggerItem } from "@/components/motion/stagger-container";
 import { SectionHeader } from "@/components/shared/section-header";
-import { ContactSection } from "@/components/shared/contact-section";
 import { FlipCard } from "@/components/home/flip-card";
 import { HeroSection } from "@/components/home/hero-section";
-import { WhyChooseUs } from "@/components/home/why-choose-us";
-import { StatsBanner } from "@/components/home/stats-banner";
-import { TestimonialsMarquee } from "@/components/home/testimonials-marquee";
-import { FAQSection } from "@/components/home/faq-section";
+
+// Dynamic imports for below-fold heavy components
+const WhyChooseUs = dynamic(
+  () => import("@/components/home/why-choose-us").then((mod) => mod.WhyChooseUs),
+  {
+    ssr: false,
+    loading: () => <div className="h-64" />,
+  }
+);
+
+const StatsBanner = dynamic(
+  () => import("@/components/home/stats-banner").then((mod) => mod.StatsBanner),
+  {
+    ssr: false,
+    loading: () => <div className="h-40" />,
+  }
+);
+
+const TestimonialsMarquee = dynamic(
+  () => import("@/components/home/testimonials-marquee").then((mod) => mod.TestimonialsMarquee),
+  {
+    ssr: false,
+    loading: () => <div className="h-32" />,
+  }
+);
+
+const FAQSection = dynamic(
+  () => import("@/components/home/faq-section").then((mod) => mod.FAQSection),
+  {
+    ssr: false,
+    loading: () => <div className="h-48" />,
+  }
+);
+
+const PosterOverlay = dynamic(
+  () => import("@/components/promotion/poster-overlay").then((mod) => mod.PosterOverlay),
+  {
+    ssr: false,
+  }
+);
+
+const ExamRevisionSection = dynamic(
+  () => import("@/components/promotion/exam-revision-section").then((mod) => mod.ExamRevisionSection),
+  {
+    ssr: false,
+    loading: () => <div className="h-80" />,
+  }
+);
+
+const ContactSection = dynamic(
+  () => import("@/components/shared/contact-section").then((mod) => mod.ContactSection),
+  {
+    ssr: false,
+    loading: () => <div className="h-64" />,
+  }
+);
 
 const books = [
   {
@@ -191,17 +246,44 @@ const gradeStyles = {
 };
 
 export default function HomePage() {
+  const [posterTrigger, setPosterTrigger] = useState<"math" | "statistics" | null>(null);
+  const [posterKey, setPosterKey] = useState(0);
+
+  const onOpenMathPoster = useCallback(() => {
+    setPosterKey((k) => k + 1);
+    setPosterTrigger("math");
+  }, []);
+
+  const onOpenStatsPoster = useCallback(() => {
+    setPosterKey((k) => k + 1);
+    setPosterTrigger("statistics");
+  }, []);
+
+  const onTriggerConsumed = useCallback(() => {
+    setPosterTrigger(null);
+  }, []);
+
   return (
     <div className="flex flex-col">
-      {/* 1. Hero Section */}
-      <HeroSection />
+      {/* Global Poster Overlay — shows on every visit + external trigger */}
+      <PosterOverlay
+        key={posterKey}
+        showPoster={posterTrigger}
+        onTriggerConsumed={onTriggerConsumed}
+      />
 
-      {/* 2. Why Choose Us (Bento Grid) */}
+      {/* 1. Hero Section */}
+      <HeroSection onOpenMathPoster={onOpenMathPoster} onOpenStatsPoster={onOpenStatsPoster} />
+
+      {/* 2. Exam Revision — ليالي الامتحان */}
+      <ExamRevisionSection />
+
+      {/* 3. Why Choose Us (Bento Grid) */}
       <FadeIn>
         <WhyChooseUs />
       </FadeIn>
 
-      {/* 3. Smart Card Section */}
+      {/* 4. Smart Card Section */}
       <section className="py-20 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <FadeIn>
@@ -244,7 +326,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4. Attendance System Section */}
+      {/* 5. Attendance System Section */}
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <FadeIn>
@@ -322,7 +404,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. Books Section */}
+      {/* 6. Books Section */}
       <section className="py-20 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto">
           <SectionHeader title="الكتب والمذكرات" />
@@ -335,7 +417,6 @@ export default function HomePage() {
                     alt={book.title}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    unoptimized
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   <div className="absolute bottom-0 right-0 left-0 p-4 text-right">
@@ -350,7 +431,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. Courses Section */}
+      {/* 7. Courses Section */}
       <section id="courses" className="py-24 px-4">
         <div className="max-w-7xl mx-auto">
           <SectionHeader title="الصفوف الدراسية" />
@@ -532,16 +613,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 7. Stats Banner */}
+      {/* 8. Stats Banner */}
       <StatsBanner />
 
-      {/* 8. Testimonials Marquee */}
+      {/* 9. Testimonials Marquee */}
       <TestimonialsMarquee />
 
-      {/* 9. FAQ Section */}
+      {/* 10. FAQ Section */}
       <FAQSection />
 
-      {/* 10. Contact Section */}
+      {/* 11. Contact Section */}
       <section id="contact">
         <FadeIn>
           <ContactSection />

@@ -12,8 +12,18 @@ import { SectionHeader } from "@/components/shared/section-header";
 import { SubjectCard } from "@/components/shared/subject-card";
 
 export const metadata: Metadata = {
-  title: "الصف الثالث الثانوي - أ/ أشرف حسن",
-  description: "دروس الصف الثالث الثانوي في الرياضيات مع أ/ أشرف حسن",
+  title: "الصف الثالث الثانوي",
+  description:
+    "دروس الصف الثالث الثانوي في الرياضيات مع أ/ أشرف حسن. شرح التفاضل والتكامل المتقدم والجبر والهندسة الفراغية والاستاتيكا والديناميكا.",
+  alternates: {
+    canonical: "https://www.alostaz.com/grades/grade3",
+  },
+  openGraph: {
+    title: "الصف الثالث الثانوي - الرياضيات",
+    description:
+      "دروس الصف الثالث الثانوي في الرياضيات مع أ/ أشرف حسن.",
+    url: "https://www.alostaz.com/grades/grade3",
+  },
 };
 
 const sections = [

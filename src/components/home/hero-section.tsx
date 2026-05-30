@@ -14,6 +14,7 @@ import {
   Hash,
   TrendingUp,
   Users,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -92,7 +93,12 @@ function AnimatedStat({ value, suffix, label }: { value: number; suffix: string;
   );
 }
 
-export function HeroSection() {
+interface HeroSectionProps {
+  onOpenMathPoster?: () => void;
+  onOpenStatsPoster?: () => void;
+}
+
+export function HeroSection({ onOpenMathPoster, onOpenStatsPoster }: HeroSectionProps = {}) {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden py-20">
       {/* Gradient orbs */}
@@ -144,22 +150,38 @@ export function HeroSection() {
             ))}
           </div>
 
-          <div className="mt-8 flex flex-wrap gap-4 justify-start">
+          <div className="mt-8 flex flex-wrap gap-3 justify-start">
             <Link
-              href="/#contact"
+              href="/reserve/"
               className={cn(
                 buttonVariants({ size: "lg" }),
                 "animate-pulse-glow"
               )}
             >
-              تواصل معي
+              احجز السنة الجديدة
             </Link>
-            <Link
-              href="/#courses"
-              className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
-            >
-              استكشف الصفوف
-            </Link>
+          </div>
+
+          {/* Poster toggle buttons */}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {onOpenMathPoster && (
+              <button
+                onClick={onOpenMathPoster}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border-2 border-violet-300 dark:border-violet-700 text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-950/50 hover:border-violet-400 transition-all duration-200 hover:scale-105"
+              >
+                <BookOpen className="size-3.5" />
+                ليالي الامتحان - رياضيات
+              </button>
+            )}
+            {onOpenStatsPoster && (
+              <button
+                onClick={onOpenStatsPoster}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border-2 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 hover:border-emerald-400 transition-all duration-200 hover:scale-105"
+              >
+                <Sigma className="size-3.5" />
+                ليالي الامتحان - إحصاء
+              </button>
+            )}
           </div>
         </motion.div>
 
@@ -177,7 +199,6 @@ export function HeroSection() {
                 width={400}
                 height={400}
                 className="object-cover"
-                unoptimized
                 priority
               />
             </div>

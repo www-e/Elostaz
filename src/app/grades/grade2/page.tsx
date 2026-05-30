@@ -10,8 +10,18 @@ import { SectionHeader } from "@/components/shared/section-header";
 import { SubjectCard } from "@/components/shared/subject-card";
 
 export const metadata: Metadata = {
-  title: "الصف الثاني الثانوي - أ/ أشرف حسن",
-  description: "دروس الصف الثاني الثانوي في الرياضيات مع أ/ أشرف حسن",
+  title: "الصف الثاني الثانوي",
+  description:
+    "دروس الصف الثاني الثانوي في الرياضيات مع أ/ أشرف حسن. شرح التفاضل والتكامل والإحصاء والهندسة الفراغية - ثانوية عامة مصر.",
+  alternates: {
+    canonical: "https://www.alostaz.com/grades/grade2",
+  },
+  openGraph: {
+    title: "الصف الثاني الثانوي - الرياضيات",
+    description:
+      "دروس الصف الثاني الثانوي في الرياضيات مع أ/ أشرف حسن.",
+    url: "https://www.alostaz.com/grades/grade2",
+  },
 };
 
 const subjects = [

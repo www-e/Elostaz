@@ -44,7 +44,6 @@ export function FlipCard({
             alt={`${alt} - الأمام`}
             fill
             className="object-cover"
-            unoptimized
           />
         </div>
         <div
@@ -59,7 +58,6 @@ export function FlipCard({
             alt={`${alt} - الخلف`}
             fill
             className="object-cover"
-            unoptimized
           />
         </div>
       </div>

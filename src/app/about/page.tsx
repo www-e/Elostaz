@@ -1,4 +1,20 @@
+import type { Metadata } from "next";
 import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: "عن الأستاذ أشرف حسن",
+  description:
+    "مركز أ/ أشرف حسن للرياضيات - خبرة 30 عاماً في تدريس الرياضيات للمرحلة الثانوية. دروس أونلاين وفي المركز بنها، القليوبية.",
+  alternates: {
+    canonical: "https://www.alostaz.com/about",
+  },
+  openGraph: {
+    title: "عن الأستاذ أشرف حسن",
+    description:
+      "مركز أ/ أشرف حسن للرياضيات - خبرة 30 عاماً في تدريس الرياضيات للمرحلة الثانوية. دروس أونلاين وفي المركز بنها، القليوبية.",
+    url: "https://www.alostaz.com/about",
+  },
+};
 import Link from "next/link";
 import {
   Brain,
@@ -163,7 +179,6 @@ export default function AboutPage() {
                   width={400}
                   height={400}
                   className="object-cover"
-                  unoptimized
                   priority
                 />
               </div>

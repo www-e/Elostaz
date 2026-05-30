@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Tajawal } from "next/font/google"
 import "./globals.css"
 
@@ -13,14 +13,21 @@ const tajawal = Tajawal({
   variable: "--font-tajawal",
   subsets: ["arabic", "latin"],
   display: "swap",
-  weight: ["200", "300", "400", "500", "700", "800", "900"],
+  weight: ["400", "500", "700"],
 })
 
+const siteUrl = "https://www.alostaz.com"
+const siteName = "مركز أ/ أشرف حسن للرياضيات"
+const siteDescription =
+  "مركز تعليمي متخصص في تدريس الرياضيات للمرحلة الثانوية. خبرة 30 عاماً، نتائج متميزة، ومذكرات شرح حصرية."
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.alostaz.com"),
-  title: "مركز أ/ أشرف حسن للرياضيات",
-  description:
-    "مركز تعليمي متخصص في تدريس الرياضيات للمرحلة الثانوية. خبرة 30 عاماً، نتائج متميزة، ومذكرات شرح حصرية.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: siteName,
+    template: "%s | أ/ أشرف حسن",
+  },
+  description: siteDescription,
   keywords: [
     "رياضيات",
     "ثانوية عامة",
@@ -28,8 +35,12 @@ export const metadata: Metadata = {
     "تدريس رياضيات",
     "دروس خصوصية",
     "رياضيات ثانوية",
+    "شرح رياضيات",
+    "رياضيات ثانوية عامة مصر",
+    "مذكرات رياضيات",
+    "مركز تعليمي رياضيات",
   ],
-  authors: [{ name: "أشرف حسن" }],
+  authors: [{ name: "أشرف حسن", url: siteUrl }],
   creator: "مركز أ/ أشرف حسن",
   publisher: "مركز أ/ أشرف حسن",
   formatDetection: {
@@ -38,22 +49,63 @@ export const metadata: Metadata = {
     telephone: false,
   },
   manifest: "/manifest.json",
+  alternates: {
+    canonical: siteUrl,
+  },
+  openGraph: {
+    type: "website",
+    locale: "ar_AR",
+    siteName: siteName,
+    title: siteName,
+    description: siteDescription,
+    url: siteUrl,
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: siteName,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteName,
+    description: siteDescription,
+    images: ["/og-image.png"],
+  },
   other: {
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "default",
     "apple-mobile-web-app-title": "أشرف حسن",
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-  },
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon-192x192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icon-512x512.png", type: "image/png", sizes: "512x512" },
+    ],
     shortcut: "/favicon.ico",
     apple: "/apple-touch-icon.png",
+    other: [
+      {
+        rel: "mask-icon",
+        url: "/safari-pinned-tab.svg",
+        color: "#2e1269",
+      },
+    ],
   },
+}
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+  ],
 }
 
 export default function RootLayout({
@@ -67,7 +119,54 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/favicon.ico" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "EducationalOrganization",
+              name: siteName,
+              description: siteDescription,
+              url: siteUrl,
+              telephone: "+201227278084",
+              email: "mrashrafhassn@gmail.com",
+              founder: {
+                "@type": "Person",
+                name: "أشرف حسن",
+                jobTitle: "مدرس رياضيات",
+              },
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "بنها",
+                addressRegion: "القليوبية",
+                addressCountry: "EG",
+              },
+              areaServed: "EG",
+              teaches: "رياضيات",
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: siteName,
+              url: siteUrl,
+              description: siteDescription,
+              potentialAction: {
+                "@type": "SearchAction",
+                target: {
+                  "@type": "EntryPoint",
+                  urlTemplate: `${siteUrl}/?q={search_term_string}`,
+                },
+                "query-input": "required name=search_term_string",
+              },
+              inLanguage: "ar",
+            }),
+          }}
+        />
         {isGitHubPages && (
           <script
             dangerouslySetInnerHTML={{
