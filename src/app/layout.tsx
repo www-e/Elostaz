@@ -83,18 +83,8 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
-      { url: "/icon-192x192.png", type: "image/png", sizes: "192x192" },
-      { url: "/icon-512x512.png", type: "image/png", sizes: "512x512" },
     ],
     shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
-    other: [
-      {
-        rel: "mask-icon",
-        url: "/safari-pinned-tab.svg",
-        color: "#2e1269",
-      },
-    ],
   },
 }
 
@@ -117,7 +107,7 @@ export default function RootLayout({
   const isGitHubPages = process.env.NEXT_PUBLIC_DEPLOY_PLATFORM === "github-pages"
 
   return (
-    <html lang="ar" dir="rtl" suppressHydrationWarning>
+    <html lang="ar" dir="rtl" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"

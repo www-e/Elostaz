@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Keep .next in project root — the slow filesystem warning is expected on Windows
+  // with synced folders; for production this doesn't affect runtime performance
+  distDir: ".next",
   images: {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],

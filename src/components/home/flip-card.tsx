@@ -43,6 +43,7 @@ export function FlipCard({
             src={frontImage}
             alt={`${alt} - الأمام`}
             fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-cover"
           />
         </div>
@@ -57,6 +58,7 @@ export function FlipCard({
             src={backImage}
             alt={`${alt} - الخلف`}
             fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-cover"
           />
         </div>
