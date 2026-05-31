@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, IndianRupee } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,9 +12,15 @@ import {
 } from "@/components/ui/card";
 import { FadeIn } from "@/components/motion/fade-in";
 import { useBookingForm } from "./hooks/use-booking-form";
-import { GRADE_OPTIONS, GROUP_DAY_OPTIONS, GROUP_TIMES } from "./constants";
+import {
+  GRADE_OPTIONS,
+  getGradeDays,
+  getGradeTimes,
+  getGradePrice,
+  RESERVATION_OPEN_DATE,
+} from "./constants";
 import { FormField, errorId } from "./components/form-field";
-import { SelectField } from "./components/select-field";
+import { CustomDropdown } from "./components/custom-dropdown";
 import { PhoneInput } from "./components/phone-input";
 import { GenderField } from "./components/gender-field";
 import { SuccessCard } from "./components/success-card";
@@ -39,10 +45,14 @@ export function BookingForm() {
 
   const [modalOpen, setModalOpen] = useState(false);
 
-  /* ── Derived ── */
-  const availableTimes = fields.groupDay
-    ? GROUP_TIMES[fields.groupDay] ?? []
-    : [];
+  /* ── Derived — grades → dynamic days/times ── */
+  const selectedGrade = fields.grade;
+  const availableDays = selectedGrade ? getGradeDays(selectedGrade) : [];
+  const availableTimes =
+    selectedGrade && fields.groupDay
+      ? getGradeTimes(selectedGrade, fields.groupDay)
+      : [];
+  const gradePrice = selectedGrade ? getGradePrice(selectedGrade) : 0;
 
   const blur = (name: FormFieldName) => () => handleBlur(name);
 
@@ -53,6 +63,8 @@ export function BookingForm() {
       {submittedData && (
         <SuccessCard
           studentName={submittedData.studentName}
+          grade={submittedData.grade}
+          price={submittedData.price}
           apiSaved={submittedData.apiSaved}
           onViewData={() => setModalOpen(true)}
           onStartOver={handleReset}
@@ -68,7 +80,7 @@ export function BookingForm() {
                 حجز السنة الجديدة - الرياضيات
               </CardTitle>
               <CardDescription className="text-center text-base">
-                مع الأستاذ / أشرف حسن — للمرحلة الثانوية (صف أول وثاني وثالث)
+                مع الأستاذ / أشرف حسن — يبدأ الحجز من {RESERVATION_OPEN_DATE}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
@@ -178,17 +190,22 @@ export function BookingForm() {
                   />
                 </FormField>
 
-                {/* Grade */}
+                {/* Grade — with price shown */}
                 <FormField
                   label="الصف الدراسي"
                   required
                   htmlFor="grade"
                   error={getError("grade")}
                 >
-                  <SelectField
+                  <CustomDropdown
                     id="grade"
                     value={fields.grade}
-                    onChange={(v) => updateField("grade", v)}
+                    onChange={(v) => {
+                      updateField("grade", v);
+                      // Reset day & time when grade changes
+                      updateField("groupDay", "");
+                      updateField("groupTime", "");
+                    }}
                     onBlur={blur("grade")}
                     placeholder="-- اختر الصف --"
                     options={GRADE_OPTIONS}
@@ -200,59 +217,81 @@ export function BookingForm() {
                   />
                 </FormField>
 
-                {/* Group day */}
-                <FormField
-                  label="يوم المجموعة"
-                  required
-                  htmlFor="groupDay"
-                  error={getError("groupDay")}
-                >
-                  <SelectField
-                    id="groupDay"
-                    value={fields.groupDay}
-                    onChange={(v) => {
-                      updateField("groupDay", v);
-                      updateField("groupTime", "");
-                    }}
-                    onBlur={blur("groupDay")}
-                    placeholder="-- اختر اليوم --"
-                    options={GROUP_DAY_OPTIONS}
-                    hasError={!!getError("groupDay")}
-                    disabled={submitting}
-                    ariaDescribedBy={
-                      getError("groupDay") ? errorId("groupDay") : undefined
-                    }
-                  />
-                </FormField>
+                {/* ── Price summary (shown when grade is selected) ── */}
+                {selectedGrade && gradePrice > 0 && (
+                  <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 flex items-center justify-between">
+                    <span className="text-sm font-medium text-foreground">
+                      قيمة الاشتراك
+                    </span>
+                    <span className="text-lg font-bold text-primary flex items-center gap-1.5">
+                      <IndianRupee className="size-4" />
+                      {gradePrice} ج.م
+                    </span>
+                  </div>
+                )}
 
-                {/* Group time */}
-                <FormField
-                  label="وقت المجموعة"
-                  required
-                  htmlFor="groupTime"
-                  error={getError("groupTime")}
-                >
-                  <SelectField
-                    id="groupTime"
-                    value={fields.groupTime}
-                    onChange={(v) => updateField("groupTime", v)}
-                    onBlur={blur("groupTime")}
-                    disabled={submitting || !fields.groupDay}
-                    placeholder={
-                      fields.groupDay
-                        ? "-- اختر الوقت --"
-                        : "-- اختر اليوم أولاً --"
-                    }
-                    options={availableTimes.map((t) => ({
-                      value: t,
-                      label: t,
-                    }))}
-                    hasError={!!getError("groupTime")}
-                    ariaDescribedBy={
-                      getError("groupTime") ? errorId("groupTime") : undefined
-                    }
-                  />
-                </FormField>
+                {/* Group day — dynamic based on grade */}
+                {selectedGrade && (
+                  <FormField
+                    label="يوم المجموعة"
+                    required
+                    htmlFor="groupDay"
+                    error={getError("groupDay")}
+                  >
+                    <CustomDropdown
+                      id="groupDay"
+                      value={fields.groupDay}
+                      onChange={(v) => {
+                        updateField("groupDay", v);
+                        updateField("groupTime", "");
+                      }}
+                      onBlur={blur("groupDay")}
+                      placeholder={
+                        availableDays.length > 0
+                          ? "-- اختر اليوم --"
+                          : "-- لا توجد أيام متاحة --"
+                      }
+                      options={availableDays}
+                      hasError={!!getError("groupDay")}
+                      disabled={submitting || availableDays.length === 0}
+                      ariaDescribedBy={
+                        getError("groupDay")
+                          ? errorId("groupDay")
+                          : undefined
+                      }
+                    />
+                  </FormField>
+                )}
+
+                {/* Group time — dynamic based on grade + day */}
+                {selectedGrade && fields.groupDay && (
+                  <FormField
+                    label="وقت المجموعة"
+                    required
+                    htmlFor="groupTime"
+                    error={getError("groupTime")}
+                  >
+                    <CustomDropdown
+                      id="groupTime"
+                      value={fields.groupTime}
+                      onChange={(v) => updateField("groupTime", v)}
+                      onBlur={blur("groupTime")}
+                      disabled={submitting || availableTimes.length === 0}
+                      placeholder={
+                        availableTimes.length > 0
+                          ? "-- اختر الوقت --"
+                          : "-- لا توجد أوقات متاحة --"
+                      }
+                      options={availableTimes}
+                      hasError={!!getError("groupTime")}
+                      ariaDescribedBy={
+                        getError("groupTime")
+                          ? errorId("groupTime")
+                          : undefined
+                      }
+                    />
+                  </FormField>
+                )}
 
                 {/* Submit button */}
                 <Button
@@ -264,7 +303,11 @@ export function BookingForm() {
                   {submitting && (
                     <LoaderCircle className="size-5 animate-spin" />
                   )}
-                  {submitting ? "جاري الحجز..." : "تأكيد الحجز"}
+                  {submitting
+                    ? "جاري الحجز..."
+                    : gradePrice > 0
+                      ? `تأكيد الحجز (${gradePrice} ج.م)`
+                      : "تأكيد الحجز"}
                 </Button>
               </form>
             </CardContent>

@@ -1,6 +1,11 @@
 "use client";
 
-import { X, MessageCircle, AlertTriangle } from "lucide-react";
+import {
+  X,
+  MessageCircle,
+  AlertTriangle,
+  IndianRupee,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -19,16 +24,20 @@ interface DataModalProps {
 
 /**
  * Modal displaying all submitted booking data in readable Arabic.
+ * Now includes price information inline.
  */
 export function DataModal({ open, onClose, data }: DataModalProps) {
+  const gradeLabel = GRADE_LABELS[data.grade] ?? data.grade;
+
   const rows: { label: string; value: string; ltr?: boolean }[] = [
     { label: "اسم الطالب:", value: data.studentName },
     { label: "رقم الطالب (واتساب):", value: data.studentPhone, ltr: true },
     { label: "رقم ولي الأمر (واتساب):", value: data.parentPhone, ltr: true },
     { label: "النوع:", value: data.gender },
-    { label: "الصف:", value: GRADE_LABELS[data.grade] ?? data.grade },
+    { label: "الصف:", value: gradeLabel },
     { label: "يوم المجموعة:", value: data.groupDay },
     { label: "وقت المجموعة:", value: data.groupTime },
+    { label: "قيمة الاشتراك:", value: `${data.price} ج.م` },
     { label: "تاريخ الحجز:", value: formatTimestamp(data.submittedAt) },
   ];
 
@@ -66,9 +75,12 @@ export function DataModal({ open, onClose, data }: DataModalProps) {
                 {row.label}
               </span>
               <p
-                className="font-medium text-base mt-0.5"
+                className="font-medium text-base mt-0.5 flex items-center gap-1"
                 dir={row.ltr ? "ltr" : undefined}
               >
+                {row.label === "قيمة الاشتراك:" && (
+                  <IndianRupee className="size-3.5 text-primary" />
+                )}
                 {row.value}
               </p>
             </div>
@@ -86,7 +98,7 @@ export function DataModal({ open, onClose, data }: DataModalProps) {
               {VODAFONE_CASH_NUMBER}
             </p>
             <a
-              href={buildWhatsAppLink(data.studentName)}
+              href={buildWhatsAppLink(data.studentName, data.grade)}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-3 inline-flex"

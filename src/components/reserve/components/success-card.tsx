@@ -1,6 +1,12 @@
 "use client";
 
-import { CheckCircle, Eye, MessageCircle, AlertTriangle } from "lucide-react";
+import {
+  CheckCircle,
+  Eye,
+  MessageCircle,
+  AlertTriangle,
+  IndianRupee,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,10 +15,16 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { FadeIn } from "@/components/motion/fade-in";
-import { buildWhatsAppLink, VODAFONE_CASH_NUMBER } from "../constants";
+import {
+  buildWhatsAppLink,
+  VODAFONE_CASH_NUMBER,
+  GRADE_LABELS,
+} from "../constants";
 
 interface SuccessCardProps {
   studentName: string;
+  grade: string;
+  price: number;
   apiSaved: boolean;
   onViewData: () => void;
   onStartOver: () => void;
@@ -20,15 +32,18 @@ interface SuccessCardProps {
 
 /**
  * Success card shown above the form after submission.
- * - Normal state  (apiSaved === true):  confirms server save.
- * - Offline state (apiSaved === false): shows warning about local-only save.
+ * Now includes grade + price summary.
  */
 export function SuccessCard({
   studentName,
+  grade,
+  price,
   apiSaved,
   onViewData,
   onStartOver,
 }: SuccessCardProps) {
+  const gradeLabel = GRADE_LABELS[grade] ?? grade;
+
   return (
     <FadeIn>
       <Card
@@ -77,6 +92,23 @@ export function SuccessCard({
             </>
           )}
 
+          {/* Grade + Price summary */}
+          <div className="bg-white/70 dark:bg-black/20 rounded-lg p-4 mb-4 text-right space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">الصف:</span>
+              <span className="font-medium">{gradeLabel}</span>
+            </div>
+            <div className="flex items-center justify-between border-t border-border/50 pt-2">
+              <span className="text-sm text-muted-foreground">
+                قيمة الاشتراك:
+              </span>
+              <span className="text-lg font-bold text-primary flex items-center gap-1">
+                <IndianRupee className="size-4" />
+                {price} ج.م
+              </span>
+            </div>
+          </div>
+
           {/* Action buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
             <Button
@@ -90,7 +122,7 @@ export function SuccessCard({
             </Button>
 
             <a
-              href={buildWhatsAppLink(studentName)}
+              href={buildWhatsAppLink(studentName, grade)}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto"

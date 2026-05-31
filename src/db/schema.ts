@@ -3,6 +3,7 @@ import {
   serial,
   text,
   timestamp,
+  integer,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -15,6 +16,7 @@ export const bookings = pgTable("bookings", {
   parentPhone: text("parent_phone").notNull(),
   gender: text("gender").notNull(),
   grade: text("grade").notNull(),
+  price: integer("price").notNull().default(0),
   groupDay: text("group_day").notNull(),
   groupTime: text("group_time").notNull(),
   submittedAt: timestamp("submitted_at", { mode: "string" }).notNull(),

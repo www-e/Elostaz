@@ -7,9 +7,8 @@ import type {
   FormErrors,
   TouchedFields,
   FormFieldName,
-  GradeValue,
 } from "../types";
-import { STORAGE_KEY } from "../constants";
+import { STORAGE_KEY, GRADE_PRICES } from "../constants";
 import {
   validateStudentName,
   validatePhone,
@@ -143,14 +142,17 @@ export function useBookingForm() {
   const handleSubmit = useCallback(async () => {
     if (!validateAll()) return;
 
+    const price = GRADE_PRICES[fields.grade] ?? 0;
+
     const data: BookingData = {
       studentName: fields.studentName.trim(),
       studentPhone: fields.studentPhone.replace(/\D/g, ""),
       parentPhone: fields.parentPhone.replace(/\D/g, ""),
       gender: fields.gender as BookingData["gender"],
-      grade: fields.grade as GradeValue,
+      grade: fields.grade as BookingData["grade"],
       groupDay: fields.groupDay,
       groupTime: fields.groupTime,
+      price,
       submittedAt: new Date().toISOString(),
       apiSaved: false,
     };

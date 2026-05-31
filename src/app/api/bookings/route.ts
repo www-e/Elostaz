@@ -59,8 +59,15 @@ function validatePayload(body: Record<string, unknown>): ValidationError[] {
     errors.push({ field: "gender", message: "يجب اختيار النوع" });
   }
 
-  // grade
-  if (!["10", "11", "12"].includes(body.grade as string)) {
+  // grade — now 5 possible values
+  const VALID_GRADES = [
+    "10",
+    "11-bac",
+    "11-general",
+    "12-science",
+    "12-literary",
+  ];
+  if (!VALID_GRADES.includes(body.grade as string)) {
     errors.push({ field: "grade", message: "يجب اختيار الصف الدراسي" });
   }
 
@@ -94,6 +101,8 @@ export async function POST(request: Request) {
     // After validation, these are guaranteed to be strings
     const v = body as Record<string, string>;
 
+    const price = parseInt(v.price, 10) || 0;
+
     const [inserted] = await db
       .insert(bookings)
       .values({
@@ -104,6 +113,7 @@ export async function POST(request: Request) {
         grade: v.grade,
         groupDay: v.groupDay,
         groupTime: v.groupTime,
+        price,
         submittedAt: v.submittedAt,
       })
       .returning({ id: bookings.id });
